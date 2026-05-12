@@ -38,12 +38,14 @@ def base():
 
 @app.route('/index')
 def index():
-    navigation = [
-        {"href": "/uploadPage", "caption": "Upload a file"},
-        {"href": "/hello/1", "caption": "Page Hello 1"},
-        {"href": "/hello/2", "caption": "Page Hello 2"},
-        {"href": "/hello/3", "caption": "Page Hello 3"}
-    ]
+    navigation = []
+
+    all_pdb_files = get_all_files()
+
+    for pdb_file in all_pdb_files:
+        navigation.append({"href": f"/fileInfo/{pdb_file.id}/3DMol", "caption": f"{pdb_file.filename} (3Dmol)"})
+        navigation.append({"href": f"/fileInfo/{pdb_file.id}/MolStar", "caption": f"{pdb_file.filename} (MolStar)"})
+
     return render_template('index.html', a_variable='The index page', navigation=navigation)
 
 @app.route('/hello/')
@@ -57,24 +59,28 @@ def uploadPage():
 
 @app.route('/pdb_content/<int:file_id>')
 def pdb_content(file_id):
-    global pdb_storage
-    if file_id in pdb_storage:
-        content, filename = pdb_storage[file_id]
-        return Response(content, mimetype='chemical/x-pdb', headers={"Content-Disposition": f"attachment;filename={filename}"})
+
+    pdb_file = get_file_by_id(file_id)
+
+    if pdb_file is not None:
+        return Response(pdb_file.content, mimetype='chemical/x-pdb', headers={"Content-Disposition": f"attachment;filename={pdb_file.filename}"})
     return "Fichier non trouvé", 404
 
 @app.route('/uploadFileInDB', methods=['POST'])
 def uploadFile():
-    global pdb_counter, pdb_storage
     the_file = request.files['the_file']
     tech = request.form.get('tech')
     file_content = the_file.read().decode('utf-8', errors='replace')
     
-    # Stocker le fichier avec un ID
-    pdb_id = pdb_counter
-    pdb_counter += 1
-    pdb_storage[pdb_id] = (file_content, the_file.filename)
-    
+    pdb_file = save_pdb_file(the_file.filename, file_content)
+
+    return redirect(url_for('fileInfo', file_id=pdb_file.id, tech=tech))
+
+@app.route('/fileInfo/<int:file_id>/<string:tech>')
+def fileInfo(file_id, tech = '3DMol'):
+
+    pdb_file = get_file_by_id(file_id)
+
     page = None
     match tech:
         case '3DMol': 
@@ -84,14 +90,10 @@ def uploadFile():
 
     return render_template(
         page,
-        filename=the_file.filename,
-        content_type=the_file.content_type,
-        file_content=file_content,
+        filename=pdb_file.filename,
+        file_content=pdb_file.content,
         techUsed=tech,
-        pdb_id=pdb_id
+        pdb_id=pdb_file.id
     )
 
-@app.route('/fileInfo/<int:file_id>')
-def fileInfo(file_id):
-    return f"File info page for file ID: {file_id}"
 
