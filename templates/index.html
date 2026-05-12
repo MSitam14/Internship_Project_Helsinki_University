@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>{{ a_variable }}</h2>
+
+<ul id="navigation">
+    {% for item in navigation %}
+    <li><a class="text-decoration-none" href="{{ item.href }}">{{ item.caption }}</a></li>
+    {% endfor %}
+</ul>
+
+{# a comment #}
+
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-xl-10">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <span>File Informations</span>
+                <a class="text-decoration-none text-light" href="https://github.com/3dmol/3Dmol.js/blob/master/LICENSE">
+                    3D Mol Licence</a>
+                <span class="badge text-bg-light text-primary">PDB</span>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush mb-4">
+                    <li class="list-group-item"><strong>Filename:</strong> {{ filename }}</li>
+                    <li class="list-group-item"><strong>Content type:</strong> {{ content_type }}</li>
+                    <li class="list-group-item"><strong>Content preview:</strong>
+                        <pre class="mb-0 mt-2">{{ file_content[:500] }}</pre>
+                    </li>
+                    <li class="list-group-item"><strong>Visualisation tool:</strong> {{ techUsed }}</li>
+                </ul>
+
+                <div class="mb-4">
+                        <input class="btn btn-primary" type="button" id="style_cartoon" value="Cartoon">
+                        <input class="btn btn-primary" type="button" id="style_cross" value="cross">
+                        <input class="btn btn-primary" type="button" id="style_line" value="Line">
+                        <input class="btn btn-primary" type="button" id="style_sphere" value="sphere">
+                        <input class="btn btn-primary" type="button" id="style_stick" value="stick">
+                </div>
+
+                <div class="border border-2 border-secondary rounded-3 p-2 bg-white shadow-sm mol-frame">
+                    <div id="container-frame" class="mol-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+<script>
+    const element = document.getElementById("container-frame");
+    const config = { backgroundColor: "white" };
+    const viewer = $3Dmol.createViewer(element, config);
+    viewer.addModel(`{{ file_content }}`, "pdb");
+    viewer.setStyle({}, { cartoon: { color: "spectrum" } });
+    viewer.zoomTo();
+    viewer.render();
+    viewer.zoom(1.2, 1000); 
+</script>
+
+<script>
+
+    document.querySelectorAll('input[id^="style_"]').forEach(button => {
+        button.addEventListener('click', () => {
+            const style = button.id.replace('style_', '');
+            viewer.setStyle({}, { [style]: { color: "spectrum" } });
+            viewer.render();
+        });
+    });
+
+</script>
+
+<style>
+    .mol-container {
+        width: 100%;
+        height: 400px;
+        position: relative;
+    }
+
+    .mol-frame {
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
