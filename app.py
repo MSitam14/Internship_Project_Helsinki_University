@@ -5,11 +5,24 @@ from flask import redirect
 from flask import url_for
 from flask import Response
 from database import db, PDBFile
+import os
+from urllib.parse import quote_plus
+
+# Importer et enregistrer les routes API
+from api import *
 
 app = Flask(__name__)
+app.register_blueprint(api)
 
-# Configuration PostgreSQL (sans mot de passe)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost:5432/pdb_viewer'
+os.environ['PGCLIENTENCODING'] = 'UTF8'
+
+db_user = 'postgres'
+db_password = quote_plus('admin')
+db_host = 'localhost'
+db_port = '5432'
+db_name = 'pdb_viewer'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}?client_encoding=utf8'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialiser la BD avec l'app
@@ -26,7 +39,7 @@ def base():
 @app.route('/index')
 def index():
     navigation = [
-        {"href": "/upload", "caption": "Upload a file"},
+        {"href": "/uploadPage", "caption": "Upload a file"},
         {"href": "/hello/1", "caption": "Page Hello 1"},
         {"href": "/hello/2", "caption": "Page Hello 2"},
         {"href": "/hello/3", "caption": "Page Hello 3"}
@@ -82,6 +95,3 @@ def uploadFile():
 def fileInfo(file_id):
     return f"File info page for file ID: {file_id}"
 
-# Importer et enregistrer les routes API
-from api import api
-app.register_blueprint(api)
