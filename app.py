@@ -99,4 +99,8 @@ def fileInfo(file_id, tech = '3DMol'):
         pdb_id=pdb_file.id
     )
 
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('pageNotFound.html'), 404
+
 
