@@ -22,6 +22,8 @@
                     <div id="container-frame" class="mol-container"></div>
 
                 </div>
+
+                <button id="3DMolButton" class="btn btn-secondary mt-3">View with 3DMol</button>
             </div>
         </div>
     </div>
@@ -34,24 +36,30 @@
 <script src="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.js"></script>
 
 <script>
-    // Charger Mol* depuis l'endpoint Flask proprement
     molstar.Viewer.create('container-frame', {
         layoutIsExpanded: false,
         layoutShowControls: false
     })
         .then(viewer => {
-            // Charger le fichier PDB depuis l'endpoint Flask
             const pdbUrl = `/pdb_content/{{ pdb_id }}`;
 
             return viewer.loadStructureFromUrl(pdbUrl, 'pdb');
         })
         .catch(error => {
-            console.error('❌ Erreur lors du chargement:', error);
+            console.error('Erreur lors du chargement:', error);
             document.getElementById('container-frame').innerHTML =
                 '<p class="text-danger">Erreur : ' + error.message + '</p>';
         });
 
 </script>
+
+<script>
+    document.getElementById('3DMolButton').addEventListener('click', () => {
+        window.location.href = `/fileInfo/{{ pdb_id }}/3DMol`;
+    });
+</script>
+
+
 
 <style>
     .mol-container {

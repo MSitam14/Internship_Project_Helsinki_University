@@ -7,6 +7,7 @@ from flask import Response
 from database import db, PDBFile
 import os
 from urllib.parse import quote_plus
+from sqlalchemy.exc import IntegrityError
 
 # Importer et enregistrer les routes API
 from api import *
@@ -28,10 +29,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialiser la BD avec l'app
 db.init_app(app)
 
-# Stockage temporaire des fichiers PDB 
-pdb_storage = {}
-pdb_counter = 0
-
 @app.route('/')
 def base():
     return redirect(url_for('index'))
@@ -43,8 +40,7 @@ def index():
     all_pdb_files = get_all_files()
 
     for pdb_file in all_pdb_files:
-        navigation.append({"href": f"/fileInfo/{pdb_file.id}/3DMol", "caption": f"{pdb_file.filename} (3Dmol)"})
-        navigation.append({"href": f"/fileInfo/{pdb_file.id}/MolStar", "caption": f"{pdb_file.filename} (MolStar)"})
+        navigation.append({"id": f"{pdb_file.id}", "name": f"{pdb_file.filename}"})
 
     return render_template('index.html', a_variable='The index page', navigation=navigation)
 
@@ -71,8 +67,15 @@ def uploadFile():
     the_file = request.files['the_file']
     tech = request.form.get('tech')
     file_content = the_file.read().decode('utf-8', errors='replace')
-    
-    pdb_file = save_pdb_file(the_file.filename, file_content)
+
+    pdb_file = None
+    try:
+        pdb_file = save_pdb_file(the_file.filename, file_content)
+    except IntegrityError as e:
+        db.session.rollback()
+        pdb_file = get_file_by_name(the_file.filename)
+        if pdb_file is None:
+            return "Erreur : le fichier existe mais n'a pas pu être récupéré", 500
 
     return redirect(url_for('fileInfo', file_id=pdb_file.id, tech=tech))
 

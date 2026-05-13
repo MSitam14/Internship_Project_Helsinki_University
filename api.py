@@ -19,6 +19,10 @@ def get_file_by_id(file_id):
     """Récupère un fichier par son ID"""
     return PDBFile.query.get(file_id)
 
+def get_file_by_name(filename):
+    """Récupère un fichier par son nom"""
+    return PDBFile.query.filter_by(filename=filename).first()
+
 def save_pdb_file(filename, content):
     """Sauvegarde un nouveau fichier PDB dans la BD"""
     pdb_file = PDBFile(filename=filename, content=content)

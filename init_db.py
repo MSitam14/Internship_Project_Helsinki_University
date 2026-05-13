@@ -10,11 +10,11 @@ from database import PDBFile
 
 if __name__ == '__main__':
     with app.app_context():
-        print("🔨 Création des tables...")
+        db.drop_all()  # Supprimer les tables existantes (optionnel, à utiliser avec précaution)
+        print("Création des tables...")
         db.create_all()
-        print("✅ Base de données initialisée !")
-        print("\nTables créées :")
-        print("  - pdb_files")
+        print("Base de données initialisée !")
+
         print("\nConfiguration :")
         print(f"  URI : {app.config['SQLALCHEMY_DATABASE_URI']}")
-        print("\n💡 Prêt à utiliser !")
+        print("\n Prêt à utiliser !")
