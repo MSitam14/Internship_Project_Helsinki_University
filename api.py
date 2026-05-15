@@ -6,7 +6,6 @@ Fonctions utilitaires et endpoints API.
 from flask import Blueprint, request, jsonify
 from database import db, PDBFile
 
-# Créer un Blueprint pour l'API
 api = Blueprint('api', __name__, url_prefix='/api')
 
 # ===== FONCTIONS UTILITAIRES =====
