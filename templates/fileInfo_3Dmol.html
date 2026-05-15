@@ -33,6 +33,7 @@
                 </div>
 
                 <button id="molStarButton" class="btn btn-secondary mt-3">View with Mol*</button>
+                <button id="jsMolButton" class="btn btn-secondary mt-3">View with JSmol</button>
             </div>
         </div>
     </div>
@@ -66,6 +67,9 @@
 
     document.getElementById('molStarButton').addEventListener('click', () => {
         window.location.href = `/fileInfo/{{ pdb_id }}/MolStar`;
+    });
+    document.getElementById('jsMolButton').addEventListener('click', () => {
+        window.location.href = `/fileInfo/{{ pdb_id }}/JSmol`;
     });
 
 </script>

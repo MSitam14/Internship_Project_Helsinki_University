@@ -24,7 +24,7 @@
                 </div>
 
                 <button id="3DMolButton" class="btn btn-secondary mt-3">View with 3DMol</button>
-                <button id="JSmolButton" class="btn btn-secondary mt-3">View with JSmol</button>
+                <button id="molStarButton" class="btn btn-secondary mt-3">View with Mol*</button>
             </div>
         </div>
     </div>
@@ -34,25 +34,46 @@
 
 {% block scripts %}
 
-<script src="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.css" />
-
+<script src="https://chemapps.stolaf.edu/jmol/jsmol/JSmol.min.js"></script>
 
 <script>
-    molstar.Viewer.create('container-frame', {
-        layoutIsExpanded: false,
-        layoutShowControls: false
-    })
-        .then(viewer => {
-            const pdbUrl = `/pdb_content/{{ pdb_id }}`;
+</script>
 
-            return viewer.loadStructureFromUrl(pdbUrl, 'pdb');
-        })
-        .catch(error => {
-            console.error('Erreur lors du chargement:', error);
-            document.getElementById('container-frame').innerHTML =
-                '<p class="text-danger">Erreur : ' + error.message + '</p>';
-        });
+</script>
+
+<script>
+    const container = document.getElementById('container-frame');
+    if (!container) {
+        console.error('Container element not found');
+    }
+    const pdbUrl = `/pdb_content/{{ pdb_id }}`;
+
+    const width = container.width || 600;
+    const height = container.height || 400;
+
+    const Info = {
+        width: width,
+        height: height,
+        j2sPath: 'https://chemapps.stolaf.edu/jmol/jsmol/j2s',
+        use: 'HTML5',
+        debug: false
+    };
+
+    const applet = Jmol.getApplet('applet0', Info);
+    container.innerHTML = Jmol.getAppletHtml(applet);
+
+    // load the structure once the applet is inserted
+    try {
+        Jmol.script(applet, 'load ' + pdbUrl);
+    } catch (e) {
+        console.error('JSmol load error:', e);
+    }
+
+    theApplet0 = document.getElementById('applet0_appletinfotablediv')
+
+    container.appendChild(theApplet0);
+    theApplet0.style.width = "100%";
+    theApplet0.style.height = "100%";
 
 </script>
 
@@ -60,10 +81,9 @@
     document.getElementById('3DMolButton').addEventListener('click', () => {
         window.location.href = `/fileInfo/{{ pdb_id }}/3DMol`;
     });
-    document.getElementById('JSmolButton').addEventListener('click', () => {
-        window.location.href = `/fileInfo/{{ pdb_id }}/JSmol`;
+    document.getElementById('molStarButton').addEventListener('click', () => {
+        window.location.href = `/fileInfo/{{ pdb_id }}/MolStar`;
     });
-        
 </script>
 
 
@@ -79,6 +99,5 @@
     .mol-frame {
         overflow: hidden;
     }
-
 </style>
 {% endblock %}

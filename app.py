@@ -90,6 +90,8 @@ def fileInfo(file_id, tech = '3DMol'):
             page = 'fileInfo_3Dmol.html';
         case 'MolStar': 
             page = 'fileInfo_molstar.html';
+        case 'JSmol': 
+            page = 'fileInfo_jsmol.html';
 
     return render_template(
         page,
