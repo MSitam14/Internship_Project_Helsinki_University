@@ -1,36 +1,49 @@
 #!/usr/bin/env python
+import argparse
 import os
-from flask import Migrate, MigrateCommand
+import subprocess
 from app import create_app
-from flask import Manager
+from flask_migrate import Migrate
 from app import db
 
 
 if os.path.exists('.env'):
     print('Importing environment from .env...')
     for line in open('.env'):
+        if not line.strip() or line.strip().startswith('#'):
+            continue
         var = line.strip().split('=')
         if len(var) == 2:
             os.environ[var[0]] = var[1]
-app = create_app(os.environ['FLASK_CONFIG'] or 'default')
-magrate = Migrate(app, db)
-manager = Manager(app)
-manager.add_command('db', MigrateCommand)
 
+app = create_app(os.environ.get('FLASK_CONFIG', 'default'))
+migrate = Migrate(app, db)
 
-@manager.command
 def init_db():
-    db.drop_all()
-    db.create_all()
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
 
+def main():
+    parser = argparse.ArgumentParser(description='Project management commands')
+    subparsers = parser.add_subparsers(dest='command')
 
-@manager.command
-def test():
-    from subprocess import call
-    call(['nosetests', '-v',
-          '--with-coverage', '--cover-package=app', '--cover-branches',
-          '--cover-erase', '--cover-html', '--cover-html-dir=cover'])
+    runserver_parser = subparsers.add_parser('runserver', help='Run development server')
+    runserver_parser.add_argument('--host', default='127.0.0.1')
+    runserver_parser.add_argument('--port', type=int, default=5000)
+    runserver_parser.add_argument('--debug', action='store_true')
+
+    subparsers.add_parser('init_db', help='Drop and recreate all tables')
+
+    args = parser.parse_args()
+
+    if args.command == 'runserver':
+        app.run(host=args.host, port=args.port, debug=args.debug)
+    elif args.command == 'init_db':
+        init_db()
+    else:
+        parser.print_help()
 
 
 if __name__ == '__main__':
-            manager.run()
+    main()

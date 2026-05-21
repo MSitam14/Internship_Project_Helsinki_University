@@ -14,7 +14,7 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <h1 class="text-white" style="cursor: pointer;" onclick="window.location.href='{{ url_for('index') }}'">My web site</h1>
+                <h1 class="mb-0"><a class="text-white text-decoration-none" href="{{ url_for('viewer.index') }}">My web site</a></h1>
             </div>
         </nav>
     </header>
@@ -26,7 +26,7 @@
     <footer class="bg-light mt-auto py-3 border-top">
         <div class="container d-flex justify-content-between align-items-center">
             <div>
-                <a class="text-decoration-none" href="{{ url_for('index') }}">Go to the index</a>
+                <a class="text-decoration-none" href="{{ url_for('viewer.index') }}">Go to the index</a>
             </div>
             <a>Hadet Matis — Projet Flask</a>
         </div>

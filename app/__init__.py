@@ -1,6 +1,6 @@
 from flask import Flask
-from flask import Bootstrap
-from flask import SQLAlchemy
+from flask_bootstrap import Bootstrap
+from flask_sqlalchemy import SQLAlchemy
 # from flask.ext.login import LoginManager
 # from flask.ext.moment import Moment
 # from flask.ext.pagedown import PageDown
@@ -20,7 +20,7 @@ db = SQLAlchemy()
 # pagedown = PageDown()
 # mail = Mail()
 # login_manager = LoginManager()
-# login_manager.login_view = 'fast.login'
+# login_manager.login_view = 'viewer.login'
 
 
 def create_app(config_name):
@@ -38,6 +38,8 @@ def create_app(config_name):
     # moment.init_app(app)
     # pagedown.init_app(app)
     # login_manager.init_app(app)
-    from .fast import fast as fast_blueprint
-    app.register_blueprint(fast_blueprint)
+    from .viewer import viewer as viewer_blueprint
+    from .viewer.api import api as api_blueprint
+    app.register_blueprint(viewer_blueprint)
+    app.register_blueprint(api_blueprint)
     return app
