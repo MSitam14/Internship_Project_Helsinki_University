@@ -1,6 +1,5 @@
 
-
-## Set up
+## Set and Sart up
 ------------
 **Step 1**: Clone the git repository
 
@@ -13,36 +12,7 @@
     $ .venv\Scripts\activate
     (venv) $ pip install -r requirements.txt
 
-**Step 4**: Start the application:
+**Step 3**: Start the application:
 
     (venv) $ python manage.py runserver
      * Running on http://127.0.0.1:5000/
-
-
-## Database Setup
-
-**Prerequisites:**
-- PostgreSQL must be installed and running
-- Default credentials: user=`postgres`, password=`admin`
-
-Create the database
-```
-createdb -U postgres -h localhost pdb_viewer
-```
-
-Initialize the database tables
-```
-python init_db.py
-```
-
-## Start
-
-Run the Flask application
-```
-flask run
-```
-
-Run with debug mode
-```
-flask run --debug
-```
