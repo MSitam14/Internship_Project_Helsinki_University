@@ -1,20 +1,23 @@
 
-## Installation
 
-Create .venv
-```
-py -3 -m venv .venv
-```
+## Set up
+------------
+**Step 1**: Clone the git repository
 
-Activate .venv
-```
-.venv\Scripts\activate
-```
+    $ https://github.com/MSitam14/InternshipTestProject
+    $ cd InternshipTestProject
 
-Install dependencies
-```
-pip install Flask Flask-SQLAlchemy psycopg2-binary
-```
+**Step 2**: Create a virtual environment
+
+    $ py -3 -m venv .venv
+    $ .venv\Scripts\activate
+    (venv) $ pip install -r requirements.txt
+
+**Step 4**: Start the application:
+
+    (venv) $ python manage.py runserver
+     * Running on http://127.0.0.1:5000/
+
 
 ## Database Setup
 

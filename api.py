@@ -8,35 +8,35 @@ from database import db, PDBFile
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
-# ===== FONCTIONS UTILITAIRES =====
+# # ===== FONCTIONS UTILITAIRES =====
 
-def get_all_files():
-    """Récupère tous les fichiers PDB"""
-    return PDBFile.query.all()
+# def get_all_files():
+#     """Récupère tous les fichiers PDB"""
+#     return PDBFile.query.all()
 
-def get_file_by_id(file_id):
-    """Récupère un fichier par son ID"""
-    return PDBFile.query.get(file_id)
+# def get_file_by_id(file_id):
+#     """Récupère un fichier par son ID"""
+#     return PDBFile.query.get(file_id)
 
-def get_file_by_name(filename):
-    """Récupère un fichier par son nom"""
-    return PDBFile.query.filter_by(filename=filename).first()
+# def get_file_by_name(filename):
+#     """Récupère un fichier par son nom"""
+#     return PDBFile.query.filter_by(filename=filename).first()
 
-def save_pdb_file(filename, content):
-    """Sauvegarde un nouveau fichier PDB dans la BD"""
-    pdb_file = PDBFile(filename=filename, content=content)
-    db.session.add(pdb_file)
-    db.session.commit()
-    return pdb_file
+# def save_pdb_file(filename, content):
+#     """Sauvegarde un nouveau fichier PDB dans la BD"""
+#     pdb_file = PDBFile(filename=filename, content=content)
+#     db.session.add(pdb_file)
+#     db.session.commit()
+#     return pdb_file
 
-def delete_pdb_file(file_id):
-    """Supprime un fichier PDB de la BD"""
-    pdb_file = PDBFile.query.get(file_id)
-    if pdb_file:
-        db.session.delete(pdb_file)
-        db.session.commit()
-        return True
-    return False
+# def delete_pdb_file(file_id):
+#     """Supprime un fichier PDB de la BD"""
+#     pdb_file = PDBFile.query.get(file_id)
+#     if pdb_file:
+#         db.session.delete(pdb_file)
+#         db.session.commit()
+#         return True
+#     return False
 
 # ===== ROUTES API =====
 
