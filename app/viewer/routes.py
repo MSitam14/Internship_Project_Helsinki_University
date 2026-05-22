@@ -60,17 +60,8 @@ def fileInfo(file_id, tech = '3DMol'):
 
     pdb_file = PDBFile.get_file_by_id(file_id)
 
-    page = None
-    match tech:
-        case '3DMol': 
-            page = 'viewer/fileInfo_3Dmol.html'
-        case 'MolStar': 
-            page = 'viewer/fileInfo_molstar.html'
-        case 'JSmol': 
-            page = 'viewer/fileInfo_jsmol.html'
-
     return render_template(
-        page,
+        'viewer/fileInfo.html',
         filename=pdb_file.filename,
         file_content=pdb_file.content,
         techUsed=tech,
