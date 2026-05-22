@@ -23,7 +23,7 @@ def index():
     for pdb_file in all_pdb_files:
         navigation.append({"id": f"{pdb_file.id}", "name": f"{pdb_file.filename}"})
 
-    return render_template('viewer/index.html', a_variable='The index page', navigation=navigation)
+    return render_template('viewer/index.html', a_variable='Index', navigation=navigation)
 
 @viewer.route('/uploadPage')
 def uploadPage():
@@ -79,4 +79,4 @@ def fileInfo(file_id, tech = '3DMol'):
 
 @viewer.errorhandler(404)
 def page_not_found(error):
-    return render_template('viewer/pageNotFound.html'), 404
+    return render_template('viewer/pageNotFound.html', error=error), 404

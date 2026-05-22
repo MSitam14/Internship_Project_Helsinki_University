@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import argparse
 import os
-import subprocess
 from app import create_app
 from flask_migrate import Migrate
 from app import db
