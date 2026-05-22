@@ -1,8 +1,6 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# os.environ['PGCLIENTENCODING'] = 'UTF8'
-
 class Config(object):
     DEBUG = False
     SECRET_KEY = os.environ.get('SECRET_KEY') or '\xbb\xed\x0e?\xcfY#8Ev\x17\
@@ -22,13 +20,6 @@ class Config(object):
 class DevelopmentConfig(Config):
     DEBUG = True
 
-
-class TestingConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
-
-
 class ProductionConfig(Config):
     DEBUG = False
 
@@ -43,7 +34,6 @@ class HerokuConfig(ProductionConfig):
         app.logger.addHandler(file_handler)
 config = {
     'development': DevelopmentConfig,
-    'testing': TestingConfig,
     'production': ProductionConfig,
     'heroku': HerokuConfig,
 
