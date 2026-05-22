@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+(function () {
     const dataElement = document.getElementById('file-info-data');
     if (!dataElement) {
         console.error('File info data element not found');
@@ -48,20 +48,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const applet = Jmol.getApplet('applet0', info);
         container.innerHTML = Jmol.getAppletHtml(applet);
 
-        try {
-            Jmol.script(applet, 'load ' + pdbUrl);
-        } catch (error) {
-            console.error('JSmol load error:', error);
-        }
+        // load the structure after a short delay and poll for the applet info div
+        setTimeout(() => {
+            try {
+                Jmol.script(applet, 'load ' + pdbUrl);
+            } catch (error) {
+                console.error('JSmol script error:', error);
+            }
 
-        const appletInfo = document.getElementById('applet0_appletinfotablediv');
-        if (!appletInfo) {
-            return;
-        }
-
-        container.appendChild(appletInfo);
-        appletInfo.style.width = '100%';
-        appletInfo.style.height = '100%';
+            const start = Date.now();
+            const maxWait = 3000; // ms
+            const interval = 100;
+            const poll = setInterval(() => {
+                const appletInfo = document.getElementById('applet0_appletinfotablediv');
+                if (appletInfo) {
+                    clearInterval(poll);
+                    if (!container.contains(appletInfo)) container.appendChild(appletInfo);
+                    appletInfo.style.width = '100%';
+                    appletInfo.style.height = '100%';
+                } else if (Date.now() - start > maxWait) {
+                    clearInterval(poll);
+                    console.warn('JSmol applet info div not found after wait');
+                }
+            }, interval);
+        }, 100);
     }
 
     function loadMolStar() {
@@ -104,4 +114,4 @@ document.addEventListener('DOMContentLoaded', () => {
     threeDMolButton.addEventListener('click', () => {
         window.location.href = `/fileInfo/${pdbId}/3DMol`;
     });
-});
+})();
