@@ -6,6 +6,7 @@
 
 import csv
 import datetime
+import json
 import os
 import time
 import warnings
@@ -20,11 +21,6 @@ from tqdm import tqdm
 ########
 # Main #
 ########
-warnings.filterwarnings("ignore")
-date = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-cmd.feedback("disable", "all", "everything")
-ob.obErrorLog.SetOutputLevel(0)
-
 
 # finish_launching()
 class CustomAtomTypes:
@@ -729,7 +725,17 @@ def element_prot_dist_score(pdb, size, date, fold_out, wat_env, atom_type, l_ori
 
 
 def main():
+    warnings.filterwarnings("ignore")
+    date = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    cmd.feedback("disable", "all", "everything")
+    ob.obErrorLog.SetOutputLevel(0)
+
     params = parse_parameter_file('../data/input/Scoring_parameters.txt')
+    json_params = None
+
+    with open('../data/input/parameters.json', 'r') as file:
+        params = json.load(file)
+
     with tqdm(total=len(os.listdir(params['fold_in']))) as pbar:
         pbar.set_description('Score proteins')
         for pdb in os.listdir(params['fold_in']):
