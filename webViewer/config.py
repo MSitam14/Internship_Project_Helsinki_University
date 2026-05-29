@@ -7,8 +7,8 @@ class Config(object):
     x04t\x15\xa4\x8b\xa8\****************'
     USER_PER_PAGE = 10
     if os.environ.get('DATABASE_URL') is None:
-        db_user = 'postgres'
-        db_password = 'admin'
+        db_user = 'protein_viewer_user'
+        db_password = 'protein'
         SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL',
                  f'postgresql://{db_user}:{db_password}@localhost:5432/pdb_viewer?client_encoding=utf8')
     else:

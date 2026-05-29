@@ -15,6 +15,7 @@ if os.path.exists('.env'):
         if len(var) == 2:
             os.environ[var[0]] = var[1]
 
+
 app = create_app(os.environ.get('FLASK_CONFIG', 'default'))
 migrate = Migrate(app, db)
 

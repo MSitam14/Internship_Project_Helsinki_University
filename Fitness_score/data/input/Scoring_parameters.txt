@@ -1,0 +1,75 @@
+# Information ---------------------------------------------------------------- #
+# Author :	Loïc Dreano
+# Contact : loic.dreano@helsinki.fi
+# University of Helsinki
+# ---------------------------------------------------------------------------- #
+
+# INPUT AND OUTPUT PATHS ------------------------------------------- #
+
+fold_in = ../data/input/structures/
+    # Default : ../data/input/structures/
+	# Possible values :
+		# Any path leading to an existing directory for fold files
+
+fold_out = ../data/output/
+	# Default : ../data/output/
+	# Possible values :
+		# Any path leading to an existing, or not, directory for fold output files
+
+densities_fold = ../data/densities/sybyl/
+    # Default : ../data/input/densities/sybyl/
+    # Possible values :
+        # Any path leading to an existing directory for densities files
+
+frequencies_fold = ../data/frequencies/sybyl/
+    # Default : ../data/input/frequencies/sybyl/
+    # Possible values :
+        # Any path leading to an existing directory for frequencies files
+
+
+
+# SCORING PARAMETERS ----------------------------- #
+
+run_frequencies = True
+	# Default : True
+	# Possible values :
+		# True or False
+
+water_env = True
+	# Default : True
+	# Possible values :
+		# True : Considers water in the environment in the processing
+		# False : Does not consider water in the environment in the processing
+
+atom_type = sybyl
+	# Default : sybyl
+	# Possible values :
+		# sybyl : Uses the sybyl atom types
+		# custom : Uses the custom atom types
+    # Warning: pay attention that the densities and frequencies folder correspond to the atom type chosen
+
+
+environment_size = 3
+    # Default : 3
+    # Possible values :
+        # Any integer value between 1 and 10
+    # Note : Represents the size of the environment to be considered
+
+# POCKET AND MODEL PARAMETERS ----------------------------- #
+
+pocket_num = None
+	# Default : None
+	# Possible values :
+		#  list of residues numbers forming in the pocket of interest like : 10,15,25
+	# Note : Represents the number of pockets to be considered
+
+model_num = 1
+	# Default : 1
+	# Possible values :
+		# Any positive integer value
+	# Note : Represents the number of the model to be considered
+
+l_ori = None
+	# Default : None
+	# Possible values :
+		# list of any atom type we are interested in like : Car, Nbas

@@ -7,7 +7,6 @@ from flask import Response
 from sqlalchemy.exc import IntegrityError
 
 
-
 @viewer.route("/", defaults={"page": 1})
 
 @viewer.route('/')
@@ -45,6 +44,7 @@ def uploadFile():
     file_content = the_file.read().decode('utf-8', errors='replace')
 
     pdb_file = None
+
     try:
         pdb_file = PDBFile.save_pdb_file(the_file.filename, file_content)
     except IntegrityError as e:
