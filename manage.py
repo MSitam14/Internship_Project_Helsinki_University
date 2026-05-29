@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import argparse
 import os
-from app import create_app
+from webViewer.app import create_app
+from webViewer.app import db
 from flask_migrate import Migrate
-from app import db
 
 
 if os.path.exists('.env'):

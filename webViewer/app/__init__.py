@@ -21,8 +21,10 @@ def create_app(config_name):
         app.logger.info('intership project')
     bootstrap.init_app(app)
     db.init_app(app)
-    from .viewer import viewer as viewer_blueprint
-    from .viewer.api import api as api_blueprint
+    from webViewer.app.viewer import viewer as viewer_blueprint
+    from webViewer.app.viewer.api import api as api_viewer_blueprint
+    from Fitness_score.src.api import api as api_score_blueprint
     app.register_blueprint(viewer_blueprint)
-    app.register_blueprint(api_blueprint)
+    app.register_blueprint(api_viewer_blueprint)
+    app.register_blueprint(api_score_blueprint)
     return app

@@ -17,7 +17,6 @@ def get_files():
             {
                 'id': f.id,
                 'filename': f.filename,
-                'date': str(f.upload_date)
             }
             for f in files
         ]
