@@ -17,6 +17,7 @@ from pymol import cmd, cgo
 from sklearn.neighbors import KDTree
 from chempy import cpv
 from tqdm import tqdm
+from .tools import translate_path
 
 ########
 # Main #
@@ -86,7 +87,7 @@ CustomType = CustomAtomTypes()
 
 def parse_parameter_file(file_path):
     parameters = {}
-    with open(file_path, 'r') as file:
+    with open(translate_path(file_path), 'r') as file:
         for line in file:
             # Skip comments and empty lines
             if '=' in line:
@@ -228,8 +229,8 @@ def dist_score_prot(l_atom, l_atom_num, dist, nb_contact, pdb, run_fobs, density
                 continue
         if run_fobs:
             # Fobs_Fexp
-            with open(fobs_fexp_fold + 'Env_score_' + l_atom[0] + '_' + str(
-                    i) + '_prim.txt', 'r') as src:
+            with open(translate_path(fobs_fexp_fold + 'Env_score_' + l_atom[0] + '_' + str(
+                    i) + '_prim.txt'), 'r') as src:
                 reader = csv.reader(src, quotechar="\"", delimiter=' ')
                 next(reader, None)
                 for row in reader:
@@ -241,8 +242,8 @@ def dist_score_prot(l_atom, l_atom_num, dist, nb_contact, pdb, run_fobs, density
         try:
             # Fitness score
             log_file = '../logs/logfile_' + pdb + '.txt'
-            with open(density_fold + l_atom[0] + '_' +
-                      l_atom[i] + '_' + str(i) + '.txt', 'r') as src:
+            with open(translate_path(density_fold + l_atom[0] + '_' +
+                      l_atom[i] + '_' + str(i) + '.txt'), 'r') as src:
                 reader = csv.reader(src, quotechar="\"", delimiter=' ')
                 next(reader, None)
                 x = []
@@ -260,7 +261,7 @@ def dist_score_prot(l_atom, l_atom_num, dist, nb_contact, pdb, run_fobs, density
                 append_write = 'a'  # append if already exists
             else:
                 append_write = 'w'  # make a new file if not
-            with open(log_file, append_write) as out:
+            with open(translate_path(log_file), append_write) as out:
                 out.write(l_atom_num[0] + ' ' + l_atom[0] + '_' +
                           l_atom[i] + '_' + str(i) + ' no density\n')
             dict_detail['Score_' + str(i)] = -1.00
@@ -366,7 +367,7 @@ def fobs_pymol(csv_in, pdb_in, pdb_ses, atom_type='custom', p_min=-1, p_max=100,
     alt_pos.append('')
     pdb_name = pdb_in.split('/')[-1].split('.')[0]
     cmd.delete('*')
-    cmd.load(pdb_in)
+    cmd.load(str(translate_path(pdb_in)))
     cmd.hide('cartoon')
     cmd.show('stick')
     cmd.hide('stick', 'hydro')
@@ -381,7 +382,7 @@ def fobs_pymol(csv_in, pdb_in, pdb_ses, atom_type='custom', p_min=-1, p_max=100,
     header = []
     l_id = []
     l_grp = []
-    with open(pdb_in) as pdb_f:
+    with open(translate_path(pdb_in)) as pdb_f:
         for line in pdb_f:
             if len(res_num) == len(res_name) == 0 and line[16:17].strip() in alt_pos:
                 l_id.append(line[6:11].strip())
@@ -398,7 +399,7 @@ def fobs_pymol(csv_in, pdb_in, pdb_ses, atom_type='custom', p_min=-1, p_max=100,
                 else:
                     l_grp.append('Side_')
 
-    with open(csv_in) as csv_file:
+    with open(translate_path(csv_in)) as csv_file:
         csv_reader = csv.reader(csv_file)
         header = next(csv_reader)
         id_neighs = [i for i, col_name in enumerate(header) if 'Neighbor' in col_name]
@@ -470,10 +471,10 @@ def fobs_pymol(csv_in, pdb_in, pdb_ses, atom_type='custom', p_min=-1, p_max=100,
     cmd.set('grid_mode', 1)
     cmd.util.cbaw('Protein_*')
     cmd.set('all_states', 1)
-    cmd.save(pdb_ses)
+    cmd.save(translate_path(pdb_ses))
 
 
-def element_prot_dist_score(pdb, size, date, fold_out, wat_env, atom_type, l_ori, pocket_num,
+def element_prot_dist_score(pdb, fold_out, size, date, wat_env, atom_type, l_ori, pocket_num,
                             model_num, run_fobs, density_fold, fobs_fexp_fold):
     # Score and color protein atoms
     # Initialize variables and lists needed
@@ -504,7 +505,7 @@ def element_prot_dist_score(pdb, size, date, fold_out, wat_env, atom_type, l_ori
         idx_syb = 0
         basename = 'syb_' + pdb.split("/")[-1][:-4]
     # Read pdb file to find the last residue number
-    with open(pdb, 'r') as src:
+    with open(translate_path(pdb), 'r') as src:
         mdl_flag = 1
         if atom_type == 'custom':
             for line in src:
@@ -520,7 +521,7 @@ def element_prot_dist_score(pdb, size, date, fold_out, wat_env, atom_type, l_ori
                 if line[0:6].strip() == "ATOM":
                     last_resn = line[22:27].strip()
     # Read pdb file
-    with open(pdb, 'r') as src:
+    with open(translate_path(pdb), 'r') as src:
         mdl_flag = 1
         for line in src:
             if line.split()[0] == 'MODEL':  # select model
@@ -687,63 +688,129 @@ def element_prot_dist_score(pdb, size, date, fold_out, wat_env, atom_type, l_ori
     pdb_ses_fold = fold_out + date + '/pdb_session_' + atom_type + '/'
     score_fold = fold_out + date + '/detail_score_' + atom_type + '/'
     try:
-        os.makedirs(pdb_ses_fold)
-        os.makedirs(pdb_fold)
-        os.makedirs(score_fold)
+        os.makedirs(translate_path(pdb_ses_fold))
+        os.makedirs(translate_path(pdb_fold))
+        os.makedirs(translate_path(score_fold))
     except:
         pass
-    pdb_name = pdb_fold + basename + '_' + str(size) + "_score_" + date + ".pdb"
-    csv_name = score_fold + basename + "_" + str(size) + "_prot_score_" + date + ".csv"
-    pdb_ses = pdb_ses_fold + basename + '_' + str(size) + "_score_" + date + ".pse"
-    with open(pdb_name, 'w') as out:
-        out.write('REMARK   1 SCORE PROTEIN ' +
-                  str(round(np.mean(l_score_prot), 3))
-                  + '                                                  \n')
-        out.write('REMARK   1 SCORE WATERS  ' +
-                  str(round(np.mean(l_score_wat), 3))
-                  + '                                                  \n')
-        out.write('REMARK   1 SCORE TOTAL   ' +
-                  str(round(np.mean(l_score_wat + l_score_prot), 3))
-                  + '                                                  \n')
-        l = 0
-        for line in pdb_score:
-            if len(line) <= 71:
-                line_out = line[:56] + '1.00 ' + "%.3f" % (
-                        1 - float(l_dict[l]['Score_total'])) + line[56:]
-                l += 1
-            else:
-                line_out = line[0:56] + "1.00 0.500" + line[66:]
-            out.write(line_out)
-    with open(csv_name, 'w') as outcsv:
-        writer = csv.DictWriter(outcsv, fieldnames=dict_detail_keys)
-        writer.writeheader()
-        for line in l_dict:
-            writer.writerow(line)
-    if run_fobs:
-        fobs_pymol(csv_name, pdb_name, pdb_ses, atom_type=atom_type)
-    return l_res_pocket
+
+    pdb_name = basename + '_' + str(size) + "_score_" + date + ".pdb"
+    csv_name = basename + "_" + str(size) + "_prot_score_" + date + ".csv"
+    pdb_ses = basename + '_' + str(size) + "_score_" + date + ".pse"
+    pdb_path = pdb_fold + pdb_name
+    csv_path = score_fold + csv_name
+    pdb_ses_path = pdb_ses_fold + pdb_ses
+
+    try:
+        with open(translate_path(pdb_path), 'w') as out:
+            out.write('REMARK   1 SCORE PROTEIN ' +
+                    str(round(np.mean(l_score_prot), 3))
+                    + '                                                  \n')
+            out.write('REMARK   1 SCORE WATERS  ' +
+                    str(round(np.mean(l_score_wat), 3))
+                    + '                                                  \n')
+            out.write('REMARK   1 SCORE TOTAL   ' +
+                    str(round(np.mean(l_score_wat + l_score_prot), 3))
+                    + '                                                  \n')
+            l = 0
+            for line in pdb_score:
+                if len(line) <= 71:
+                    line_out = line[:56] + '1.00 ' + "%.3f" % (
+                            1 - float(l_dict[l]['Score_total'])) + line[56:]
+                    l += 1
+                else:
+                    line_out = line[0:56] + "1.00 0.500" + line[66:]
+                out.write(line_out)
+
+        with open(translate_path(csv_path), 'w') as outcsv:
+            writer = csv.DictWriter(outcsv, fieldnames=dict_detail_keys)
+            writer.writeheader()
+            for line in l_dict:
+                writer.writerow(line)
+
+        if run_fobs:
+            fobs_pymol(csv_path, pdb_path, pdb_ses_path, atom_type=atom_type)
+        
+    except Exception as e:
+        try: os.remove(translate_path(pdb_path))
+        except: pass
+        try: os.remove(translate_path(csv_path))
+        except: pass
+        try: os.remove(translate_path(pdb_ses_path))
+        except: pass
+        try:
+            os.rmdir(translate_path(pdb_fold))
+            os.rmdir(translate_path(pdb_ses_fold))
+            os.rmdir(translate_path(score_fold))
+            os.rmdir(translate_path(fold_out+date))
+            os.rmdir(translate_path(fold_out))
+        except: pass
+        raise Exception("Error in writing output files: " + str(e))
+
+    pdb_content = ''
+    csv_content = ''
+    pdb_ses_content = ''
+
+    with open(translate_path(pdb_path), 'r') as src:
+        pdb_content = src.read()
+    with open(translate_path(csv_path), 'r') as src:
+        csv_content = src.read()
+    with open(translate_path(pdb_ses_path), 'rb') as src:
+        pdb_ses_content = src.read()
+
+    out = {
+        "pdb_file": {
+            "file_name": pdb_name,
+            "file_content": pdb_content
+        },
+        "csv_file": {
+            "file_name": csv_name,
+            "file_content": csv_content
+        },
+        "pdb_session": {
+            "file_name": pdb_ses,
+            "file_content": pdb_ses_content
+        }
+    }
+
+    try: 
+        os.remove(translate_path(pdb_path))
+        os.remove(translate_path(csv_path))
+        os.remove(translate_path(pdb_ses_path))
+        os.rmdir(translate_path(pdb_fold))
+        os.rmdir(translate_path(pdb_ses_fold))
+        os.rmdir(translate_path(score_fold))
+        os.rmdir(translate_path(fold_out+date))
+        os.rmdir(translate_path(fold_out))
+    except: pass
+    
+    return out
 
 
-def main():
+def score(parameter_json, pdb_path):
     warnings.filterwarnings("ignore")
     date = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     cmd.feedback("disable", "all", "everything")
     ob.obErrorLog.SetOutputLevel(0)
+    # params = parse_parameter_file('../data/input/Scoring_parameters.txt')
 
-    params = parse_parameter_file('../data/input/Scoring_parameters.txt')
-    json_params = None
+    params = parameter_json
+    fold_out = '../data/output/api_score/'
 
-    with open('../data/input/parameters.json', 'r') as file:
-        params = json.load(file)
-
-    with tqdm(total=len(os.listdir(params['fold_in']))) as pbar:
-        pbar.set_description('Score proteins')
-        for pdb in os.listdir(params['fold_in']):
-            element_prot_dist_score(params['fold_in'] + pdb, params['environment_size'], date,
-                                    params['fold_out'], params['water_env'], params['atom_type'], params['l_ori'],
+    out = element_prot_dist_score(pdb_path, fold_out, params['environment_size'], date,
+                                    params['water_env'], params['atom_type'], params['l_ori'],
                                     params['pocket_num'], params['model_num'], params['run_frequencies'],
                                     params['densities_fold'], params['frequencies_fold'])
-            pbar.update(1)
+
+    return out
+    # with tqdm(total=len(os.listdir(params['fold_in']))) as pbar:
+    #     pbar.set_description('Score proteins')
+    #     for pdb in os.listdir(params['fold_in']):
+    #         element_prot_dist_score(params['fold_in'] + pdb, params['environment_size'], date,
+    #                                 params['fold_out'], params['water_env'], params['atom_type'], params['l_ori'],
+    #                                 params['pocket_num'], params['model_num'], params['run_frequencies'],
+    #                                 params['densities_fold'], params['frequencies_fold'])
+    #         pbar.update(1)
 
 
     # fobs_pymol(csv_in='./Demo_comitee/output/Score_111123/detail_score_sybyl/syb_4eiy_3_prot_score_111123.csv',
@@ -778,7 +845,7 @@ def comparaison_pocket(l_pdb, csv_out="Score_pocket_target_1.csv"):
         nb_atm = 0
         nb_atm_lig = 0
         score_lig = 0
-        with open(score_fold + pdb_scored, 'r') as src:
+        with open(translate_path(score_fold + pdb_scored), 'r') as src:
             for line in src:
                 if line[22:26].strip() in l_res_pocket and line[0:6].strip() == 'ATOM':
                     score = score + (1 - float(line[60:66]))
@@ -793,7 +860,7 @@ def comparaison_pocket(l_pdb, csv_out="Score_pocket_target_1.csv"):
     csv_columns = ['pdb', 'score_pocket', 'mean_score', 'nb_atom', 'score_ligand', 'nb_atom_lig']
     csv_file = csv_out
     try:
-        with open(csv_file, 'w') as csvfile:
+        with open(translate_path(csv_file), 'w') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
             writer.writeheader()
             for data in l_score:
