@@ -5,11 +5,11 @@
     },
 
     "params": {
-        "densities_fold": "../data/densities/custom/",
-        "frequencies_fold": "../data/frequencies/custom/",
+        "densities_fold": "../data/densities/sybyl/",
+        "frequencies_fold": "../data/frequencies/sybyl/",
         "run_frequencies" : "True",
         "water_env": "True",
-        "atom_type": "custom",
+        "atom_type": "sybyl",
         "environment_size": 3,
         "pocket_num": null,
         "model_num": 1,

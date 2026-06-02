@@ -130,7 +130,7 @@ def translate_sybyl(pdb):
 
     l_syb = []
     mol = ob.OBMol()
-    obConversion.ReadFile(mol, pdb)
+    obConversion.ReadFile(mol, str(translate_path(pdb)))
     for obatom in ob.OBMolAtomIter(mol):
         if obatom.GetResidue().GetName() == 'HOH':
             l_syb.append('O.3.wat')
