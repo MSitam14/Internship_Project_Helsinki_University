@@ -792,7 +792,7 @@ def score(parameter_json, pdb_path):
     date = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     cmd.feedback("disable", "all", "everything")
     ob.obErrorLog.SetOutputLevel(0)
-    # params = parse_parameter_file('../data/input/Scoring_parameters.txt')
+    # params = parse_parameter_file('../data/input/Scoring_parameters.txt') 
 
     params = parameter_json
     fold_out = '../data/output/api_score/'
@@ -820,11 +820,6 @@ def score(parameter_json, pdb_path):
 
     # element_prot_dist_score('./structures_to_score/4eiy_round_1_step_2.pdb', 3, wat_env=False, atom_type='custom',
     #                         Fobs=False, fold_out='./Demo_comitee/output/')
-
-
-if __name__ == "__main__":
-    main()
-
 
 
 

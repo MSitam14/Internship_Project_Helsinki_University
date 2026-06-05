@@ -1,5 +1,5 @@
 """
-Configuration et modèles de la base de données.
+Configuration et modèles
 """
 
 from . import db

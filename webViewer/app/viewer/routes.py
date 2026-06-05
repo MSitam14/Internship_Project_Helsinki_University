@@ -1,5 +1,7 @@
 from flask import render_template, flash, redirect, \
     url_for, abort, request, current_app
+from ..static.tools.viewer.RequestParamFitness import AtomType
+from ..static.tools.viewer.RequestParamFitness import RequestParamFitness
 from ..import db
 from ..models import PDBFile
 from . import viewer
@@ -66,6 +68,32 @@ def fileInfo(file_id, tech = '3DMol'):
         file_content=pdb_file.content,
         techUsed=tech,
         pdb_id=pdb_file.id
+    )
+
+@viewer.route('/fitnessForm', methods=['GET'])
+def fitnessForm():
+    return render_template('viewer/fitnessForm.html')
+
+@viewer.route('/pdbInfo', methods=['POST'])
+def pdbInfo():
+    the_file = request.files['the_file']
+    file_content = the_file.read().decode('utf-8', errors='replace')
+
+    params = RequestParamFitness(
+        pdb_name=the_file.filename,
+        pdb_content=file_content,
+        run_frequencies=request.form.get('run_frequencies') == 'on',
+        water_env=request.form.get('water_env') == 'on',
+        atom_type=AtomType(request.form.get('atom_type')),
+        environment_size=int(request.form.get('environment_size')),
+        pocket_num=int(request.form.get('pocket_num')) if request.form.get('pocket_num') else None,
+        model_num=int(request.form.get('model_num')))
+    
+    #todo call api
+
+    return render_template(
+        'viewer/pdbInfo.html',
+        params=params.toJson()
     )
 
 @viewer.errorhandler(404)
