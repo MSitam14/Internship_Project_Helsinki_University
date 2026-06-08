@@ -7,6 +7,8 @@ from ..models import PDBFile
 from . import viewer
 from flask import Response
 from sqlalchemy.exc import IntegrityError
+import requests
+import json
 
 
 @viewer.route("/", defaults={"page": 1})
@@ -88,8 +90,6 @@ def pdbInfo():
         environment_size=int(request.form.get('environment_size')),
         pocket_num=int(request.form.get('pocket_num')) if request.form.get('pocket_num') else None,
         model_num=int(request.form.get('model_num')))
-    
-    #todo call api
 
     return render_template(
         'viewer/pdbInfo.html',

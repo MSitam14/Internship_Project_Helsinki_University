@@ -1,4 +1,5 @@
 from enum import Enum
+import json
 
 class AtomType(Enum):
     sybyl = "Sybyl"
@@ -36,7 +37,7 @@ class RequestParamFitness:
         self.densities_fold += atom_type.name + "/"
 
     def toJson(self):
-        json = {
+        data = {
             "pdb":{
                 "name": self.pdb_name,
                 "content": self.pdb_content
@@ -52,9 +53,10 @@ class RequestParamFitness:
                 "model_num": self.model_num,
                 "l_ori": self.l_ori
             }
+
         }
 
-        if json["params"]["pocket_num"] is None or json["params"]["pocket_num"] == 0:
-            json["params"]["pocket_num"] = None
+        if data["params"]["pocket_num"] is None or data["params"]["pocket_num"] == 0:
+            data["params"]["pocket_num"] = None
 
-        return json
+        return json.dumps(data)

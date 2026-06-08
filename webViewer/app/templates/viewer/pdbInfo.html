@@ -2,10 +2,30 @@
 
 {% block content %}
 
-<a> {{params["params"]}}</a>
+<a> info page</a>
 
 {% endblock %}
 
 {% block scripts %}
+
+<script>
+
+const dataObj = JSON.parse({{ params | tojson }});
+
+response = fetch("http://localhost:5000/api-score/score", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(dataObj)
+}).then(response => response.json())
+.then(data => {
+    console.log(data);
+})
+.catch(error => {
+    console.error("Error:", error);
+});
+
+</script>
 
 {% endblock %}
