@@ -52,11 +52,13 @@ def calculate_score():
 
     params = data['params']
     pdb = data['pdb']
-    pdb_path = '../data/input/structures/'+pdb["pdb_name"]
+    pdb_path = '../data/input/structures/'+pdb["name"]
 
     with open(translate_path(pdb_path), 'w') as f:
-        f.write(pdb["pdb_content"])
+        f.write(pdb["content"])
     
+    print(f"Received scoring request for {pdb['name']} with parameters: {params}")
+
     try:
         out = score(params, pdb_path) 
     except Exception as e:
@@ -65,6 +67,8 @@ def calculate_score():
             'status': 'error',
             'message': f'Error during scoring: {str(e)}'
         }), 500
+    
+    print(f"Scoring completed for {pdb['name']}. Cleaning up temporary files.")
 
     try: os.remove(translate_path(pdb_path))
     except OSError: print(f"File '{pdb_path}' not found.")

@@ -1,7 +1,7 @@
 {
     "pdb":{
-        "pdb_name": "protein.pdb",
-        "pdb_content": null
+        "name": "protein.pdb",
+        "content": null
     },
 
     "params": {

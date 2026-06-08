@@ -795,6 +795,7 @@ def score(parameter_json, pdb_path):
     # params = parse_parameter_file('../data/input/Scoring_parameters.txt') 
 
     params = parameter_json
+    params['atom_type'] = str(params['atom_type']).lower()
     fold_out = '../data/output/api_score/'
 
     out = element_prot_dist_score(pdb_path, fold_out, params['environment_size'], date,

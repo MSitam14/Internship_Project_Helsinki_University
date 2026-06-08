@@ -15,10 +15,10 @@ if __name__ == "__main__":
     print("preparing pdb file...")
     print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-    params["pdb"]["pdb_name"] = "4KW4.pdb"
+    params["pdb"]["name"] = "4KW4.pdb"
 
     with open('4KW4.pdb', 'r') as file:
-        params["pdb"]["pdb_content"] = file.read()
+        params["pdb"]["content"] = file.read()
 
     print("fetching score...")
     print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
