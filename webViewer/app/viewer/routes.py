@@ -88,7 +88,7 @@ def pdbInfo():
         water_env=request.form.get('water_env') == 'on',
         atom_type=AtomType(request.form.get('atom_type')),
         environment_size=int(request.form.get('environment_size')),
-        pocket_num=int(request.form.get('pocket_num')) if request.form.get('pocket_num') else None,
+        pocket_num=request.form.get('pocket_num') if request.form.get('pocket_num') else None,
         model_num=int(request.form.get('model_num')))
 
     return render_template(
