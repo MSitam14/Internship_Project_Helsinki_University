@@ -14,45 +14,43 @@
                         <input class="form-control" type="file" id="the_file" name="the_file" accept=".pdb" required>
                     </div>
 
-                    <div class="mb-3">
 
-                        <div class="form-check form-switch">
+                        <div class="form-check form-switch mb-3">
                             <input class="form-check-input" type="checkbox" id="run_frequencies" name="run_frequencies"
                                 checked>
                             <label for="run_frequencies" class="form-check-label"> Run with frequencies</label>
                         </div>
 
-                        <div class="form-check form-switch">
+                        <div class="form-check form-switch mb-3">
                             <input class="form-check-input" type="checkbox" id="water_env" name="water_env" checked>
                             <label for="water_env" class="form-check-label"> Run with water environement</label>
                         </div>
 
-                        <label>Choose a type :</label><br>
+                        <label class="form-check-inline mb-3">Choose a type :</label>
 
-                        <div class="form-check form-check-inline">
+                        <div class="form-check form-check-inline mb-3">
                             <input class="form-check-input" type="radio" id="type_sybyl" name="atom_type" value="Sybyl" checked>
                             <label class="form-check-label" for="type_sybyl">Sybyl</label>
                         </div>
-                        <div class="form-check form-check-inline">
+                        <div class="form-check form-check-inline mb-3">
                             <input class="form-check-input" type="radio" id="type_custom" name="atom_type" value="Custom">
                             <label class="form-check-label" for="type_custom">Custom</label>
                         </div>
 
-                        <div class="form-number">
+                        <div class="form-group mb-3">
                             <label for="environment_size" class="form-check-label">Environement size</label>
                             <input class="form-number-input" type="number" id="environment_size" name="environment_size" value="3" min="1" max="10" required>
                         </div>
 
-                        <div class="form-number">
-                            <label for="pocket_num" class="form-check-label">Number of pocket</label>
-                            <input class="form-number-input" type="number" id="pocket_num" name="pocket_num" value="0" min="0" max="100">
+                        <div class="form-group mb-3">
+                            <label for="pocket_num" class="form-check-label">Residue number</label>
+                            <input class="form-text-input" type="text" id="pocket_num" name="pocket_num" placeholder=" example : 10,15,25">
                         </div>
 
-                        <div class="form-number">
-                            <label for="model_num" class="form-check-label">Number of the model</label>
+                        <div class="form-group mb-3">
+                            <label for="model_num" class="form-check-label">Model number</label>
                             <input class="form-number-input" type="number" id="model_num" name="model_num" value="1" min="1" max="100" required>
                         </div>
-                    </div>
 
                     <button type="submit" class="btn btn-primary">Run</button>
                 </form>

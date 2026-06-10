@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import base64
@@ -57,8 +58,8 @@ def calculate_score():
     with open(translate_path(pdb_path), 'w') as f:
         f.write(pdb["content"])
     
-    print(f"Received scoring request for {pdb['name']} with parameters: {params}")
-
+    print(f"\nReceived scoring request for {pdb['name']} with parameters: {params}")
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     try:
         out = score(params, pdb_path) 
     except Exception as e:
@@ -69,6 +70,7 @@ def calculate_score():
         }), 500
     
     print(f"Scoring completed for {pdb['name']}. Cleaning up temporary files.")
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
 
     try: os.remove(translate_path(pdb_path))
     except OSError: print(f"File '{pdb_path}' not found.")
