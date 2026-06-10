@@ -702,6 +702,9 @@ def element_prot_dist_score(pdb, fold_out, size, date, wat_env, atom_type, l_ori
     pdb_ses_path = pdb_ses_fold + pdb_ses
 
     try:
+        print("\nWriting output files...")
+        print("PDB file")
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         with open(translate_path(pdb_path), 'w') as out:
             out.write('REMARK   1 SCORE PROTEIN ' +
                     str(round(np.mean(l_score_prot), 3))
@@ -722,6 +725,8 @@ def element_prot_dist_score(pdb, fold_out, size, date, wat_env, atom_type, l_ori
                     line_out = line[0:56] + "1.00 0.500" + line[66:]
                 out.write(line_out)
 
+        print("CSV file")
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         with open(translate_path(csv_path), 'w') as outcsv:
             writer = csv.DictWriter(outcsv, fieldnames=dict_detail_keys)
             writer.writeheader()
@@ -729,7 +734,12 @@ def element_prot_dist_score(pdb, fold_out, size, date, wat_env, atom_type, l_ori
                 writer.writerow(line)
 
         if run_fobs:
+            print("Pymol session")
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             fobs_pymol(csv_path, pdb_path, pdb_ses_path, atom_type=atom_type)
+        
+        print("Done writing output files")
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         
     except Exception as e:
         try: os.remove(translate_path(pdb_path))
