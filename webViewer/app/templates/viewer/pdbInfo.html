@@ -12,7 +12,23 @@
     </div>
 </div>
 
-<a id="infoBlock"></a>
+<div class="d-flex">
+    <a> Protein score : </a>
+    <a id="proteinScore"></a>
+</div>
+
+<div class="d-flex">
+    <a> Water score : </a>
+    <a id="waterScore"></a>
+</div>
+
+<div class="d-flex">
+    <a > Total score : </a>
+    <a id="totalScore"></a>
+</div>
+
+
+
 
 {% endblock %}
 
@@ -38,9 +54,9 @@ function showData(data) {
         scoreList.push(dataInLine.split(" ")[4]);
     }
 
-    console.log(scoreList);
-
-    
+    document.getElementById("proteinScore").textContent = scoreList[0];
+    document.getElementById("waterScore").textContent = scoreList[1];
+    document.getElementById("totalScore").textContent = scoreList[2];    
 }
 
 // spinner animation
