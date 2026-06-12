@@ -2,142 +2,264 @@
 
 {% block content %}
 
-<!-- Loading overlay -->
-<div id="loading" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,0.8);align-items:center;justify-content:center;z-index:9999;">
-    <div style="display:flex;flex-direction:column;align-items:center;">
-        <div style="width:48px;height:48px;border:6px solid #ddd;border-top-color:#007bff;border-radius:50%;animation:spin 1s linear infinite"></div>
-        <div style="margin-top:8px;font-size:14px;color:#333">Chargement…</div>
+<div class="container py-4">
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <!-- Loading overlay -->
+      <div id="loading"
+           class="position-fixed top-0 start-0 w-100 h-100 d-none justify-content-center align-items-center"
+           style="background: rgba(255,255,255,0.8); z-index: 9999;">
+        <div class="text-center">
+          <div class="spinner-border text-primary" role="status"></div>
+          <div class="mt-2 text-muted">Chargement…</div>
+        </div>
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
+
+          <button id="buttonDownloadPDB" class="btn btn-primary">
+            Download PDB file
+          </button>
+
+          <button id="buttonDownloadCSV" class="btn btn-outline-primary">
+            Download detail score file (.csv)
+          </button>
+
+          <button id="buttonDownloadPSE" class="btn btn-outline-primary">
+            Download PyMOL session file
+          </button>
+
+        </div>
+      </div>
+
+      <!-- FILE INFO -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+
+          <h5 class="card-title mb-3">File information</h5>
+
+          <div class="row mb-2">
+            <div class="col-4 fw-bold">File name</div>
+            <div class="col-8" id="fileName"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SCORES -->
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <h5 class="card-title mb-3">Scores</h5>
+
+          <div class="row mb-2">
+            <div class="col-4 fw-bold">Protein score</div>
+            <div class="col-8" id="proteinScore"></div>
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-4 fw-bold">Water score</div>
+            <div class="col-8" id="waterScore"></div>
+          </div>
+
+          <div class="row">
+            <div class="col-4 fw-bold">Total score</div>
+            <div class="col-8 fw-bold" id="totalScore"></div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
-</div>
+  </div>
 
-<div class="d-flex-space">
-    <button id="buttonDownloadPDB" class="btn btn-primary">Download PDB file</button>
-    <button id="buttonDownloadCSV" class="btn btn-primary">Download detail score file (.csv)</button>
-    <button id="buttonDownloadPSE" class="btn btn-primary">Download pymol session file</button>
 </div>
-
-<div class="d-flex">
-    <a> Protein score : </a>
-    <a id="proteinScore"></a>
-</div>
-
-<div class="d-flex">
-    <a> Water score : </a>
-    <a id="waterScore"></a>
-</div>
-
-<div class="d-flex">
-    <a > Total score : </a>
-    <a id="totalScore"></a>
-</div>
-
 
 {% endblock %}
 
 {% block scripts %}
 
-<script>
+<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+<script >
 
-let dataResult = null;
+    let dataResult = null;
 
-const dataObj = JSON.parse({{ params | tojson }});
+    const dataObj = JSON.parse({{ params | tojson }});
 
-function connectDownloadButtons() {
+    function connectDownloadButtons() {
 
-    downloadPDBButton = document.getElementById("buttonDownloadPDB");
-    downloadCSVButton = document.getElementById("buttonDownloadCSV");
-    downloadPSEButton = document.getElementById("buttonDownloadPSE");
+        downloadPDBButton = document.getElementById("buttonDownloadPDB");
+        downloadCSVButton = document.getElementById("buttonDownloadCSV");
+        downloadPSEButton = document.getElementById("buttonDownloadPSE");
 
-    downloadPDBButton.addEventListener("click", () => {
-        const blob = new Blob([dataResult.content.pdb_file.file_content], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${dataResult.content.pdb_file.file_name}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    });
+        downloadPDBButton.addEventListener("click", () => {
+            const blob = new Blob([dataResult.content.pdb_file.file_content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${dataResult.content.pdb_file.file_name}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
 
-    downloadCSVButton.addEventListener("click", () => {
-        const blob = new Blob([dataResult.content.csv_file.file_content], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${dataResult.content.csv_file.file_name}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    });
+        downloadCSVButton.addEventListener("click", () => {
+            const blob = new Blob([dataResult.content.csv_file.file_content], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${dataResult.content.csv_file.file_name}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
 
-    downloadPSEButton.addEventListener("click", () => {
-        const blob = new Blob([dataResult.content.pdb_session.file_content], { type: 'application/octet-stream' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${dataResult.content.pdb_session.file_name}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    });
+        downloadPSEButton.addEventListener("click", () => {
+            const blob = new Blob([dataResult.content.pdb_session.file_content], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${dataResult.content.pdb_session.file_name}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
 
-}
-
-function showData(data) {
-    dataResult = data;
-    console.log(data);
-
-    connectDownloadButtons();
-
-    find(line => line.startsWith("SCORE:"));
-
-    scoreList = [];
-
-    scoreLine = data.content.pdb_file.file_content.split("\n").slice(0,3)
-    for(let line of scoreLine) {
-        dataInLine = line.replace(/\s+/g, " ");
-        scoreList.push(dataInLine.split(" ")[4]);
     }
 
-    document.getElementById("proteinScore").textContent = scoreList[0];
-    document.getElementById("waterScore").textContent = scoreList[1];
-    document.getElementById("totalScore").textContent = scoreList[2];    
-}
+    function colorScore(score) {
+        let red = 255;
+        let green =255;
 
-// spinner animation
-const styleEl = document.createElement('style');
-styleEl.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
-document.head.appendChild(styleEl);
+        if (score > 0.5) {
+            red = Math.round(255 * (1 - score)*2);
+            green = 255;
+        }
+        else {
+            red = 255;
+            green = Math.round(255 * score*2);
+        }
 
-// show loading
-const showLoading = () => document.getElementById('loading').style.display = 'flex';
-const hideLoading = () => document.getElementById('loading').style.display = 'none';
+        return `rgb(${red}, ${green}, 0)`;
+    }
 
-showLoading();
+    function showData(data) {
+        hideLoading();
+
+        dataResult = data;
+        console.log(data);
+
+        connectDownloadButtons();
+
+        find(line => line.startsWith("SCORE:"));
+
+        scoreList = [];
+
+        scoreLine = data.content.pdb_file.file_content.split("\n").slice(0, 3)
+        for (let line of scoreLine) {
+            dataInLine = line.replace(/\s+/g, " ");
+            scoreList.push(dataInLine.split(" ")[4]);
+        }
+
+        document.getElementById("fileName").textContent = dataObj.pdb.name;
+
+        document.getElementById("proteinScore").textContent = scoreList[0];
+        document.getElementById("waterScore").textContent = scoreList[1];
+        document.getElementById("totalScore").textContent = scoreList[2];
+
+        document.getElementById("proteinScore").style.color = colorScore(scoreList[0]);
+        document.getElementById("waterScore").style.color = colorScore(scoreList[1]);
+        document.getElementById("totalScore").style.color = colorScore(scoreList[2]);
+    }
+
+    // spinner animation
+    const styleEl = document.createElement('style');
+    styleEl.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+    document.head.appendChild(styleEl);
+
+    // show loading
+    const showLoading = () => document.getElementById('loading').style.display = 'flex';
+    const hideLoading = () => document.getElementById('loading').style.display = 'none';
+
+    function fetchData() {
+        fetch("/api-score/score", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dataObj)
+        }).then(response => response.json())
+        .then(data => {
+            sessionStorage.setItem("lastDataLoadedParams", JSON.stringify(dataObj));
+            saveDataInSession(JSON.stringify(data));
+            showData(data);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            hideLoading();
+        });
+    }
+
+    function saveDataInSession(data) {
+        const compressed = LZString.compressToUTF16(JSON.stringify(data));
+        sessionStorage.setItem("lastDataLoadedResult", compressed);
+    }
+
+    function loadDataFromSession() {
+
+        const compressed = sessionStorage.getItem("lastDataLoadedResult");
+        if (!compressed) return null;
+        const decompressed = JSON.parse(LZString.decompressFromUTF16(compressed));
+        return JSON.parse(decompressed);
+    }
+
+    function compareParams(params1, params2) {
+        return JSON.stringify(params1) === JSON.stringify(params2);
+    }
 
 
-// on load, send POST request to backend
+    onload = () => {
 
-// fetch("http://127.0.0.1:5000//api-score/score", {
-//     method: "POST",
-//     headers: {
-//         "Content-Type": "application/json"
-//     },
-//     body: JSON.stringify(dataObj)
-// }).then(response => response.json())
-// .then(data => {
-//     showData(data);
-//     hideLoading();
-// })
-// .catch(error => {
-//     console.error("Error:", error);
-//     hideLoading();
-// });
+        showLoading();
 
-hideLoading();
+        let cachedParams = sessionStorage.getItem("lastDataLoadedParams");
+
+        if (cachedParams) {
+            cachedParams = JSON.parse(cachedParams);
+
+            console.log("Cached params found:", cachedParams);
+            console.log("Current params:", dataObj);
+
+            if (compareParams(cachedParams, dataObj)) {
+                console.log("Params match, loading cached data");
+
+                const cachedData = loadDataFromSession();
+                if (!cachedData) {
+                    console.log("No cached data found, fetching new data");
+                    fetchData();
+                    return;
+                }
+                showData(cachedData);
+            } 
+            else {
+                console.log("Params do not match, fetching new data");
+                fetchData();
+            }
+        }
+        else {
+            fetchData();
+        }
+        
+    };
+
+
 
 </script>
 
