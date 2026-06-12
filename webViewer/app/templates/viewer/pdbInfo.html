@@ -4,78 +4,79 @@
 
 <div class="container py-4">
 
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
 
-      <!-- Loading overlay -->
-      <div id="loading"
-           class="position-fixed top-0 start-0 w-100 h-100 d-none justify-content-center align-items-center"
-           style="background: rgba(255,255,255,0.8); z-index: 9999;">
-        <div class="text-center">
-          <div class="spinner-border text-primary" role="status"></div>
-          <div class="mt-2 text-muted">Chargement…</div>
+            <!-- Loading overlay -->
+            <div id="loading"
+                style="display:none;position:fixed;inset:0;background:rgba(255,255,255,0.8);align-items:center;justify-content:center;z-index:9999;">
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                    <div
+                        style="width:48px;height:48px;border:6px solid #ddd;border-top-color:#007bff;border-radius:50%;animation:spin 1s linear infinite">
+                    </div>
+                    <div style="margin-top:8px;font-size:14px;color:#333">Chargement…</div>
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
+
+                    <button id="buttonDownloadPDB" class="btn btn-primary">
+                        Download PDB file
+                    </button>
+
+                    <button id="buttonDownloadCSV" class="btn btn-outline-primary">
+                        Download detail score file (.csv)
+                    </button>
+
+                    <button id="buttonDownloadPSE" class="btn btn-outline-primary">
+                        Download PyMOL session file
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- FILE INFO -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+
+                    <h5 class="card-title mb-3">File information</h5>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">File name</div>
+                        <div class="col-8" id="fileName"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- SCORES -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h5 class="card-title mb-3">Scores</h5>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Protein score</div>
+                        <div class="col-8" id="proteinScore"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Water score</div>
+                        <div class="col-8" id="waterScore"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-4 fw-bold">Total score</div>
+                        <div class="col-8 fw-bold" id="totalScore"></div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
-      </div>
-
-      <!-- ACTION BUTTONS -->
-      <div class="card shadow-sm mb-4">
-        <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
-
-          <button id="buttonDownloadPDB" class="btn btn-primary">
-            Download PDB file
-          </button>
-
-          <button id="buttonDownloadCSV" class="btn btn-outline-primary">
-            Download detail score file (.csv)
-          </button>
-
-          <button id="buttonDownloadPSE" class="btn btn-outline-primary">
-            Download PyMOL session file
-          </button>
-
-        </div>
-      </div>
-
-      <!-- FILE INFO -->
-      <div class="card shadow-sm mb-3">
-        <div class="card-body">
-
-          <h5 class="card-title mb-3">File information</h5>
-
-          <div class="row mb-2">
-            <div class="col-4 fw-bold">File name</div>
-            <div class="col-8" id="fileName"></div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- SCORES -->
-      <div class="card shadow-sm">
-        <div class="card-body">
-
-          <h5 class="card-title mb-3">Scores</h5>
-
-          <div class="row mb-2">
-            <div class="col-4 fw-bold">Protein score</div>
-            <div class="col-8" id="proteinScore"></div>
-          </div>
-
-          <div class="row mb-2">
-            <div class="col-4 fw-bold">Water score</div>
-            <div class="col-8" id="waterScore"></div>
-          </div>
-
-          <div class="row">
-            <div class="col-4 fw-bold">Total score</div>
-            <div class="col-8 fw-bold" id="totalScore"></div>
-          </div>
-
-        </div>
-      </div>
-
     </div>
-  </div>
 
 </div>
 
@@ -84,7 +85,7 @@
 {% block scripts %}
 
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
-<script >
+<script>
 
     let dataResult = null;
 
@@ -136,15 +137,15 @@
 
     function colorScore(score) {
         let red = 255;
-        let green =255;
+        let green = 255;
 
         if (score > 0.5) {
-            red = Math.round(255 * (1 - score)*2);
+            red = Math.round(255 * (1 - score) * 2);
             green = 255;
         }
         else {
             red = 255;
-            green = Math.round(255 * score*2);
+            green = Math.round(255 * score * 2);
         }
 
         return `rgb(${red}, ${green}, 0)`;
@@ -196,15 +197,15 @@
             },
             body: JSON.stringify(dataObj)
         }).then(response => response.json())
-        .then(data => {
-            sessionStorage.setItem("lastDataLoadedParams", JSON.stringify(dataObj));
-            saveDataInSession(JSON.stringify(data));
-            showData(data);
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            hideLoading();
-        });
+            .then(data => {
+                sessionStorage.setItem("lastDataLoadedParams", JSON.stringify(dataObj));
+                saveDataInSession(JSON.stringify(data));
+                showData(data);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                hideLoading();
+            });
     }
 
     function saveDataInSession(data) {
@@ -247,7 +248,7 @@
                     return;
                 }
                 showData(cachedData);
-            } 
+            }
             else {
                 console.log("Params do not match, fetching new data");
                 fetchData();
@@ -256,7 +257,7 @@
         else {
             fetchData();
         }
-        
+
     };
 
 
