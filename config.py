@@ -1,21 +1,37 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-class Config(object):
-    DEBUG = False
-    SECRET_KEY = os.environ.get('SECRET_KEY') or '\xbb\xed\x0e?\xcfY#8Ev\x17\
-    x04t\x15\xa4\x8b\xa8\****************'
-    USER_PER_PAGE = 10
-    if os.environ.get('DATABASE_URL') is None:
-        db_user = 'protein_viewer_user'
-        db_password = 'protein'
-        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL',
-                 f'postgresql://{db_user}:{db_password}@localhost:5432/pdb_viewer?client_encoding=utf8')
-    else:
-        SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
-        SQLALCHEMY_RECORD_QUERIES = True
-    print(SQLALCHEMY_DATABASE_URI)
 
+class Config(object):
+    """Base configuration (commune à tous les environnements)"""
+
+    DEBUG = False
+
+    SECRET_KEY = os.getenv("SECRET_KEY")
+
+    USER_PER_PAGE = 10
+
+    DB_USER = os.getenv("DB_USER")
+    DB_PASSWORD = os.getenv("DB_PASSWORD")
+    DB_HOST = os.getenv("DB_HOST", "localhost")
+    DB_PORT = os.getenv("DB_PORT", "5432")
+    DB_NAME = os.getenv("DB_NAME", "pdb_viewer")
+
+    DATABASE_URL = os.getenv("DATABASE_URL")
+
+    if DATABASE_URL:
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    else:
+        SQLALCHEMY_DATABASE_URI = (
+            f"postgresql://{DB_USER}:{DB_PASSWORD}"
+            f"@{DB_HOST}:{DB_PORT}/{DB_NAME}?client_encoding=utf8"
+        )
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -23,19 +39,21 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
 
-
 class HerokuConfig(ProductionConfig):
+    @classmethod
     def init_app(cls, app):
         ProductionConfig.init_app(app)
+
         import logging
         from logging import StreamHandler
+
         file_handler = StreamHandler()
         file_handler.setLevel(logging.WARNING)
         app.logger.addHandler(file_handler)
-config = {
-    'development': DevelopmentConfig,
-    'production': ProductionConfig,
-    'heroku': HerokuConfig,
 
-    'default': DevelopmentConfig
+config = {
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
+    "heroku": HerokuConfig,
+    "default": DevelopmentConfig,
 }

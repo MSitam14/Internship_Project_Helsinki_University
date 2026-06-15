@@ -23,34 +23,37 @@ git clone https://github.com/MSitam14/InternshipTestProject
 cd InternshipTestProject
 ```
 
-## 2. Créer l’environnement Conda
+## 2. Remplire le .env
+
+
+## 3. Créer l’environnement Conda
 
 ```bash
 conda env create -f requirements_webViewer.yml
 ```
 
-## 3. Activer l’environnement
+## 4. Activer l’environnement
 
 ```bash
 conda activate webViewer
 ```
 
-## 4. PostgreSQL — démarrage et création d'un utilisateur / base:
+## 5. PostgreSQL — démarrage et création d'un utilisateur / base:
 
 ```bash
 sudo service postgresql start
 sudo -u postgres psql
 ```
 
-Dans le shell PostgreSQL:
+Dans le shell PostgreSQL (/.../ to fil):
 
 ```sql
-CREATE USER protein_viewer_user WITH PASSWORD 'protein';
-CREATE DATABASE pdb_viewer OWNER protein_viewer_user;
-GRANT ALL PRIVILEGES ON DATABASE pdb_viewer TO protein_viewer_user;
+CREATE USER /user/ WITH PASSWORD /'password'/;
+CREATE DATABASE pdb_viewer OWNER /user/;
+GRANT ALL PRIVILEGES ON DATABASE pdb_viewer TO /user/;
 ```
 
-## 5. Initialiser la base :
+## 6. Initialiser la base :
 
 ```bash
 python manage.py init_db

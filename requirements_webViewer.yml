@@ -81,4 +81,5 @@ dependencies:
     - unicodedata2
     - urllib3
     - zipp==3.16.0
+    - python-dotenv
 
