@@ -18,6 +18,7 @@ from sklearn.neighbors import KDTree
 from chempy import cpv
 from tqdm import tqdm
 from .tools import translate_path
+import shutil
 
 ########
 # Main #
@@ -742,21 +743,11 @@ def element_prot_dist_score(pdb, fold_out, size, date, wat_env, atom_type, l_ori
         print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         
     except Exception as e:
-        try: os.remove(translate_path(pdb_path))
+        try: shutil.rmtree(translate_path(fold_out + date))
         except: pass
-        try: os.remove(translate_path(csv_path))
-        except: pass
-        try: os.remove(translate_path(pdb_ses_path))
-        except: pass
-        try:
-            os.rmdir(translate_path(pdb_fold))
-            os.rmdir(translate_path(pdb_ses_fold))
-            os.rmdir(translate_path(score_fold))
-            os.rmdir(translate_path(fold_out+date))
-            os.rmdir(translate_path(fold_out))
-        except: pass
-        raise Exception("Error in writing output files: " + str(e))
+        raise Exception("Error in creating output files: " + str(e))
 
+    
     pdb_content = ''
     csv_content = ''
     pdb_ses_content = ''
@@ -784,15 +775,9 @@ def element_prot_dist_score(pdb, fold_out, size, date, wat_env, atom_type, l_ori
     }
 
     try: 
-        os.remove(translate_path(pdb_path))
-        os.remove(translate_path(csv_path))
-        os.remove(translate_path(pdb_ses_path))
-        os.rmdir(translate_path(pdb_fold))
-        os.rmdir(translate_path(pdb_ses_fold))
-        os.rmdir(translate_path(score_fold))
-        os.rmdir(translate_path(fold_out+date))
-        os.rmdir(translate_path(fold_out))
-    except: pass
+        shutil.rmtree(translate_path(fold_out + date))
+    except Exception as e: 
+        print("Error in cleaning up temporary files: " + str(e))
     
     return out
 
