@@ -756,8 +756,9 @@ def element_prot_dist_score(pdb, fold_out, size, date, wat_env, atom_type, l_ori
         pdb_content = src.read()
     with open(translate_path(csv_path), 'r') as src:
         csv_content = src.read()
-    with open(translate_path(pdb_ses_path), 'rb') as src:
-        pdb_ses_content = src.read()
+    if run_fobs:
+        with open(translate_path(pdb_ses_path), 'rb') as src:
+            pdb_ses_content = src.read()
 
     out = {
         "pdb_file": {

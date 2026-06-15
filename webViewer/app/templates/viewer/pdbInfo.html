@@ -57,17 +57,17 @@
 
                     <h5 class="card-title mb-3">Scores</h5>
 
-                    <div class="row mb-2">
-                        <div class="col-4 fw-bold">Protein score</div>
+                    <div class="row mb-2" id="proteinScoreDiv">
+                        <div class="col-4 fw-bold">Score of the protein</div>
                         <div class="col-8" id="proteinScore"></div>
                     </div>
 
-                    <div class="row mb-2">
-                        <div class="col-4 fw-bold">Water score</div>
+                    <div class="row mb-2" id="waterScoreDiv">
+                        <div class="col-4 fw-bold">Score of the water</div>
                         <div class="col-8" id="waterScore"></div>
                     </div>
 
-                    <div class="row">
+                    <div class="row" id="totalScoreDiv">
                         <div class="col-4 fw-bold">Total score</div>
                         <div class="col-8 fw-bold" id="totalScore"></div>
                     </div>
@@ -89,13 +89,12 @@
 
     let dataResult = null;
 
-    const dataObj = JSON.parse({{ params | tojson }});
+    const paramObject = JSON.parse({{ params | tojson }});
 
     function connectDownloadButtons() {
 
         downloadPDBButton = document.getElementById("buttonDownloadPDB");
         downloadCSVButton = document.getElementById("buttonDownloadCSV");
-        downloadPSEButton = document.getElementById("buttonDownloadPSE");
 
         downloadPDBButton.addEventListener("click", () => {
             const blob = new Blob([dataResult.content.pdb_file.file_content], { type: 'text/plain' });
@@ -121,17 +120,23 @@
             URL.revokeObjectURL(url);
         });
 
-        downloadPSEButton.addEventListener("click", () => {
-            const blob = new Blob([dataResult.content.pdb_session.file_content], { type: 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${dataResult.content.pdb_session.file_name}`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
+        if(paramObject.params.run_frequencies == true) {
+            downloadPSEButton = document.getElementById("buttonDownloadPSE");
+            downloadPSEButton.addEventListener("click", () => {
+                const blob = new Blob([dataResult.content.pdb_session.file_content], { type: 'application/octet-stream' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${dataResult.content.pdb_session.file_name}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+        else {
+            document.getElementById("buttonDownloadPSE").style.display = "none";
+        }
 
     }
 
@@ -163,21 +168,34 @@
 
         scoreList = [];
 
-        scoreLine = data.content.pdb_file.file_content.split("\n").slice(0, 3)
+        scoreLine = data.content.pdb_file.file_content.split("\n").slice(0, 10)
+
+        proteinScore = scoreLine.find(line => line.includes("PROTEIN")).replace(/\s+/g, " ").split(" ")[4];
+        
+        totalScore = scoreLine.find(line => line.includes("TOTAL")).replace(/\s+/g, " ").split(" ")[4];
+
+        
         for (let line of scoreLine) {
             dataInLine = line.replace(/\s+/g, " ");
             scoreList.push(dataInLine.split(" ")[4]);
         }
 
-        document.getElementById("fileName").textContent = dataObj.pdb.name;
+        if(paramObject.params.water_env == true) {
+            waterScore = scoreLine.find(line => line.includes("WATERS")).replace(/\s+/g, " ").split(" ")[4];
+            document.getElementById("waterScore").textContent = waterScore;
+            document.getElementById("waterScore").style.color = colorScore(waterScore);
+        }
+        else {
+            document.getElementById("waterScoreDiv").style.display = "none";
+        }
 
-        document.getElementById("proteinScore").textContent = scoreList[0];
-        document.getElementById("waterScore").textContent = scoreList[1];
-        document.getElementById("totalScore").textContent = scoreList[2];
+        document.getElementById("fileName").textContent = paramObject.pdb.name;
 
-        document.getElementById("proteinScore").style.color = colorScore(scoreList[0]);
-        document.getElementById("waterScore").style.color = colorScore(scoreList[1]);
-        document.getElementById("totalScore").style.color = colorScore(scoreList[2]);
+        document.getElementById("proteinScore").textContent = proteinScore;
+        document.getElementById("totalScore").textContent = totalScore;
+
+        document.getElementById("proteinScore").style.color = colorScore(proteinScore);
+        document.getElementById("totalScore").style.color = colorScore(totalScore);
     }
 
     // spinner animation
@@ -195,10 +213,10 @@
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(dataObj)
+            body: JSON.stringify(paramObject)
         }).then(response => response.json())
             .then(data => {
-                sessionStorage.setItem("lastDataLoadedParams", JSON.stringify(dataObj));
+                sessionStorage.setItem("lastDataLoadedParams", JSON.stringify(paramObject));
                 saveDataInSession(JSON.stringify(data));
                 showData(data);
             })
@@ -236,9 +254,9 @@
             cachedParams = JSON.parse(cachedParams);
 
             console.log("Cached params found:", cachedParams);
-            console.log("Current params:", dataObj);
+            console.log("Current params:", paramObject);
 
-            if (compareParams(cachedParams, dataObj)) {
+            if (compareParams(cachedParams, paramObject)) {
                 console.log("Params match, loading cached data");
 
                 const cachedData = loadDataFromSession();
