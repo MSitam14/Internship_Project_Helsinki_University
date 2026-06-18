@@ -112,245 +112,271 @@
                                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" id="progressbarWaterScore">
                             </div>
                         </div>
+                    </div>
 
-                        <div class="mb-2" id="totalScoreDiv">
-                            <div class="fw-bold">Total score</div>
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 100%"
-                                    aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
-                                    id="progressbarTotalScore"></div>
+                    <div class="mb-2" id="totalScoreDiv">
+                        <div class="fw-bold">Total score</div>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 100%"
+                                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" id="progressbarTotalScore">
                             </div>
-
                         </div>
                     </div>
 
                 </div>
+
             </div>
 
+            <button class="btn btn-secondary mt-4" id="viwerButton">View Protein</button>
         </div>
 
-        {% endblock %}
+    </div>
 
-        {% block scripts %}
+    {% endblock %}
 
-        <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
-        <script>
+    {% block scripts %}
 
-            let dataResult = null;
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+    <script>
 
-            const paramObject = JSON.parse({{ params | tojson }});
+        let dataResult = null;
 
-            function connectDownloadButtons() {
+        const paramObject = JSON.parse({{ params | tojson }});
 
-                downloadPDBButton = document.getElementById("buttonDownloadPDB");
-                downloadCSVButton = document.getElementById("buttonDownloadCSV");
+        function connectDownloadButtons() {
 
-                downloadPDBButton.addEventListener("click", () => {
-                    const blob = new Blob([dataResult.content.pdb_file.file_content], { type: 'text/plain' });
+            downloadPDBButton = document.getElementById("buttonDownloadPDB");
+            downloadCSVButton = document.getElementById("buttonDownloadCSV");
+
+            downloadPDBButton.addEventListener("click", () => {
+                const blob = new Blob([dataResult.content.pdb_file.file_content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${dataResult.content.pdb_file.file_name}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+
+            downloadCSVButton.addEventListener("click", () => {
+                const blob = new Blob([dataResult.content.csv_file.file_content], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${dataResult.content.csv_file.file_name}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+
+            if (paramObject.params.run_frequencies == true) {
+                downloadPSEButton = document.getElementById("buttonDownloadPSE");
+                downloadPSEButton.addEventListener("click", () => {
+                    const blob = new Blob([dataResult.content.pdb_session.file_content], { type: 'application/octet-stream' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `${dataResult.content.pdb_file.file_name}`;
+                    a.download = `${dataResult.content.pdb_session.file_name}`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 });
+            }
+            else {
+                document.getElementById("buttonDownloadPSE").style.display = "none";
+            }
 
-                downloadCSVButton.addEventListener("click", () => {
-                    const blob = new Blob([dataResult.content.csv_file.file_content], { type: 'text/csv' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${dataResult.content.csv_file.file_name}`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
+        }
+
+        function initViwerButton() {
+            const viewerButton = document.getElementById("viwerButton");
+            viewerButton.addEventListener("click", () => {
+
+                dataTemp = dataResult.content.pdb_file;
+
+                const form = document.createElement("form");
+                form.method = "POST";
+                form.action = "/proteinViewer/3DMol";
+
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "json";
+                input.value = JSON.stringify(dataTemp);
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            });
+        }
+
+        function colorScore(score) {
+            let red = 255;
+            let green = 255;
+
+            if (score > 0.5) {
+                red = Math.round(255 * (1 - score) * 2);
+                green = 255;
+            }
+            else {
+                red = 255;
+                green = Math.round(255 * score * 2);
+            }
+
+            return `rgb(${red}, ${green}, 0)`;
+        }
+
+        function initPage(data) {
+            hideLoading();
+
+            dataResult = data;
+            console.log(data);
+
+            connectDownloadButtons();
+
+            initViwerButton();
+
+            find(line => line.startsWith("SCORE:"));
+
+            scoreList = [];
+
+            scoreLine = data.content.pdb_file.file_content.split("\n").slice(0, 10)
+
+            proteinScore = scoreLine.find(line => line.includes("PROTEIN")).replace(/\s+/g, " ").split(" ")[4];
+
+            totalScore = scoreLine.find(line => line.includes("TOTAL")).replace(/\s+/g, " ").split(" ")[4];
+
+
+            for (let line of scoreLine) {
+                dataInLine = line.replace(/\s+/g, " ");
+                scoreList.push(dataInLine.split(" ")[4]);
+            }
+
+            if (paramObject.params.water_env == true) {
+                waterScore = scoreLine.find(line => line.includes("WATERS")).replace(/\s+/g, " ").split(" ")[4];
+                document.getElementById("progressbarWaterScore").style.width = `${waterScore * 100}%`;
+                document.getElementById("progressbarWaterScore").setAttribute("aria-valuenow", waterScore * 100);
+                document.getElementById("progressbarWaterScore").style.backgroundColor = colorScore(waterScore);
+                document.getElementById("progressbarWaterScore").textContent = `${waterScore}`;
+                document.getElementById("progressbarWaterScore").style.color = "black";
+                document.getElementById("progressbarWaterScore").style.fontWeight = "bold";
+            }
+            else {
+                document.getElementById("waterScoreDiv").style.display = "none";
+            }
+
+            document.getElementById("fileName").textContent = paramObject.pdb.name;
+
+            // parameters
+            document.getElementById("paramRun_frequencies").textContent = paramObject.params.run_frequencies;
+            document.getElementById("paramWater_env").textContent = paramObject.params.water_env;
+            document.getElementById("paramAtom_type").textContent = paramObject.params.atom_type;
+            document.getElementById("paramEnvironment_size").textContent = paramObject.params.environment_size;
+            document.getElementById("paramPocket_num").textContent = paramObject.params.pocket_num;
+            document.getElementById("paramModel_num").textContent = paramObject.params.model_num;
+
+            // score bars
+            document.getElementById("progressbarProteinScore").style.width = `${proteinScore * 100}%`;
+            document.getElementById("progressbarProteinScore").setAttribute("aria-valuenow", proteinScore * 100);
+            document.getElementById("progressbarProteinScore").style.backgroundColor = colorScore(proteinScore);
+            document.getElementById("progressbarProteinScore").textContent = `${proteinScore}`;
+            document.getElementById("progressbarProteinScore").style.color = "black";
+            document.getElementById("progressbarProteinScore").style.fontWeight = "bold";
+
+            document.getElementById("progressbarTotalScore").style.width = `${totalScore * 100}%`;
+            document.getElementById("progressbarTotalScore").setAttribute("aria-valuenow", totalScore * 100);
+            document.getElementById("progressbarTotalScore").style.backgroundColor = colorScore(totalScore);
+            document.getElementById("progressbarTotalScore").textContent = `${totalScore}`;
+            document.getElementById("progressbarTotalScore").style.color = "black";
+            document.getElementById("progressbarTotalScore").style.fontWeight = "bold";
+
+        }
+
+        // spinner animation
+        const styleEl = document.createElement('style');
+        styleEl.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+        document.head.appendChild(styleEl);
+
+        // show loading
+        const showLoading = () => document.getElementById('loading').style.display = 'flex';
+        const hideLoading = () => document.getElementById('loading').style.display = 'none';
+
+        function fetchData() {
+            fetch("/api-score/score", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(paramObject)
+            }).then(response => response.json())
+                .then(data => {
+                    sessionStorage.setItem("lastDataLoadedParams", JSON.stringify(paramObject));
+                    saveDataInSession(JSON.stringify(data));
+                    initPage(data);
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    hideLoading();
                 });
+        }
 
-                if (paramObject.params.run_frequencies == true) {
-                    downloadPSEButton = document.getElementById("buttonDownloadPSE");
-                    downloadPSEButton.addEventListener("click", () => {
-                        const blob = new Blob([dataResult.content.pdb_session.file_content], { type: 'application/octet-stream' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `${dataResult.content.pdb_session.file_name}`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                    });
-                }
-                else {
-                    document.getElementById("buttonDownloadPSE").style.display = "none";
-                }
+        function saveDataInSession(data) {
+            const compressed = LZString.compressToUTF16(JSON.stringify(data));
+            sessionStorage.setItem("lastDataLoadedResult", compressed);
+        }
 
-            }
+        function loadDataFromSession() {
 
-            function colorScore(score) {
-                let red = 255;
-                let green = 255;
+            const compressed = sessionStorage.getItem("lastDataLoadedResult");
+            if (!compressed) return null;
+            const decompressed = JSON.parse(LZString.decompressFromUTF16(compressed));
+            return JSON.parse(decompressed);
+        }
 
-                if (score > 0.5) {
-                    red = Math.round(255 * (1 - score) * 2);
-                    green = 255;
-                }
-                else {
-                    red = 255;
-                    green = Math.round(255 * score * 2);
-                }
-
-                return `rgb(${red}, ${green}, 0)`;
-            }
-
-            function showData(data) {
-                hideLoading();
-
-                dataResult = data;
-                console.log(data);
-
-                connectDownloadButtons();
-
-                find(line => line.startsWith("SCORE:"));
-
-                scoreList = [];
-
-                scoreLine = data.content.pdb_file.file_content.split("\n").slice(0, 10)
-
-                proteinScore = scoreLine.find(line => line.includes("PROTEIN")).replace(/\s+/g, " ").split(" ")[4];
-
-                totalScore = scoreLine.find(line => line.includes("TOTAL")).replace(/\s+/g, " ").split(" ")[4];
+        function compareParams(params1, params2) {
+            return JSON.stringify(params1) === JSON.stringify(params2);
+        }
 
 
-                for (let line of scoreLine) {
-                    dataInLine = line.replace(/\s+/g, " ");
-                    scoreList.push(dataInLine.split(" ")[4]);
-                }
+        onload = () => {
 
-                if (paramObject.params.water_env == true) {
-                    waterScore = scoreLine.find(line => line.includes("WATERS")).replace(/\s+/g, " ").split(" ")[4];
-                    document.getElementById("progressbarWaterScore").style.width = `${waterScore * 100}%`;
-                    document.getElementById("progressbarWaterScore").setAttribute("aria-valuenow", waterScore * 100);
-                    document.getElementById("progressbarWaterScore").style.backgroundColor = colorScore(waterScore);
-                    document.getElementById("progressbarWaterScore").textContent = `${waterScore}`;
-                    document.getElementById("progressbarWaterScore").style.color = "black";
-                    document.getElementById("progressbarWaterScore").style.fontWeight = "bold";
-                }
-                else {
-                    document.getElementById("waterScoreDiv").style.display = "none";
-                }
+            showLoading();
 
-                document.getElementById("fileName").textContent = paramObject.pdb.name;
+            let cachedParams = sessionStorage.getItem("lastDataLoadedParams");
 
-                // parameters
-                document.getElementById("paramRun_frequencies").textContent = paramObject.params.run_frequencies;
-                document.getElementById("paramWater_env").textContent = paramObject.params.water_env;
-                document.getElementById("paramAtom_type").textContent = paramObject.params.atom_type;
-                document.getElementById("paramEnvironment_size").textContent = paramObject.params.environment_size;
-                document.getElementById("paramPocket_num").textContent = paramObject.params.pocket_num;
-                document.getElementById("paramModel_num").textContent = paramObject.params.model_num;
+            if (cachedParams) {
+                cachedParams = JSON.parse(cachedParams);
 
-                // score bars
-                document.getElementById("progressbarProteinScore").style.width = `${proteinScore * 100}%`;
-                document.getElementById("progressbarProteinScore").setAttribute("aria-valuenow", proteinScore * 100);
-                document.getElementById("progressbarProteinScore").style.backgroundColor = colorScore(proteinScore);
-                document.getElementById("progressbarProteinScore").textContent = `${proteinScore}`;
-                document.getElementById("progressbarProteinScore").style.color = "black";
-                document.getElementById("progressbarProteinScore").style.fontWeight = "bold";
+                console.log("Cached params found:", cachedParams);
+                console.log("Current params:", paramObject);
 
-                document.getElementById("progressbarTotalScore").style.width = `${totalScore * 100}%`;
-                document.getElementById("progressbarTotalScore").setAttribute("aria-valuenow", totalScore * 100);
-                document.getElementById("progressbarTotalScore").style.backgroundColor = colorScore(totalScore);
-                document.getElementById("progressbarTotalScore").textContent = `${totalScore}`;
-                document.getElementById("progressbarTotalScore").style.color = "black";
-                document.getElementById("progressbarTotalScore").style.fontWeight = "bold";
+                if (compareParams(cachedParams, paramObject)) {
+                    console.log("Params match, loading cached data");
 
-            }
-
-            // spinner animation
-            const styleEl = document.createElement('style');
-            styleEl.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
-            document.head.appendChild(styleEl);
-
-            // show loading
-            const showLoading = () => document.getElementById('loading').style.display = 'flex';
-            const hideLoading = () => document.getElementById('loading').style.display = 'none';
-
-            function fetchData() {
-                fetch("/api-score/score", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(paramObject)
-                }).then(response => response.json())
-                    .then(data => {
-                        sessionStorage.setItem("lastDataLoadedParams", JSON.stringify(paramObject));
-                        saveDataInSession(JSON.stringify(data));
-                        showData(data);
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        hideLoading();
-                    });
-            }
-
-            function saveDataInSession(data) {
-                const compressed = LZString.compressToUTF16(JSON.stringify(data));
-                sessionStorage.setItem("lastDataLoadedResult", compressed);
-            }
-
-            function loadDataFromSession() {
-
-                const compressed = sessionStorage.getItem("lastDataLoadedResult");
-                if (!compressed) return null;
-                const decompressed = JSON.parse(LZString.decompressFromUTF16(compressed));
-                return JSON.parse(decompressed);
-            }
-
-            function compareParams(params1, params2) {
-                return JSON.stringify(params1) === JSON.stringify(params2);
-            }
-
-
-            onload = () => {
-
-                showLoading();
-
-                let cachedParams = sessionStorage.getItem("lastDataLoadedParams");
-
-                if (cachedParams) {
-                    cachedParams = JSON.parse(cachedParams);
-
-                    console.log("Cached params found:", cachedParams);
-                    console.log("Current params:", paramObject);
-
-                    if (compareParams(cachedParams, paramObject)) {
-                        console.log("Params match, loading cached data");
-
-                        const cachedData = loadDataFromSession();
-                        if (!cachedData) {
-                            console.log("No cached data found, fetching new data");
-                            fetchData();
-                            return;
-                        }
-                        showData(cachedData);
-                    }
-                    else {
-                        console.log("Params do not match, fetching new data");
+                    const cachedData = loadDataFromSession();
+                    if (!cachedData) {
+                        console.log("No cached data found, fetching new data");
                         fetchData();
+                        return;
                     }
+                    initPage(cachedData);
                 }
                 else {
+                    console.log("Params do not match, fetching new data");
                     fetchData();
                 }
+            }
+            else {
+                fetchData();
+            }
 
-            };
+        };
 
 
 
-        </script>
+    </script>
 
-        {% endblock %}
+    {% endblock %}

@@ -72,6 +72,28 @@ def fileInfo(file_id, tech = '3DMol'):
         pdb_id=pdb_file.id
     )
 
+@viewer.route('/proteinViewer/<string:tech>', methods=['POST'])
+def proteinViewer(tech = '3DMol'):
+
+    data = request.form.get('json')
+
+    data = json.loads(data)
+
+    fileName = data["file_name"]
+    fileContent = data["file_content"]
+
+    #todo regler id et nettoyer le code
+
+    return render_template(
+        'viewer/fileInfo.html',
+        filename=fileName,
+        file_content=fileContent,
+        techUsed=tech,
+        pdb_id=1
+    )
+
+
+
 @viewer.route('/fitnessForm', methods=['GET'])
 def fitnessForm():
     return render_template('viewer/fitnessForm.html')

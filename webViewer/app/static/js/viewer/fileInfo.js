@@ -5,7 +5,7 @@
         return;
     }
 
-    const { fileContent, pdbId, techUsed } = JSON.parse(dataElement.textContent);
+    const { fileName, fileContent, pdbId, techUsed } = JSON.parse(dataElement.textContent);
 
     const container = document.getElementById('container-frame');
     const buttonDiv = document.getElementById('buttonDiv3DMol');
@@ -32,10 +32,8 @@
     }
 
     function loadJSMol() {
-        const pdbUrl = `/pdb_content/${pdbId}`;
-
-        const width = container.width || 600;
-        const height = container.height || 400;
+        const width = container.clientWidth || container.offsetWidth || 600;
+        const height = container.clientHeight || container.offsetHeight || 400;
 
         const info = {
             width: width,
@@ -51,13 +49,19 @@
         // load the structure after a short delay and poll for the applet info div
         setTimeout(() => {
             try {
-                Jmol.script(applet, 'load ' + pdbUrl);
+                const escapedContent = fileContent
+                    .replace(/\\/g, '\\\\')
+                    .replace(/\r\n/g, '\n')
+                    .replace(/\r/g, '\n');
+
+                const script = `load DATA "pdb"\n${escapedContent}\nEND "pdb"; cartoon only; color structure; zoom 120;`;
+                Jmol.script(applet, script);
             } catch (error) {
                 console.error('JSmol script error:', error);
             }
 
             const start = Date.now();
-            const maxWait = 3000; // ms
+            const maxWait = 5000; // ms
             const interval = 100;
             const poll = setInterval(() => {
                 const appletInfo = document.getElementById('applet0_appletinfotablediv');
@@ -66,6 +70,7 @@
                     if (!container.contains(appletInfo)) container.appendChild(appletInfo);
                     appletInfo.style.width = '100%';
                     appletInfo.style.height = '100%';
+                    appletInfo.style.display = 'block';
                 } else if (Date.now() - start > maxWait) {
                     clearInterval(poll);
                     console.warn('JSmol applet info div not found after wait');
@@ -80,8 +85,7 @@
             layoutShowControls: false
         })
             .then(viewer => {
-                const pdbUrl = `/pdb_content/${pdbId}`;
-                return viewer.loadStructureFromUrl(pdbUrl, 'pdb');
+                return viewer.loadStructureFromData(fileContent, 'pdb');
             })
             .catch(error => {
                 console.error('Erreur lors du chargement:', error);
@@ -103,15 +107,40 @@
         loadJSMol();
     }
 
+    function useOtherViewer(viewer) {
+
+
+        dataTemp = {
+            "file_name": fileName,
+            "file_content": fileContent
+        }
+
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/proteinViewer/" + viewer;
+
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "json";
+        input.value = JSON.stringify(dataTemp);
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
     molStarButton.addEventListener('click', () => {
-        window.location.href = `/fileInfo/${pdbId}/Mol*`;
+        // window.location.href = `/fileInfo/${pdbId}/Mol*`;
+        useOtherViewer("Mol*");
     });
 
     jsMolButton.addEventListener('click', () => {
-        window.location.href = `/fileInfo/${pdbId}/JSmol`;
+        // window.location.href = `/fileInfo/${pdbId}/JSmol`;
+        useOtherViewer("JSmol");
     });
 
     threeDMolButton.addEventListener('click', () => {
-        window.location.href = `/fileInfo/${pdbId}/3DMol`;
+        // window.location.href = `/fileInfo/${pdbId}/3DMol`;
+        useOtherViewer("3DMol");
     });
 })();
