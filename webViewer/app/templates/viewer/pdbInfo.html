@@ -192,6 +192,52 @@
 
         }
 
+        function initScoreBar(){
+            scoreLine = dataResult.content.pdb_file.file_content.split("\n").slice(0, 10)
+
+            proteinScore = scoreLine.find(line => line.includes("PROTEIN")).replace(/\s+/g, " ").split(" ")[4];
+
+            totalScore = scoreLine.find(line => line.includes("TOTAL")).replace(/\s+/g, " ").split(" ")[4];
+
+            if (paramObject.params.water_env == true) {
+                waterScore = scoreLine.find(line => line.includes("WATERS")).replace(/\s+/g, " ").split(" ")[4];
+                document.getElementById("progressbarWaterScore").style.width = `${waterScore * 100}%`;
+                document.getElementById("progressbarWaterScore").setAttribute("aria-valuenow", waterScore * 100);
+                document.getElementById("progressbarWaterScore").style.backgroundColor = colorScore(waterScore);
+                document.getElementById("progressbarWaterScore").textContent = `${waterScore}`;
+                document.getElementById("progressbarWaterScore").style.color = "black";
+                document.getElementById("progressbarWaterScore").style.fontWeight = "bold";
+            }
+            else {
+                document.getElementById("waterScoreDiv").style.display = "none";
+            }
+
+            document.getElementById("fileName").textContent = paramObject.pdb.name;
+
+            // parameters
+            document.getElementById("paramRun_frequencies").textContent = paramObject.params.run_frequencies;
+            document.getElementById("paramWater_env").textContent = paramObject.params.water_env;
+            document.getElementById("paramAtom_type").textContent = paramObject.params.atom_type;
+            document.getElementById("paramEnvironment_size").textContent = paramObject.params.environment_size;
+            document.getElementById("paramPocket_num").textContent = paramObject.params.pocket_num;
+            document.getElementById("paramModel_num").textContent = paramObject.params.model_num;
+
+            // score bars
+            document.getElementById("progressbarProteinScore").style.width = `${proteinScore * 100}%`;
+            document.getElementById("progressbarProteinScore").setAttribute("aria-valuenow", proteinScore * 100);
+            document.getElementById("progressbarProteinScore").style.backgroundColor = colorScore(proteinScore);
+            document.getElementById("progressbarProteinScore").textContent = `${proteinScore}`;
+            document.getElementById("progressbarProteinScore").style.color = "black";
+            document.getElementById("progressbarProteinScore").style.fontWeight = "bold";
+
+            document.getElementById("progressbarTotalScore").style.width = `${totalScore * 100}%`;
+            document.getElementById("progressbarTotalScore").setAttribute("aria-valuenow", totalScore * 100);
+            document.getElementById("progressbarTotalScore").style.backgroundColor = colorScore(totalScore);
+            document.getElementById("progressbarTotalScore").textContent = `${totalScore}`;
+            document.getElementById("progressbarTotalScore").style.color = "black";
+            document.getElementById("progressbarTotalScore").style.fontWeight = "bold";
+        }
+
         function initViwerButton() {
             const viewerButton = document.getElementById("viwerButton");
             viewerButton.addEventListener("click", () => {
@@ -235,63 +281,11 @@
             dataResult = data;
             console.log(data);
 
+            initScoreBar();
+
             connectDownloadButtons();
 
             initViwerButton();
-
-            find(line => line.startsWith("SCORE:"));
-
-            scoreList = [];
-
-            scoreLine = data.content.pdb_file.file_content.split("\n").slice(0, 10)
-
-            proteinScore = scoreLine.find(line => line.includes("PROTEIN")).replace(/\s+/g, " ").split(" ")[4];
-
-            totalScore = scoreLine.find(line => line.includes("TOTAL")).replace(/\s+/g, " ").split(" ")[4];
-
-
-            for (let line of scoreLine) {
-                dataInLine = line.replace(/\s+/g, " ");
-                scoreList.push(dataInLine.split(" ")[4]);
-            }
-
-            if (paramObject.params.water_env == true) {
-                waterScore = scoreLine.find(line => line.includes("WATERS")).replace(/\s+/g, " ").split(" ")[4];
-                document.getElementById("progressbarWaterScore").style.width = `${waterScore * 100}%`;
-                document.getElementById("progressbarWaterScore").setAttribute("aria-valuenow", waterScore * 100);
-                document.getElementById("progressbarWaterScore").style.backgroundColor = colorScore(waterScore);
-                document.getElementById("progressbarWaterScore").textContent = `${waterScore}`;
-                document.getElementById("progressbarWaterScore").style.color = "black";
-                document.getElementById("progressbarWaterScore").style.fontWeight = "bold";
-            }
-            else {
-                document.getElementById("waterScoreDiv").style.display = "none";
-            }
-
-            document.getElementById("fileName").textContent = paramObject.pdb.name;
-
-            // parameters
-            document.getElementById("paramRun_frequencies").textContent = paramObject.params.run_frequencies;
-            document.getElementById("paramWater_env").textContent = paramObject.params.water_env;
-            document.getElementById("paramAtom_type").textContent = paramObject.params.atom_type;
-            document.getElementById("paramEnvironment_size").textContent = paramObject.params.environment_size;
-            document.getElementById("paramPocket_num").textContent = paramObject.params.pocket_num;
-            document.getElementById("paramModel_num").textContent = paramObject.params.model_num;
-
-            // score bars
-            document.getElementById("progressbarProteinScore").style.width = `${proteinScore * 100}%`;
-            document.getElementById("progressbarProteinScore").setAttribute("aria-valuenow", proteinScore * 100);
-            document.getElementById("progressbarProteinScore").style.backgroundColor = colorScore(proteinScore);
-            document.getElementById("progressbarProteinScore").textContent = `${proteinScore}`;
-            document.getElementById("progressbarProteinScore").style.color = "black";
-            document.getElementById("progressbarProteinScore").style.fontWeight = "bold";
-
-            document.getElementById("progressbarTotalScore").style.width = `${totalScore * 100}%`;
-            document.getElementById("progressbarTotalScore").setAttribute("aria-valuenow", totalScore * 100);
-            document.getElementById("progressbarTotalScore").style.backgroundColor = colorScore(totalScore);
-            document.getElementById("progressbarTotalScore").textContent = `${totalScore}`;
-            document.getElementById("progressbarTotalScore").style.color = "black";
-            document.getElementById("progressbarTotalScore").style.fontWeight = "bold";
 
         }
 
