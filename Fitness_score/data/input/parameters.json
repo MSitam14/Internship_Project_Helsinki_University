@@ -5,8 +5,8 @@
     },
 
     "params": {
-        "densities_fold": "../data/densities/sybyl/",
-        "frequencies_fold": "../data/frequencies/sybyl/",
+        "densities_fold": "Fitness_score/data/densities/sybyl/",
+        "frequencies_fold": "Fitness_score/data/frequencies/sybyl/",
         "run_frequencies" : "True",
         "water_env": "True",
         "atom_type": "sybyl",

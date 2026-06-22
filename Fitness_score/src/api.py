@@ -3,8 +3,6 @@ import json
 import os
 import base64
 from .Scoring_website import score
-from .tools import translate_path
-
 
 from flask import Blueprint, request, jsonify
 
@@ -53,9 +51,9 @@ def calculate_score():
 
     params = data['params']
     pdb = data['pdb']
-    pdb_path = '../data/input/structures/'+pdb["name"]
+    pdb_path = 'Fitness_score/data/input/structures/'+pdb["name"]
 
-    with open(translate_path(pdb_path), 'w') as f:
+    with open(pdb_path, 'w') as f:
         f.write(pdb["content"])
     
     print(f"\nReceived scoring request for {pdb['name']} with parameters: {params}")
@@ -63,7 +61,7 @@ def calculate_score():
     try:
         out = score(params, pdb_path) 
     except Exception as e:
-        os.remove(translate_path(pdb_path))
+        os.remove(pdb_path)
         return jsonify({
             'status': 'error',
             'message': f'Error during scoring: {str(e)}'
@@ -72,7 +70,7 @@ def calculate_score():
     print(f"Scoring completed for {pdb['name']}. Cleaning up temporary files.")
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
 
-    try: os.remove(translate_path(pdb_path))
+    try: os.remove(pdb_path)
     except OSError: print(f"File '{pdb_path}' not found.")
 
     return jsonify({

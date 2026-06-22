@@ -10,8 +10,8 @@ class RequestParamFitness:
     pdb_name: str
     pdb_content: str
 
-    densities_fold: str = "../data/densities/"
-    frequencies_fold: str = "../data/frequencies/"
+    densities_fold: str = "Fitness_score/data/densities/"
+    frequencies_fold: str = "Fitness_score/data/frequencies/"
 
     run_frequencies: bool
     water_env: bool
