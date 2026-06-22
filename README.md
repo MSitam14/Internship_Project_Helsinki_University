@@ -10,6 +10,7 @@ Avant de commencer, assure-toi d’avoir :
 
 - Conda (Miniconda ou Anaconda)
 - Python 3.11+
+- postgresql
 - Environement linux
 
 ---
