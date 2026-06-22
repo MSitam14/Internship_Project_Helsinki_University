@@ -26,6 +26,9 @@ cd InternshipTestProject
 
 ## 2. Remplire le .env
 
+Copier le comptenu de .env.example dans un nouveau fichier .env <br>
+Remplire le nouveau fichier .env
+
 
 ## 3. Créer l’environnement Conda
 
