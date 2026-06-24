@@ -80,6 +80,11 @@
     }
 
     function loadMolStar() {
+
+        const cifFileUrl = "Fitness_score/src/res.cif"; // Replace with the actual URL of your CIF file
+        const cifFileName = "res.cif"; // Replace with the actual name of your CIF file
+        const cifFileContent = 
+
         molstar.Viewer.create('container-frame', {
             layoutIsExpanded: false,
             layoutShowControls: false
