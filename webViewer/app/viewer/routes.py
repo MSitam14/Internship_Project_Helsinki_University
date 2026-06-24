@@ -62,7 +62,7 @@ def pdbInfo():
 
     return render_template(
         'viewer/pdbInfo.html',
-        params=params.toJson()
+        params=json.loads(params.toJson())
     )
 
 @viewer.errorhandler(404)
