@@ -1,35 +1,18 @@
+
+const dataElement = document.getElementById('file-info-data');
+if (!dataElement) {
+    console.error('File info data element not found');
+}
+
+const { fileName, fileContent, pdbId, techUsed } = JSON.parse(dataElement.textContent);
+
+const container = document.getElementById('container-frame');
+const buttonDiv = document.getElementById('buttonDiv3DMol');
+const threeDMolButton = document.getElementById('3DMolButton');
+const molStarButton = document.getElementById('molStarButton');
+const jsMolButton = document.getElementById('jsMolButton');
+
 (function () {
-    const dataElement = document.getElementById('file-info-data');
-    if (!dataElement) {
-        console.error('File info data element not found');
-        return;
-    }
-
-    const { fileName, fileContent, pdbId, techUsed } = JSON.parse(dataElement.textContent);
-
-    const container = document.getElementById('container-frame');
-    const buttonDiv = document.getElementById('buttonDiv3DMol');
-    const threeDMolButton = document.getElementById('3DMolButton');
-    const molStarButton = document.getElementById('molStarButton');
-    const jsMolButton = document.getElementById('jsMolButton');
-
-    function load3DMol() {
-        const config = { backgroundColor: 'white' };
-        const viewer = $3Dmol.createViewer(container, config);
-        viewer.addModel(fileContent, 'pdb');
-        viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
-        viewer.zoomTo();
-        viewer.render();
-        viewer.zoom(1.2, 1000);
-
-        document.querySelectorAll('input[id^="style_"]').forEach(button => {
-            button.addEventListener('click', () => {
-                const style = button.id.replace('style_', '');
-                viewer.setStyle({}, { [style]: { color: 'spectrum' } });
-                viewer.render();
-            });
-        });
-    }
 
     function loadJSMol() {
         const width = container.clientWidth || container.offsetWidth || 600;
@@ -79,25 +62,6 @@
         }, 100);
     }
 
-    function loadMolStar() {
-
-        const cifFileUrl = "Fitness_score/src/res.cif"; // Replace with the actual URL of your CIF file
-        const cifFileName = "res.cif"; // Replace with the actual name of your CIF file
-        const cifFileContent = 
-
-        molstar.Viewer.create('container-frame', {
-            layoutIsExpanded: false,
-            layoutShowControls: false
-        })
-            .then(viewer => {
-                return viewer.loadStructureFromData(fileContent, 'pdb');
-            })
-            .catch(error => {
-                console.error('Erreur lors du chargement:', error);
-                container.innerHTML = '<p class="text-danger">Erreur : ' + error.message + '</p>';
-            });
-    }
-
     if (techUsed === '3DMol') {
         buttonDiv.style.display = 'block';
         threeDMolButton.style.display = 'none';
@@ -110,28 +74,6 @@
         buttonDiv.style.display = 'none';
         jsMolButton.style.display = 'none';
         loadJSMol();
-    }
-
-    function useOtherViewer(viewer) {
-
-
-        dataTemp = {
-            "file_name": fileName,
-            "file_content": fileContent
-        }
-
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = "/proteinViewer/" + viewer;
-
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "json";
-        input.value = JSON.stringify(dataTemp);
-
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
     }
 
     molStarButton.addEventListener('click', () => {
@@ -148,4 +90,83 @@
         // window.location.href = `/fileInfo/${pdbId}/3DMol`;
         useOtherViewer("3DMol");
     });
+
+    document.getElementById('returnToInfoButton').addEventListener('click', () => {
+        // const form = document.createElement("form");
+        // form.method = "POST";
+        // form.action = "/pdbInfoParameters";
+
+        // const input = document.createElement("input");
+        // input.type = "hidden";
+        // input.name = "json";
+
+        // cachedParams = sessionStorage.getItem("lastDataLoadedParams");
+
+        // input.value = cachedParams;
+
+        // form.appendChild(input);
+        // document.body.appendChild(form);
+        // form.submit();
+    });
+
 })();
+
+function useOtherViewer(viewer) {
+
+    dataTemp = {
+        "file_name": fileName,
+        "file_content": fileContent
+    }
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/proteinViewer/" + viewer;
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "json";
+    input.value = JSON.stringify(dataTemp);
+
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function load3DMol() {
+    const config = { backgroundColor: 'white' };
+    const viewer = $3Dmol.createViewer(container, config);
+    viewer.addModel(fileContent, 'pdb');
+    viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+    viewer.zoomTo();
+    viewer.render();
+    viewer.zoom(1.2, 1000);
+
+    document.querySelectorAll('input[id^="style_"]').forEach(button => {
+        button.addEventListener('click', () => {
+            const style = button.id.replace('style_', '');
+            viewer.setStyle({}, { [style]: { color: 'spectrum' } });
+            viewer.render();
+        });
+    });
+}
+
+
+
+function loadMolStar() {
+
+    const cifFileUrl = "Fitness_score/src/res.cif"; // Replace with the actual URL of your CIF file
+    const cifFileName = "res.cif"; // Replace with the actual name of your CIF file
+    const cifFileContent =
+
+        molstar.Viewer.create('container-frame', {
+            layoutIsExpanded: false,
+            layoutShowControls: false
+        })
+            .then(viewer => {
+                return viewer.loadStructureFromData(fileContent, 'pdb');
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement:', error);
+                container.innerHTML = '<p class="text-danger">Erreur : ' + error.message + '</p>';
+            });
+}

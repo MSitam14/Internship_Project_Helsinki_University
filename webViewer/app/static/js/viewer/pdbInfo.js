@@ -112,7 +112,7 @@ function initScoreBar() {
     document.getElementById("progressbarTotalScore").style.fontWeight = "bold";
 }
 
-function initViwerButton() {
+function initViewerButton() {
     const viewerButton = document.getElementById("viwerButton");
     viewerButton.addEventListener("click", () => {
 
@@ -159,7 +159,7 @@ function initPage(data) {
 
     connectDownloadButtons();
 
-    initViwerButton();
+    initViewerButton();
 }
 
 // spinner animation
