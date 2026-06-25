@@ -37,16 +37,30 @@ def proteinViewer(tech = '3DMol'):
         'viewer/proteinViewer.html',
         filename=fileName,
         file_content=fileContent,
-        techUsed=tech,
-        pdb_id=1
+        techUsed=tech
     )
 
 @viewer.route('/fitnessForm', methods=['GET'])
 def fitnessForm():
     return render_template('viewer/fitnessForm.html')
 
-@viewer.route('/pdbInfo', methods=['POST'])
-def pdbInfo():
+@viewer.route('/pdbInfo')
+def pdbInfo(parameters):
+
+    return render_template(
+        'viewer/pdbInfo.html',
+        params=parameters
+    )
+
+@viewer.route('/pdbInfoParameters', methods=['POST'])
+def pdbInfoParameters():
+    
+    parameters = request.form.get('json')
+    
+    return pdbInfo(json.dumps(parameters))
+
+@viewer.route('/pdbInfoRequest', methods=['POST'])
+def pdbInfoRequest():
     the_file = request.files['the_file']
     file_content = the_file.read().decode('utf-8', errors='replace')
 
@@ -59,11 +73,8 @@ def pdbInfo():
         environment_size=int(request.form.get('environment_size')),
         pocket_num=request.form.get('pocket_num') if request.form.get('pocket_num') else None,
         model_num=int(request.form.get('model_num')))
-
-    return render_template(
-        'viewer/pdbInfo.html',
-        params=json.loads(params.toJson())
-    )
+    
+    return pdbInfo(json.loads(params.toJson()))
 
 @viewer.errorhandler(404)
 def page_not_found(error):
