@@ -1,10 +1,129 @@
-    .mol-container {
-        width: 100%;
-        height: 400px;
-        position: relative;
-        display: block;
+:root {
+    --bs-body-font-family: 'Open Sans Variable', sans-serif;
+    --base-font-size: 16px;
+    --bs-primary-rgb: 0, 0, 0;
+
+    --sidebar-width: 250px;
+    --sidebar-size-collapsed: 60px;
+}
+
+/* ===== Mol* ===== */
+
+.mol-container {
+    width: 100%;
+    height: 400px;
+    position: relative;
+    display: block;
+}
+
+.mol-frame {
+    overflow: hidden;
+}
+
+/* ===== Layout ===== */
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+/* ===== Header ===== */
+
+#divNavBarLogo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+/* ===== Sidebar ===== */
+
+/* ===== Sidebar ===== */
+
+#sidebar {
+    position: sticky;
+    top: 0;
+
+    align-self: flex-start;
+
+    width: 250px;
+
+    overflow-x: hidden;
+
+    transition: width 0.3s ease;
+}
+
+#sidebar.collapsed {
+    width: var(--sidebar-size-collapsed);
+}
+
+/* ===== Menu ===== */
+
+.menu-text {
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+}
+
+#sidebar.collapsed .menu-text {
+    opacity: 0;
+    display: none;
+}
+
+#sidebar .nav-item {
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 2px 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#sidebar .nav-item:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Bouton burger ===== */
+
+#toggleBtn {
+    border-radius: 0;
+    border-bottom: 2px solid black;
+}
+
+/* ===== Contenu ===== */
+
+#content {
+    /* margin-left: var(--sidebar-width); */
+    transition: margin-left 0.3s ease;
+}
+
+main {
+    border-left: 2px solid black;
+}
+
+/* Quand la sidebar est réduite */
+body.sidebar-collapsed #content {
+    /* margin-left: var(--sidebar-size-collapsed); */
+}
+
+/* ===== Footer ===== */
+
+footer {
+    flex-shrink: 0;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 768px) {
+
+    #sidebar {
+        width: var(--sidebar-size-collapsed);
     }
 
-    .mol-frame {
-        overflow: hidden;
+    #content {
+        margin-left: var(--sidebar-size-collapsed);
     }
+
+    .menu-text {
+        display: none;
+    }
+}
