@@ -22,17 +22,17 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
 
-                    <button id="buttonDownloadPDB" class="btn btn-primary">
-                        Download PDB file
+                    <button id="buttonDownloadCIF" class="btn btn-primary">
+                        Download Cif file
                     </button>
 
                     <button id="buttonDownloadCSV" class="btn btn-outline-primary">
                         Download detail score file (.csv)
                     </button>
 
-                    <button id="buttonDownloadPSE" class="btn btn-outline-primary">
+                    <!-- <button id="buttonDownloadPSE" class="btn btn-outline-primary">
                         Download PyMOL session file
-                    </button>
+                    </button> -->
 
                 </div>
             </div>
@@ -140,7 +140,7 @@
 
     <script id="params-data" type="application/json">{{ params | tojson }}</script>
 
-    <script src="{{ url_for('static', filename='js/viewer/pdbInfo.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/viewer/proteinInfo.js') }}"></script>
 
 
     {% endblock %}

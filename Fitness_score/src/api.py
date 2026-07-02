@@ -2,7 +2,7 @@ import datetime
 import json
 import os
 import base64
-from .Scoring_website import score
+from .Scoring_website_mmcif import apiMain
 
 from flask import Blueprint, request, jsonify
 
@@ -21,14 +21,6 @@ def _json_safe(value):
     if isinstance(value, (list, tuple)):
         return [_json_safe(v) for v in value]
     return value
-
-@api.route('/test', methods=['GET'])
-def get_files():
-    """GET /api-score/test - test api"""
-    return jsonify({
-        'status': 'success',
-        'message': 'api-score is working!'
-    })
 
 @api.route('/score', methods=['POST'])
 def calculate_score():    
@@ -52,6 +44,7 @@ def calculate_score():
     params = data['params']
     pdb = data['pdb']
     pdb_path = 'Fitness_score/data/input/structures/'+pdb["name"]
+    file_path = 'Fitness_score/data/input/structures/'
 
     with open(pdb_path, 'w') as f:
         f.write(pdb["content"])
@@ -59,7 +52,7 @@ def calculate_score():
     print(f"\nReceived scoring request for {pdb['name']} with parameters: {params}")
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     try:
-        out = score(params, pdb_path) 
+        out = apiMain(params, pdb_path, file_path) 
     except Exception as e:
         os.remove(pdb_path)
         return jsonify({

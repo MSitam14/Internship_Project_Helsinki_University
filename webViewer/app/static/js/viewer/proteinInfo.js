@@ -12,15 +12,15 @@ let dataResult = null;
 
 function connectDownloadButtons() {
 
-    downloadPDBButton = document.getElementById("buttonDownloadPDB");
-    downloadCSVButton = document.getElementById("buttonDownloadCSV");
+    const downloadCIFButton = document.getElementById("buttonDownloadCIF");
+    const downloadCSVButton = document.getElementById("buttonDownloadCSV");
 
-    downloadPDBButton.addEventListener("click", () => {
-        const blob = new Blob([dataResult.content.pdb_file.file_content], { type: 'text/plain' });
+    downloadCIFButton.addEventListener("click", () => {
+        const blob = new Blob([dataResult.content.cif_file.file_content], { type: 'chemical/x-mmcif' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${dataResult.content.pdb_file.file_name}`;
+        a.download = `${dataResult.content.cif_file.file_name}`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -39,42 +39,19 @@ function connectDownloadButtons() {
         URL.revokeObjectURL(url);
     });
 
-    if (paramObject.params.run_frequencies == true) {
-        downloadPSEButton = document.getElementById("buttonDownloadPSE");
-        downloadPSEButton.addEventListener("click", () => {
-
-            const binary = atob(dataResult.content.pdb_session.file_content.data);
-            const bytes = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) {
-                bytes[i] = binary.charCodeAt(i);
-            }
-
-            const blob = new Blob([bytes], { type: 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${dataResult.content.pdb_session.file_name}`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-    }
-    else {
-        document.getElementById("buttonDownloadPSE").style.display = "none";
-    }
-
 }
 
 function initScoreBar() {
-    scoreLine = dataResult.content.pdb_file.file_content.split("\n").slice(0, 10)
 
-    proteinScore = scoreLine.find(line => line.includes("PROTEIN")).replace(/\s+/g, " ").split(" ")[4];
+    const scoreLine = dataResult.content.cif_file.file_content.split("\n").slice(0, 20);
 
-    totalScore = scoreLine.find(line => line.includes("TOTAL")).replace(/\s+/g, " ").split(" ")[4];
+    const proteinScore = scoreLine.find(line => line.includes("_pdbx_scoring_summary.score_protein")).replace(/\s+/g, " ").split(" ")[1];
+    
+    const totalScore = scoreLine.find(line => line.includes("_pdbx_scoring_summary.score_total")).replace(/\s+/g, " ").split(" ")[1];
+
 
     if (paramObject.params.water_env == true) {
-        waterScore = scoreLine.find(line => line.includes("WATERS")).replace(/\s+/g, " ").split(" ")[4];
+        const waterScore = scoreLine.find(line => line.includes("_pdbx_scoring_summary.score_water")).replace(/\s+/g, " ").split(" ")[1];
         document.getElementById("progressbarWaterScore").style.width = `${waterScore * 100}%`;
         document.getElementById("progressbarWaterScore").setAttribute("aria-valuenow", waterScore * 100);
         document.getElementById("progressbarWaterScore").style.backgroundColor = colorScore(waterScore);
@@ -116,7 +93,7 @@ function initViewerButton() {
     const viewerButton = document.getElementById("viwerButton");
     viewerButton.addEventListener("click", () => {
 
-        dataTemp = dataResult.content.pdb_file;
+        const dataTemp = dataResult.content.cif_file;
 
         const form = document.createElement("form");
         form.method = "POST";
