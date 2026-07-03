@@ -5,8 +5,9 @@ if (!dataElement) {
 }
 
 const paramObject = JSON.parse(dataElement.textContent);
+let userKey = null;
 
-console.log("Params object:", paramObject);
+// console.log("Params object:", paramObject);
 
 let dataResult = null;
 
@@ -46,7 +47,7 @@ function initScoreBar() {
     const scoreLine = dataResult.content.cif_file.file_content.split("\n").slice(0, 20);
 
     const proteinScore = scoreLine.find(line => line.includes("_pdbx_scoring_summary.score_protein")).replace(/\s+/g, " ").split(" ")[1];
-    
+
     const totalScore = scoreLine.find(line => line.includes("_pdbx_scoring_summary.score_total")).replace(/\s+/g, " ").split(" ")[1];
 
 
@@ -130,7 +131,6 @@ function initPage(data) {
     hideLoading();
 
     dataResult = data;
-    console.log(data);
 
     initScoreBar();
 
@@ -148,7 +148,7 @@ document.head.appendChild(styleEl);
 const showLoading = () => document.getElementById('loading').style.display = 'flex';
 const hideLoading = () => document.getElementById('loading').style.display = 'none';
 
-function fetchData() {
+async function fetchData() {
     fetch("/api-score/score", {
         method: "POST",
         headers: {
@@ -156,9 +156,33 @@ function fetchData() {
         },
         body: JSON.stringify(paramObject)
     }).then(response => response.json())
-        .then(data => {
-            sessionStorage.setItem("lastDataLoadedParams", JSON.stringify(paramObject));
-            saveDataInSession(JSON.stringify(data));
+        .then(async data => {
+
+            if (!userKey) {
+                console.log("No userKey found, generating new userKey");
+                userKey = await fetch("/api/generateUserKey", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            saveUserKey(data.user_key);
+                        }
+                        else {
+                            console.error("Error generating userKey:", data.message);
+                        }
+
+                        return data.user_key;
+                    })
+                    .catch(error => {
+                        console.error("Error generating userKey:", error);
+                    });
+            }
+
+            saveDataInDB(userKey, paramObject, data);
             initPage(data);
         })
         .catch(error => {
@@ -167,9 +191,31 @@ function fetchData() {
         });
 }
 
-function saveDataInSession(data) {
-    const compressed = LZString.compressToUTF16(JSON.stringify(data));
-    sessionStorage.setItem("lastDataLoadedResult", compressed);
+function saveDataInDB(userKey, params, data) {
+    fetch(`/api/saveDataWithUserKey/${userKey}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            parameter: params,
+            cif_file_name: data.content.cif_file.file_name,
+            cif_file_content: data.content.cif_file.file_content,
+            csv_file_name: data.content.csv_file.file_name,
+            csv_file_content: data.content.csv_file.file_content
+        })
+    }).then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                console.log("Data saved successfully with userKey");
+            }
+            else {
+                console.error("Error saving data with userKey:", data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error saving data with userKey:", error);
+        });
 }
 
 function loadDataFromSession() {
@@ -185,36 +231,61 @@ function compareParams(params1, params2) {
 }
 
 
-onload = () => {
+onload = async () => {
 
     showLoading();
 
-    let cachedParams = sessionStorage.getItem("lastDataLoadedParams");
+    userKey = await getUserKey();
 
-    if (cachedParams) {
-        cachedParams = JSON.parse(cachedParams);
+    userKey = userKey ? userKey.data : null;
 
-        console.log("Cached params found:", cachedParams);
-        console.log("Current params:", paramObject);
+    if (userKey) {
 
-        if (compareParams(cachedParams, paramObject)) {
-            console.log("Params match, loading cached data");
-
-            const cachedData = loadDataFromSession();
-            if (!cachedData) {
-                console.log("No cached data found, fetching new data");
-                fetchData();
-                return;
+        fetch(`/api/getDataWhithUserKey/` + userKey, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
             }
-            initPage(cachedData);
-        }
-        else {
-            console.log("Params do not match, fetching new data");
-            fetchData();
-        }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    if (compareParams(data.parameter, paramObject)) {
+
+                        console.log("Params match, loading cached data");
+
+                        const formatData = {
+                            content: {
+                                cif_file: {
+                                    file_name: data.cif_file_name,
+                                    file_content: data.cif_file_content
+                                },
+                                csv_file: {
+                                    file_name: data.csv_file_name,
+                                    file_content: data.csv_file_content
+                                }
+                            }
+                        };
+
+                        initPage(formatData);
+                    }
+                    else {
+                        console.log("Params do not match, fetching new data");
+                        fetchData();
+                    }
+                }
+                else {
+                    console.log("No data found for userKey, fetching new data");
+                    fetchData();
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                hideLoading();
+            });
     }
     else {
+        console.log("No userKey found, fetching new data");
         fetchData();
     }
-
 };

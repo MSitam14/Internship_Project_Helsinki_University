@@ -138,9 +138,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 
+    <script src="{{ url_for('static', filename='tools/viewer/webCache.js') }}"></script>
+
     <script id="params-data" type="application/json">{{ params | tojson }}</script>
 
-    <script type="module" src="{{ url_for('static', filename='js/viewer/proteinInfo.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/viewer/proteinInfo.js') }}"></script>
 
 
     {% endblock %}
