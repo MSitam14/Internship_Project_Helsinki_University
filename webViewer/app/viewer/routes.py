@@ -3,7 +3,7 @@ from flask import render_template, flash, redirect, \
 from ..static.tools.viewer.RequestParamFitness import AtomType
 from ..static.tools.viewer.RequestParamFitness import RequestParamFitness
 from ..import db
-from ..models import PDBFile
+from ..models import TempSaveScoreOneFile
 from . import viewer
 from flask import Response
 from sqlalchemy.exc import IntegrityError
@@ -52,10 +52,12 @@ def pdbInfo(parameters):
         params=parameters
     )
 
-@viewer.route('/pdbInfoParameters', methods=['POST'])
+@viewer.route('/pdbInfoUserKey', methods=['POST'])
 def pdbInfoParameters():
     
     parameters = request.form.get('json')
+
+    # todo appel api recuperer params avec userkey
     
     return pdbInfo(json.dumps(parameters))
 
