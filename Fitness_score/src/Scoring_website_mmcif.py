@@ -224,7 +224,7 @@ def dist_score_prot(l_atom, l_atom_num, dist, nb_contact, pdb, run_fobs, density
             dict_detail['Fobs_Fexp_' + str(i)] = "%.3f" % (float(fobs_fexp))
 
         try:
-            log_file = '../logs/logfile_' + pdb + '.txt'
+            log_file = 'Fitness_score/logs/logfile_' + pdb + '.txt'
             with open(density_fold + l_atom[0] + '_' +
                       l_atom[i] + '_' + str(i) + '.txt', 'r') as src:
                 reader = csv.reader(src, quotechar="\"", delimiter=' ')
