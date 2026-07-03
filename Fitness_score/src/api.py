@@ -58,7 +58,7 @@ def calculate_score():
         return jsonify({
             'status': 'error',
             'message': f'Error during scoring: {str(e)}'
-        }), 500
+        }), 400
     
     print(f"Scoring completed for {pdb['name']}. Cleaning up temporary files.")
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
