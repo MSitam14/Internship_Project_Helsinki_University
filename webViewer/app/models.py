@@ -46,11 +46,12 @@ class TempSaveScoreOneFile(db.Model):
 
         data = TempSaveScoreOneFile.query.filter_by(user_key=userKey).first()
 
-        data.date_last_used = datetime.now()
-
-        db.session.commit()
-
-        return data
+        if data:
+            data.date_last_used = datetime.now()
+            db.session.commit()
+            return data
+        
+        return None
     
     @staticmethod
     def user_key_exists(userKey):

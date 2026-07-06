@@ -13,7 +13,7 @@ def get_data_with_user_key(userKey):
         return jsonify({
             'status': 'error',
             'message': 'Aucune donnée trouvée pour ce user_key'
-        }), 204
+        })
     
     return jsonify({
         'status': 'success',
