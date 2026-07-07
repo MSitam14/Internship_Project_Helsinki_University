@@ -98,12 +98,12 @@ function initViewerButton() {
 
         const form = document.createElement("form");
         form.method = "POST";
-        form.action = "/proteinViewer/3DMol";
+        form.action = "/proteinViewer/Mol*";
 
         const input = document.createElement("input");
         input.type = "hidden";
-        input.name = "json";
-        input.value = JSON.stringify(dataTemp);
+        input.name = "userKey";
+        input.value = userKey;
 
         form.appendChild(input);
         document.body.appendChild(form);
