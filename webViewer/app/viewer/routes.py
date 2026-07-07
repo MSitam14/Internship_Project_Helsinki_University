@@ -24,20 +24,21 @@ def index():
 
 
 @viewer.route('/proteinViewer/<string:tech>', methods=['POST'])
-def proteinViewer(tech = '3DMol'):
+def proteinViewer(tech = 'Mol*'):
 
-    data = request.form.get('json')
+    userKey = request.form.get('userKey')
 
-    data = json.loads(data)
+    score_data = TempSaveScoreOneFile.get_by_user_key(userKey)
 
-    fileName = data["file_name"]
-    fileContent = data["file_content"]
+    cif_file_name = score_data.cif_file_name
+    cif_file_content = score_data.cif_file_content
 
     return render_template(
         'viewer/proteinViewer.html',
-        filename=fileName,
-        file_content=fileContent,
-        techUsed=tech
+        filename=cif_file_name,
+        file_content=cif_file_content,
+        techUsed=tech,
+        userKey=userKey
     )
 
 @viewer.route('/fitnessForm', methods=['GET'])
@@ -55,11 +56,17 @@ def pdbInfo(parameters):
 @viewer.route('/pdbInfoUserKey', methods=['POST'])
 def pdbInfoParameters():
     
-    parameters = request.form.get('json')
+    userKey = request.form.get('userKey')
 
-    # todo appel api recuperer params avec userkey
+    data = TempSaveScoreOneFile.get_by_user_key(userKey)
+
+    if not data:
+        return fitnessForm()
     
-    return pdbInfo(json.dumps(parameters))
+    else:
+        parameters = data.parameter
+    
+        return pdbInfo((parameters))
 
 @viewer.route('/pdbInfoRequest', methods=['POST'])
 def pdbInfoRequest():

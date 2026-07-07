@@ -4,7 +4,7 @@ if (!dataElement) {
     console.error('File info data element not found');
 }
 
-const { fileName, fileContent, pdbId, techUsed } = JSON.parse(dataElement.textContent);
+const { fileName, fileContent, pdbId, techUsed, userKey } = JSON.parse(dataElement.textContent);
 
 const container = document.getElementById('container-frame');
 const buttonDiv = document.getElementById('buttonDiv3DMol');
@@ -37,7 +37,7 @@ const jsMolButton = document.getElementById('jsMolButton');
                     .replace(/\r\n/g, '\n')
                     .replace(/\r/g, '\n');
 
-                const script = `load DATA "pdb"\n${escapedContent}\nEND "pdb"; cartoon only; color structure; zoom 120;`;
+                const script = `load DATA "mmcif"\n${escapedContent}\nEND "mmcif"; cartoon only; color structure; zoom 120;`;
                 Jmol.script(applet, script);
             } catch (error) {
                 console.error('JSmol script error:', error);
@@ -92,31 +92,23 @@ const jsMolButton = document.getElementById('jsMolButton');
     });
 
     document.getElementById('returnToInfoButton').addEventListener('click', () => {
-        // const form = document.createElement("form");
-        // form.method = "POST";
-        // form.action = "/pdbInfoParameters";
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/pdbInfoUserKey";
 
-        // const input = document.createElement("input");
-        // input.type = "hidden";
-        // input.name = "json";
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "userKey";
+        input.value = userKey;
 
-        // cachedParams = sessionStorage.getItem("lastDataLoadedParams");
-
-        // input.value = cachedParams;
-
-        // form.appendChild(input);
-        // document.body.appendChild(form);
-        // form.submit();
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
     });
 
 })();
 
 function useOtherViewer(viewer) {
-
-    dataTemp = {
-        "file_name": fileName,
-        "file_content": fileContent
-    }
 
     const form = document.createElement("form");
     form.method = "POST";
@@ -124,8 +116,8 @@ function useOtherViewer(viewer) {
 
     const input = document.createElement("input");
     input.type = "hidden";
-    input.name = "json";
-    input.value = JSON.stringify(dataTemp);
+    input.name = "userKey";
+    input.value = userKey;
 
     form.appendChild(input);
     document.body.appendChild(form);
@@ -135,7 +127,7 @@ function useOtherViewer(viewer) {
 function load3DMol() {
     const config = { backgroundColor: 'white' };
     const viewer = $3Dmol.createViewer(container, config);
-    viewer.addModel(fileContent, 'pdb');
+    viewer.addModel(fileContent, 'mmcif');
     viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
     viewer.zoomTo();
     viewer.render();
@@ -154,8 +146,6 @@ function load3DMol() {
 
 function loadMolStar() {
 
-    const cifFileUrl = "Fitness_score/src/res.cif"; // Replace with the actual URL of your CIF file
-    const cifFileName = "res.cif"; // Replace with the actual name of your CIF file
     const cifFileContent =
 
         molstar.Viewer.create('container-frame', {
@@ -163,7 +153,7 @@ function loadMolStar() {
             layoutShowControls: false
         })
             .then(viewer => {
-                return viewer.loadStructureFromData(fileContent, 'pdb');
+                return viewer.loadStructureFromData(fileContent, 'mmcif');
             })
             .catch(error => {
                 console.error('Erreur lors du chargement:', error);
