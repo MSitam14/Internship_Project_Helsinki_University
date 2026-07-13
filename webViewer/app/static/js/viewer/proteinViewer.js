@@ -29,10 +29,12 @@ const jsMolButton = document.getElementById('jsMolButton');
         const applet = Jmol.getApplet('applet0', info);
         container.innerHTML = Jmol.getAppletHtml(applet);
 
+        const modifiedContent = replaceBFactorByFitness(fileContent);
+
         // load the structure after a short delay and poll for the applet info div
         setTimeout(() => {
             try {
-                const escapedContent = fileContent
+                const escapedContent = modifiedContent
                     .replace(/\\/g, '\\\\')
                     .replace(/\r\n/g, '\n')
                     .replace(/\r/g, '\n');
@@ -125,10 +127,12 @@ function useOtherViewer(viewer) {
 }
 
 function load3DMol() {
+    const modifiedContent = replaceBFactorByFitness(fileContent);
     const config = { backgroundColor: 'white' };
     const viewer = $3Dmol.createViewer(container, config);
-    viewer.addModel(fileContent, 'mmcif');
-    viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+    viewer.addModel(modifiedContent, 'mmcif');
+    // viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+    viewer.setStyle({},{cartoon: {colorscheme: {prop: "b",gradient: new $3Dmol.Gradient.RWB(0, 1)}}});
     viewer.zoomTo();
     viewer.render();
     viewer.zoom(1.2, 1000);
@@ -136,7 +140,7 @@ function load3DMol() {
     document.querySelectorAll('input[id^="style_"]').forEach(button => {
         button.addEventListener('click', () => {
             const style = button.id.replace('style_', '');
-            viewer.setStyle({}, { [style]: { color: 'spectrum' } });
+            viewer.setStyle({}, { [style]: {colorscheme: {prop: "b",gradient: new $3Dmol.Gradient.RWB(0, 1)}} });
             viewer.render();
         });
     });
@@ -146,6 +150,8 @@ function load3DMol() {
 
 function loadMolStar() {
 
+    const modifiedContent = replaceBFactorByFitness(fileContent);
+
     const cifFileContent =
 
         molstar.Viewer.create('container-frame', {
@@ -153,10 +159,75 @@ function loadMolStar() {
             layoutShowControls: false
         })
             .then(viewer => {
-                return viewer.loadStructureFromData(fileContent, 'mmcif');
+                return viewer.loadStructureFromData(modifiedContent, 'mmcif');
             })
             .catch(error => {
                 console.error('Erreur lors du chargement:', error);
                 container.innerHTML = '<p class="text-danger">Erreur : ' + error.message + '</p>';
             });
+
+    console.log(molstar.Viewer.plugin);
+}
+
+function replaceBFactorByFitness(cifContent) {
+
+    const lines = cifContent.split("\n");
+
+    let atomLoop = false;
+    let readingHeaders = false;
+    let headers = [];
+
+    let bIndex = -1;
+    let fitnessIndex = -1;
+
+    for (let i = 0; i < lines.length; i++) {
+
+        const line = lines[i].trim();
+
+        if (line === "loop_") {
+            atomLoop = false;
+            readingHeaders = true;
+            headers = [];
+            continue;
+        }
+
+        if (readingHeaders && line.startsWith("_atom_site.")) {
+
+            headers.push(line);
+
+            if (line === "_atom_site.B_iso_or_equiv")
+                bIndex = headers.length - 1;
+
+            if (line === "_atom_site.pdbx_fitness_score")
+                fitnessIndex = headers.length - 1;
+
+            continue;
+        }
+
+        // Première ligne de données
+        if (readingHeaders && headers.length > 0 && !line.startsWith("_")) {
+
+            readingHeaders = false;
+
+            // Ce n'est pas le bon loop
+            if (bIndex === -1 || fitnessIndex === -1)
+                break;
+
+            atomLoop = true;
+        }
+
+        if (atomLoop) {
+
+            if (line === "#" || line.startsWith("loop_"))
+                break;
+
+            const cols = lines[i].trim().split(/\s+/);
+
+            cols[bIndex] = cols[fitnessIndex];
+
+            lines[i] = cols.join(" ");
+        }
+    }
+
+    return lines.join("\n");
 }
