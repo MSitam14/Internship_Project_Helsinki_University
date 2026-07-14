@@ -131,8 +131,22 @@ function load3DMol() {
     const config = { backgroundColor: 'white' };
     const viewer = $3Dmol.createViewer(container, config);
     viewer.addModel(modifiedContent, 'mmcif');
-    // viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
-    viewer.setStyle({},{cartoon: {colorscheme: {prop: "b",gradient: new $3Dmol.Gradient.RWB(0, 1)}}});
+    viewer.setStyle({}, { cartoon: { colorscheme: { prop: "b", gradient: new $3Dmol.Gradient.RWB(0, 1) } } });
+
+    // viewer.addBox({
+    //     center: { x: 0, y: 0, z: 0 },
+    //     dimensions: { w: 30, h: 30, d: 30},
+    //     color: "black",
+    //     opacity: 0.5
+    // });
+
+    // viewer.addBox({
+    //     center: { x: 10, y: 30, z: 0 },
+    //     dimensions: { w: 30, h: 30, d: 30},
+    //     color: "green",
+    //     wireframe: true
+    // });
+
     viewer.zoomTo();
     viewer.render();
     viewer.zoom(1.2, 1000);
@@ -140,7 +154,7 @@ function load3DMol() {
     document.querySelectorAll('input[id^="style_"]').forEach(button => {
         button.addEventListener('click', () => {
             const style = button.id.replace('style_', '');
-            viewer.setStyle({}, { [style]: {colorscheme: {prop: "b",gradient: new $3Dmol.Gradient.RWB(0, 1)}} });
+            viewer.setStyle({}, { [style]: { colorscheme: { prop: "b", gradient: new $3Dmol.Gradient.RWB(0, 1) } } });
             viewer.render();
         });
     });
