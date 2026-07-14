@@ -224,7 +224,7 @@ def dist_score_prot(l_atom, l_atom_num, dist, nb_contact, pdb, run_fobs, density
             dict_detail['Fobs_Fexp_' + str(i)] = "%.3f" % (float(fobs_fexp))
 
         try:
-            log_file = 'Fitness_score/logs/logfile_' + pdb + '.txt'
+            log_file = 'Fitness_score/logs/api_score/logfile_' + pdb + '.txt'
             with open(density_fold + l_atom[0] + '_' +
                       l_atom[i] + '_' + str(i) + '.txt', 'r') as src:
                 reader = csv.reader(src, quotechar="\"", delimiter=' ')
@@ -843,11 +843,24 @@ def element_prot_dist_score(struct_path, size, date, fold_out, wat_env, atom_typ
 
     cif_content = ''
     csv_content = ''
+    log_name = ''
+    log_content = ''
 
     with open(cif_name, 'r') as src:
         cif_content = src.read()
     with open(csv_name, 'r') as src:
         csv_content = src.read()
+
+    try:
+        log_name = 'Fitness_score/logs/api_score/logfile_' + basename + '.txt'
+        log_name = log_name.replace('_wat', '')
+        print("Reading log file: " + log_name)
+        with open(log_name, 'r') as src:
+            log_content = src.read()
+        os.remove(log_name)
+    except Exception as e:
+        log_name = ''
+        print("no log file found: ")
     
     out = {
         "cif_file": {
@@ -857,6 +870,10 @@ def element_prot_dist_score(struct_path, size, date, fold_out, wat_env, atom_typ
         "csv_file": {
             "file_name": basename + "_" + str(size) + "_prot_score_" + date + ".csv",
             "file_content": csv_content
+        },
+        "log_file": {
+            "file_name": log_name,
+            "file_content": log_content
         }
     }
 
