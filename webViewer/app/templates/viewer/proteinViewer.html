@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/proteinViewer.css') }}">
+{% endblock %}
+
 {% block content %}
 
 <div class="row justify-content-center">
@@ -30,6 +34,12 @@
                     <input class="btn btn-info" type="button" id="style_line" value="Line">
                     <input class="btn btn-info" type="button" id="style_sphere" value="Sphere">
                     <input class="btn btn-info" type="button" id="style_stick" value="Stick">
+                </div>
+
+                <div id="legend" class="legend mb-4">
+                    <span>0</span>
+                    <div class="gradient"></div>
+                    <span>1</span>
                 </div>
 
                 <div class="mb-4 border border-2 border-secondary rounded-3 p-2 bg-white shadow-sm mol-frame">

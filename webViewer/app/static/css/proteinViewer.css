@@ -1,0 +1,18 @@
+#legend {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 300px;
+}
+
+#legend .gradient {
+    flex: 1;
+    height: 20px;
+    border-radius: 5px;
+    background: linear-gradient(
+        to right,
+        red,
+        white,
+        blue
+    );
+}
