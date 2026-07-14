@@ -98,7 +98,7 @@ function initViewerButton() {
 
         const form = document.createElement("form");
         form.method = "POST";
-        form.action = "/proteinViewer/Mol*";
+        form.action = "/proteinViewer/3DMol";
 
         const input = document.createElement("input");
         input.type = "hidden";
