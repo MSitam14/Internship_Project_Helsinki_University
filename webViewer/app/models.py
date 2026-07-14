@@ -23,6 +23,8 @@ class TempSaveScoreOneFile(db.Model):
     cif_file_content = db.Column(db.Text, nullable=False)
     csv_file_name = db.Column(db.String(255), nullable=False)
     csv_file_content = db.Column(db.Text, nullable=False)
+    log_file_name = db.Column(db.String(255), nullable=True)
+    log_file_content = db.Column(db.Text, nullable=True)
     date_last_used = db.Column(db.DateTime, nullable=False)
 
     def __repr__(self):
@@ -59,7 +61,7 @@ class TempSaveScoreOneFile(db.Model):
         return db.session.query(TempSaveScoreOneFile.query.filter_by(user_key=userKey).exists()).scalar()
     
     @staticmethod
-    def save_score_data(userKey ,parameter, cif_file_name, cif_file_content, csv_file_name, csv_file_content):
+    def save_score_data(userKey ,parameter, cif_file_name, cif_file_content, csv_file_name, csv_file_content, log_file_name=None, log_file_content=None):
 
         TempSaveScoreOneFile.clean_old_entries()
 
@@ -72,6 +74,8 @@ class TempSaveScoreOneFile(db.Model):
             score_data.cif_file_content = cif_file_content
             score_data.csv_file_name = csv_file_name
             score_data.csv_file_content = csv_file_content
+            score_data.log_file_name = log_file_name
+            score_data.log_file_content = log_file_content
             score_data.date_last_used = datetime.now()
         else:
             # Créer une nouvelle entrée
@@ -82,6 +86,8 @@ class TempSaveScoreOneFile(db.Model):
                 cif_file_content=cif_file_content,
                 csv_file_name=csv_file_name,
                 csv_file_content=csv_file_content,
+                log_file_name=log_file_name,
+                log_file_content=log_file_content,
                 date_last_used=db.func.now()
             )
             db.session.add(score_data)
