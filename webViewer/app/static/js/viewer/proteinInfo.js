@@ -14,7 +14,8 @@ let dataResult = null;
 function connectDownloadButtons() {
 
     const downloadCIFButton = document.getElementById("buttonDownloadCIF");
-    const downloadCSVButton = document.getElementById("buttonDownloadCSV");
+    const downloadCSVButton = document.getElementById("buttonDownloadCSV"); 
+    const downloadLOGButton = document.getElementById("buttonDownloadLog"); 
 
     downloadCIFButton.addEventListener("click", () => {
         const blob = new Blob([dataResult.content.cif_file.file_content], { type: 'chemical/x-mmcif' });
@@ -39,6 +40,24 @@ function connectDownloadButtons() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     });
+
+    console.log("dataResult.content.log_file:", dataResult.content.log_file);
+
+    if (dataResult.content.log_file && dataResult.content.log_file.file_content) {
+        downloadLOGButton.addEventListener("click", () => {
+            const blob = new Blob([dataResult.content.log_file.file_content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${dataResult.content.log_file.file_name}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    } else {
+        downloadLOGButton.hidden = true;
+    }
 
 }
 
@@ -202,7 +221,9 @@ function saveDataInDB(userKey, params, data) {
             cif_file_name: data.content.cif_file.file_name,
             cif_file_content: data.content.cif_file.file_content,
             csv_file_name: data.content.csv_file.file_name,
-            csv_file_content: data.content.csv_file.file_content
+            csv_file_content: data.content.csv_file.file_content,
+            log_file_name: data.content.log_file.file_name,
+            log_file_content: data.content.log_file.file_content
         })
     }).then(response => response.json())
         .then(data => {
@@ -263,6 +284,10 @@ onload = async () => {
                                 csv_file: {
                                     file_name: data.csv_file_name,
                                     file_content: data.csv_file_content
+                                },
+                                log_file: {
+                                    file_name: data.log_file_name,
+                                    file_content: data.log_file_content
                                 }
                             }
                         };
