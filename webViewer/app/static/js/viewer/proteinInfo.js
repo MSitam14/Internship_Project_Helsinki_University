@@ -130,6 +130,12 @@ function initViewerButton() {
     });
 }
 
+function initViewer() {
+
+    loadViewer(dataResult.content.cif_file.file_content);
+    
+}
+
 function colorScore(score) {
     let red = 255;
     let green = 255;
@@ -155,7 +161,10 @@ function initPage(data) {
 
     connectDownloadButtons();
 
-    initViewerButton();
+    // initViewerButton();
+
+    initViewer();
+
 }
 
 // spinner animation

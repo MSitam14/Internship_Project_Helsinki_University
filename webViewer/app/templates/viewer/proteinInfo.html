@@ -126,23 +126,24 @@
                 </div>
 
             </div>
-
-            <button class="btn btn-secondary mt-4" id="viwerButton">View Protein</button>
         </div>
-
     </div>
 
-    {% endblock %}
+    {% include 'viewer/proteinViewer.html' %}
 
-    {% block scripts %}
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+{% endblock %}
 
-    <script src="{{ url_for('static', filename='tools/viewer/webCache.js') }}"></script>
+{% block scripts %}
 
-    <script id="params-data" type="application/json">{{ params | tojson }}</script>
+<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 
-    <script src="{{ url_for('static', filename='js/viewer/proteinInfo.js') }}"></script>
+<script src="{{ url_for('static', filename='tools/viewer/webCache.js') }}"></script>
+
+<script id="params-data" type="application/json">{{ params | tojson }}</script>
+
+<script src="{{ url_for('static', filename='js/viewer/proteinInfo.js') }}"></script>
 
 
-    {% endblock %}
+{% endblock %}

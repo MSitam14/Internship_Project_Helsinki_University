@@ -22,28 +22,6 @@ def index():
 
     return render_template('viewer/index.html', a_variable='Home Page')
 
-
-@viewer.route('/proteinViewer/<string:tech>', methods=['POST'])
-def proteinViewer(tech = 'Mol*'):
-
-    userKey = request.form.get('userKey')
-
-    score_data = TempSaveScoreOneFile.get_by_user_key(userKey)
-
-    if not score_data:
-        return fitnessForm()
-
-    cif_file_name = score_data.cif_file_name
-    cif_file_content = score_data.cif_file_content
-
-    return render_template(
-        'viewer/proteinViewer.html',
-        filename=cif_file_name,
-        file_content=cif_file_content,
-        techUsed=tech,
-        userKey=userKey
-    )
-
 @viewer.route('/fitnessForm', methods=['GET'])
 def fitnessForm():
     return render_template('viewer/fitnessForm.html')

@@ -1,72 +1,42 @@
-{% extends 'base.html' %}
-
 {% block style %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/proteinViewer.css') }}">
 {% endblock %}
 
 {% block content %}
 
+<hr class="my-4" />
+
 <div class="row justify-content-center">
     <div class="col-12 col-xl-10">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <span>File Informations</span>
-                <span class="badge text-bg-light text-primary">PDB</span>
-            </div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush mb-2">
-                    <li class="list-group-item"><strong>Filename:</strong> {{ filename }}</li>
-                    <li class="list-group-item"><strong>Content preview:</strong>
-                        <pre class="mb-0 mt-2">{{ file_content[:500] }}</pre>
-                    </li>
-                    <li class="list-group-item"><strong>Visualisation tool:</strong> {{ techUsed }}</li>
-                </ul>
 
-                <div class="mb-4">
-                    <button id="3DMolButton" class="btn btn-secondary mt-3">View with 3DMol</button>
-                    <button id="molStarButton" class="btn btn-secondary mt-3">View with Mol*</button>
-                    <button id="jsMolButton" class="btn btn-secondary mt-3">View with JSmol</button>
-                </div>
-
-                <div id="buttonDiv3DMol" class="mb-4" style="display: none;">
-                    <input class="btn btn-info" type="button" id="style_cartoon" value="Cartoon">
-                    <input class="btn btn-info" type="button" id="style_cross" value="Cross">
-                    <input class="btn btn-info" type="button" id="style_line" value="Line">
-                    <input class="btn btn-info" type="button" id="style_sphere" value="Sphere">
-                    <input class="btn btn-info" type="button" id="style_stick" value="Stick">
-                </div>
-
-                <div id="legend" class="legend mb-4">
-                    <label> Score :</label>
-                    <span>0</span>
-                    <div id="gradientLegend" class="gradient"></div>
-                    <span>1</span>
-                </div>
-
-                <div class="mb-4 border border-2 border-secondary rounded-3 p-2 bg-white shadow-sm mol-frame">
-                    <div id="container-frame" height="1000" class="mol-container"></div>
-                </div>
-
-                <button id="returnToInfoButton" class="btn btn-primary">Return to score information</button>
-
-            </div>
+        <div id="buttonDiv3DMol" class="mb-4">
+            <input class="btn btn-info" type="button" id="style_cartoon" value="Cartoon">
+            <input class="btn btn-info" type="button" id="style_cross" value="Cross">
+            <input class="btn btn-info" type="button" id="style_line" value="Line">
+            <input class="btn btn-info" type="button" id="style_sphere" value="Sphere">
+            <input class="btn btn-info" type="button" id="style_stick" value="Stick">
         </div>
+
+        <div id="legend" class="legend mb-4">
+            <label> Score :</label>
+            <span>0</span>
+            <div id="gradientLegend" class="gradient"></div>
+            <span>1</span>
+        </div>
+
+        <div class="mb-4 border border-2 border-secondary rounded-3 p-2 bg-white shadow-sm mol-frame">
+            <div id="container-frame" height="1000" class="mol-container"></div>
+        </div>
+
     </div>
 </div>
-
 
 {% endblock %}
 
 {% block scripts %}
 
 <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
-<script src="https://chemapps.stolaf.edu/jmol/jsmol/JSmol.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.js"></script>
-<script src="https://unpkg.com/molstar/build/viewer/molstar.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.css" />
-
-<script id="file-info-data"
-    type="application/json">{{ {'fileName': filename, 'fileContent': file_content, 'techUsed': techUsed, 'userKey': userKey} | tojson }}</script>
+<script src="{{ url_for('static', filename='tools/viewer/webCache.js') }}"></script>
 <script src="{{ url_for('static', filename='js/viewer/proteinViewer.js') }}"></script>
 
 {% endblock %}
