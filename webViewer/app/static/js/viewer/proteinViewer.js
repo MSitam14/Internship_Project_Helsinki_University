@@ -14,84 +14,87 @@ const jsMolButton = document.getElementById('jsMolButton');
 
 (function () {
 
-    function loadJSMol() {
-        const width = container.clientWidth || container.offsetWidth || 600;
-        const height = container.clientHeight || container.offsetHeight || 400;
+    // function loadJSMol() {
+    //     const width = container.clientWidth || container.offsetWidth || 600;
+    //     const height = container.clientHeight || container.offsetHeight || 400;
 
-        const info = {
-            width: width,
-            height: height,
-            j2sPath: 'https://chemapps.stolaf.edu/jmol/jsmol/j2s',
-            use: 'HTML5',
-            debug: false
-        };
+    //     const info = {
+    //         width: width,
+    //         height: height,
+    //         j2sPath: 'https://chemapps.stolaf.edu/jmol/jsmol/j2s',
+    //         use: 'HTML5',
+    //         debug: false
+    //     };
 
-        const applet = Jmol.getApplet('applet0', info);
-        container.innerHTML = Jmol.getAppletHtml(applet);
+    //     const applet = Jmol.getApplet('applet0', info);
+    //     container.innerHTML = Jmol.getAppletHtml(applet);
 
-        const modifiedContent = replaceBFactorByFitness(fileContent);
+    //     const modifiedContent = replaceBFactorByFitness(fileContent);
 
-        // load the structure after a short delay and poll for the applet info div
-        setTimeout(() => {
-            try {
-                const escapedContent = modifiedContent
-                    .replace(/\\/g, '\\\\')
-                    .replace(/\r\n/g, '\n')
-                    .replace(/\r/g, '\n');
+    //     // load the structure after a short delay and poll for the applet info div
+    //     setTimeout(() => {
+    //         try {
+    //             const escapedContent = modifiedContent
+    //                 .replace(/\\/g, '\\\\')
+    //                 .replace(/\r\n/g, '\n')
+    //                 .replace(/\r/g, '\n');
 
-                const script = `load DATA "mmcif"\n${escapedContent}\nEND "mmcif"; cartoon only; color structure; zoom 120;`;
-                Jmol.script(applet, script);
-            } catch (error) {
-                console.error('JSmol script error:', error);
-            }
+    //             const script = `load DATA "mmcif"\n${escapedContent}\nEND "mmcif"; cartoon only; color structure; zoom 120;`;
+    //             Jmol.script(applet, script);
+    //         } catch (error) {
+    //             console.error('JSmol script error:', error);
+    //         }
 
-            const start = Date.now();
-            const maxWait = 5000; // ms
-            const interval = 100;
-            const poll = setInterval(() => {
-                const appletInfo = document.getElementById('applet0_appletinfotablediv');
-                if (appletInfo) {
-                    clearInterval(poll);
-                    if (!container.contains(appletInfo)) container.appendChild(appletInfo);
-                    appletInfo.style.width = '100%';
-                    appletInfo.style.height = '100%';
-                    appletInfo.style.display = 'block';
-                } else if (Date.now() - start > maxWait) {
-                    clearInterval(poll);
-                    console.warn('JSmol applet info div not found after wait');
-                }
-            }, interval);
-        }, 100);
-    }
+    //         const start = Date.now();
+    //         const maxWait = 5000; // ms
+    //         const interval = 100;
+    //         const poll = setInterval(() => {
+    //             const appletInfo = document.getElementById('applet0_appletinfotablediv');
+    //             if (appletInfo) {
+    //                 clearInterval(poll);
+    //                 if (!container.contains(appletInfo)) container.appendChild(appletInfo);
+    //                 appletInfo.style.width = '100%';
+    //                 appletInfo.style.height = '100%';
+    //                 appletInfo.style.display = 'block';
+    //             } else if (Date.now() - start > maxWait) {
+    //                 clearInterval(poll);
+    //                 console.warn('JSmol applet info div not found after wait');
+    //             }
+    //         }, interval);
+    //     }, 100);
+    // }
 
     if (techUsed === '3DMol') {
         buttonDiv.style.display = 'block';
         threeDMolButton.style.display = 'none';
-        load3DMol();
-    } else if (techUsed === 'Mol*') {
-        buttonDiv.style.display = 'none';
         molStarButton.style.display = 'none';
-        loadMolStar();
-    } else if (techUsed === 'JSmol') {
-        buttonDiv.style.display = 'none';
         jsMolButton.style.display = 'none';
-        loadJSMol();
+        load3DMol();
     }
+    // else if (techUsed === 'Mol*') {
+    //     buttonDiv.style.display = 'none';
+    //     molStarButton.style.display = 'none';
+    //     loadMolStar();
+    // } else if (techUsed === 'JSmol') {
+    //     buttonDiv.style.display = 'none';
+    //     jsMolButton.style.display = 'none';
+    //     loadJSMol();
+    // }
 
-    molStarButton.addEventListener('click', () => {
-        // window.location.href = `/fileInfo/${pdbId}/Mol*`;
-        useOtherViewer("Mol*");
-    });
+    // molStarButton.addEventListener('click', () => {
+    //     // window.location.href = `/fileInfo/${pdbId}/Mol*`;
+    //     useOtherViewer("Mol*");
+    // });
 
-    jsMolButton.addEventListener('click', () => {
-        // window.location.href = `/fileInfo/${pdbId}/JSmol`;
-        useOtherViewer("JSmol");
-    });
+    // jsMolButton.addEventListener('click', () => {
+    //     // window.location.href = `/fileInfo/${pdbId}/JSmol`;
+    //     useOtherViewer("JSmol");
+    // });
 
-    threeDMolButton.addEventListener('click', () => {
-        // window.location.href = `/fileInfo/${pdbId}/3DMol`;
-        useOtherViewer("3DMol");
-    });
+    // threeDMolButton.addEventListener('click', () => {
+    //     // window.location.href = `/fileInfo/${pdbId}/3DMol`;
+    //     useOtherViewer("3DMol");
+    // });
 
     document.getElementById('returnToInfoButton').addEventListener('click', () => {
         const form = document.createElement("form");
@@ -110,28 +113,28 @@ const jsMolButton = document.getElementById('jsMolButton');
 
 })();
 
-function useOtherViewer(viewer) {
+// function useOtherViewer(viewer) {
 
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = "/proteinViewer/" + viewer;
+//     const form = document.createElement("form");
+//     form.method = "POST";
+//     form.action = "/proteinViewer/" + viewer;
 
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = "userKey";
-    input.value = userKey;
+//     const input = document.createElement("input");
+//     input.type = "hidden";
+//     input.name = "userKey";
+//     input.value = userKey;
 
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-}
+//     form.appendChild(input);
+//     document.body.appendChild(form);
+//     form.submit();
+// }
 
 function load3DMol() {
     const modifiedContent = replaceBFactorByFitness(fileContent);
-    const config = { backgroundColor: 'white' };
+    const config = { id: "3DMol_viewer", backgroundColor: 'white' };
     const viewer = $3Dmol.createViewer(container, config);
-    viewer.addModel(modifiedContent, 'mmcif');
-    viewer.setStyle({}, { cartoon: { colorscheme: { prop: "b", gradient: new $3Dmol.Gradient.RWB(0, 1) } } });
+    viewer.addModel(modifiedContent, 'cif');
+    viewer.setStyle({}, { cartoon: { colorscheme: { prop: "b", gradient: new $3Dmol.Gradient.ROYGB(0, 1) } } });
 
     // viewer.addBox({
     //     center: { x: 0, y: 0, z: 0 },
@@ -154,34 +157,63 @@ function load3DMol() {
     document.querySelectorAll('input[id^="style_"]').forEach(button => {
         button.addEventListener('click', () => {
             const style = button.id.replace('style_', '');
-            viewer.setStyle({}, { [style]: { colorscheme: { prop: "b", gradient: new $3Dmol.Gradient.RWB(0, 1) } } });
+            viewer.setStyle({}, { [style]: { colorscheme: { prop: "b", gradient: new $3Dmol.Gradient.ROYGB(0, 1) } } });
             viewer.render();
         });
     });
+
+    const viewerHeight = window.innerHeight - 200;
+    container.style.height = viewerHeight + "px";
+    document.getElementById('3DMol_viewer').style.height = viewerHeight + "px";
+    viewer.resize();
+    viewer.render();
+
+    window.addEventListener('resize', () => {
+        const viewerHeight = window.innerHeight - 200;
+        container.style.height = viewerHeight + "px";
+        document.getElementById('3DMol_viewer').style.height = viewerHeight + "px";
+        viewer.resize();
+        viewer.render();
+    });
+
+
+    const gradient = new $3Dmol.Gradient.ROYGB(0, 1);
+
+    const legend = document.getElementById("gradientLegend");
+
+    let stops = [];
+
+    for (let i = 0; i <= 100; i++) {
+        const t = i / 100;
+        const color = gradient.valueToHex(t); // ou colorAt selon la version
+        stops.push(`#${color.toString(16).padStart(6, "0")} ${i}%`);
+    }
+
+    legend.style.background = `linear-gradient(to right, ${stops.join(",")})`;
 }
 
 
 
-function loadMolStar() {
+// function loadMolStar() {
 
-    const modifiedContent = replaceBFactorByFitness(fileContent);
+//     const modifiedContent = replaceBFactorByFitness(fileContent);
 
-    const cifFileContent =
+//     const cifFileContent =
 
-        molstar.Viewer.create('container-frame', {
-            layoutIsExpanded: false,
-            layoutShowControls: false
-        })
-            .then(viewer => {
-                return viewer.loadStructureFromData(modifiedContent, 'mmcif');
-            })
-            .catch(error => {
-                console.error('Erreur lors du chargement:', error);
-                container.innerHTML = '<p class="text-danger">Erreur : ' + error.message + '</p>';
-            });
+//         molstar.Viewer.create('container-frame', {
+//             layoutIsExpanded: false,
+//             layoutShowControls: false
+//         })
+//             .then(viewer => {
+//                 return viewer.loadStructureFromData(modifiedContent, 'mmcif');
+//             })
+//             .catch(error => {
+//                 console.error('Erreur lors du chargement:', error);
+//                 container.innerHTML = '<p class="text-danger">Erreur : ' + error.message + '</p>';
+//             });
 
-    console.log(molstar.Viewer.plugin);
-}
+//     console.log(molstar.Viewer.plugin);
+// }
 
 function replaceBFactorByFitness(cifContent) {
 
@@ -237,7 +269,11 @@ function replaceBFactorByFitness(cifContent) {
 
             const cols = lines[i].trim().split(/\s+/);
 
-            cols[bIndex] = cols[fitnessIndex];
+            if(cols[fitnessIndex] === ".") {
+                cols[bIndex] = "0.0";
+            } else {
+                cols[bIndex] = cols[fitnessIndex];
+            }
 
             lines[i] = cols.join(" ");
         }
