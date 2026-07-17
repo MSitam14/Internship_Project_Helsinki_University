@@ -1,5 +1,5 @@
 {% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/proteinViewer.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/scoreProteinViewer.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -37,6 +37,6 @@
 
 <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
 <script src="{{ url_for('static', filename='tools/viewer/webCache.js') }}"></script>
-<script src="{{ url_for('static', filename='js/viewer/proteinViewer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/viewer/scoreProteinViewer.js') }}"></script>
 
 {% endblock %}

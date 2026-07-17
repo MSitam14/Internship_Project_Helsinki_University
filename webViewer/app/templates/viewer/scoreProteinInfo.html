@@ -129,7 +129,7 @@
         </div>
     </div>
 
-    {% include 'viewer/proteinViewer.html' %}
+    {% include 'viewer/scoreProteinViewer.html' %}
 
 </div>
 
@@ -143,7 +143,7 @@
 
 <script id="params-data" type="application/json">{{ params | tojson }}</script>
 
-<script src="{{ url_for('static', filename='js/viewer/proteinInfo.js') }}"></script>
+<script src="{{ url_for('static', filename='js/viewer/scoreProteinInfo.js') }}"></script>
 
 
 {% endblock %}

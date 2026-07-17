@@ -30,7 +30,7 @@ def fitnessForm():
 def pdbInfo(parameters):
 
     return render_template(
-        'viewer/proteinInfo.html',
+        'viewer/scoreProteinInfo.html',
         params=parameters
     )
 

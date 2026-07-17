@@ -109,27 +109,6 @@ function initScoreBar() {
     document.getElementById("progressbarTotalScore").style.fontWeight = "bold";
 }
 
-function initViewerButton() {
-    const viewerButton = document.getElementById("viwerButton");
-    viewerButton.addEventListener("click", () => {
-
-        const dataTemp = dataResult.content.cif_file;
-
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = "/proteinViewer/3DMol";
-
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "userKey";
-        input.value = userKey;
-
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
-    });
-}
-
 function initViewer() {
 
     loadViewer(dataResult.content.cif_file.file_content);
