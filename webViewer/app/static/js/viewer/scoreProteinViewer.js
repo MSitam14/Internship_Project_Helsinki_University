@@ -23,9 +23,9 @@ function load3DMol(fileContent ) {
     // });
 
     // viewer.addBox({
-    //     center: { x: 10, y: 30, z: 0 },
+    //     center: { x: 10, y: 30, z: -30 },
     //     dimensions: { w: 30, h: 30, d: 30},
-    //     color: "green",
+    //     color: "purple",
     //     wireframe: true
     // });
 
@@ -127,11 +127,12 @@ function replaceBFactorByFitness(cifContent) {
             const cols = lines[i].trim().split(/\s+/);
 
             if (cols[fitnessIndex] === ".") {
-                cols[bIndex] = "0.0";
-            } else {
-                cols[bIndex] = cols[fitnessIndex];
+                lines.splice(i, 1);
+                i--;
+                continue;
             }
 
+            cols[bIndex] = cols[fitnessIndex];
             lines[i] = cols.join(" ");
         }
     }
