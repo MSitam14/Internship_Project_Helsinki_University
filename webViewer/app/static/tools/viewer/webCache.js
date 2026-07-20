@@ -48,12 +48,8 @@ function saveUserKey(userKey) {
     saveCache("userKey", userKey);
 }
 
-function getUserKey() {
+async function getUserKey() {
+    const result = await getCache("userKey");
 
-    const userKey = getCache("userKey");
-
-    if (userKey) {
-        return userKey;
-    }
-    return null;
+    return result ? result.data : null;
 }
