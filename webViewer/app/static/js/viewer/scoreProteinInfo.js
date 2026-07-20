@@ -245,9 +245,7 @@ onload = async () => {
     showLoading();
 
     userKey = await getUserKey();
-
-    userKey = userKey ? userKey.data : null;
-
+    
     if (userKey) {
 
         fetch(`/api/getDataWhithUserKey/` + userKey, {
