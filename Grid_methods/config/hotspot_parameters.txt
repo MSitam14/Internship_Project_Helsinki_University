@@ -1,0 +1,126 @@
+# Information ---------------------------------------------------------------- #
+# Author :	Loïc Dreano, Samuel Besseau
+# Contact : samuelbesseau77@gmail.com
+# University of Helsinki
+# Created : June 2020
+# Updated : May 2023
+# ---------------------------------------------------------------------------- #
+
+# INPUT AND OUTPUT PATHS ------------------------------------------- #
+
+path_to_PDB_directory = ../data/input/hotspot_lig/
+    #../data/input/test_set/
+	# Default : ../data/input/hotspot/
+	# Possible values :
+		# Any path leading to a existing, or not, directory for PDB files to solubilize
+	# Note : A default value is set in the program, you can let this path empty
+
+path_to_output_directory = ../data/output/hotspot/
+    #../data/output/hotspot/Score_test_set/
+	# Default : ../data/output/hotspot/
+	# Possible values :
+		# Any path leading to a existing, or not, directory for solubilized structures
+	# Note : A default value is set in the program, you can let this path empty
+
+
+# HOTSPOT PARAMETERS ----------------------------- #
+
+grid_geometry = Sphere
+	# Default : Sphere
+	# Possible values :
+		# Sphere : Uses the default sphere formula for the euclidean geometry
+		# Taxicab : Uses the taxicab geometry, where the distance between 2 points is the sum of the absolute differences of their coordinates
+		# Uniform : Applies an uniform scaling in the euclidean geometry
+	# Note : Approximation used for the Van der Waals radius determination
+
+
+
+max_neighbor_number = 3
+	# Default : 3
+	# Possible values :
+		# Any positive value, not superior to 10
+	# Note : Defines the maximum number of neighbours considered
+	# Warning : Due to lack of data, only the first 10 neighbours have an impact on the water placement
+
+
+# ATOM SCORING ------------------------------------ #
+
+electronic_densities_folder = ../data/densities
+	# Default : ../data/densities
+	# Possible values :
+		# Any path leading to the electronic densities directory
+	# Note : These files are used by the scoring function
+
+normalize_electronic_densities = True
+	# Default : False
+	# Possible values :
+		# True : Normalizes the electronic densities
+		# False : Do not normalize the electronic densities
+	# Note : Electronic densities are normalized for each possible interaction independently
+	# Warning : Risk of accuracy and comparison loss if normalized
+
+# HOTSPOT PARAMETERS ------------------------------------ #
+
+hotspot_type = C.ar
+    #N.am O.co2 N.1 N.2 N.3 N.4 N.pl3 C.1 C.2 C.3 C.cat O.2 O.3
+    # Default : None
+    # Possible values - custom type:
+        # "Oow": Water
+        # "Car": Carbon SP2 in aromatic ring
+        # "Meta": Metal
+        # "Nam": Nitrogen in amide
+        # "Nbas"
+        # "Nlys": Nitrogen in Lysine
+        # "Oc": Oxygen in carbonyl
+        # "Oh"
+        # "Oox": Oxygen in carboxylate
+        # "Xot"
+
+    # Possible values - SYBYL type:
+        # "C.1" : Carbon (sp)
+        # "C.2": Carbon (sp2)
+        # "C.3": Carbon (sp3)
+        # "C.ar": Carbon SP2 in aromatic ring
+        # "C.cat": Carbon
+        # "Co.oh": Cobalt
+        # "Cr.oh": Chromium
+        # "N.1": Nitrogen (sp)
+        # "N.2": Nitrogen (sp2)
+        # "N.3": Nitrogen (sp3)
+        # "N.4": Nitrogen (quaternary)
+        # "N.am": Nitrogen (amide)
+        # "N.pl3": Nitrogen (trigonal)
+        # "O.2": Oxygen (sp2)
+        # "O.3": Oxygen (sp3)
+        # "O.3.wat": Water molecule
+        # "O.co2": Carboxy oxygen
+        # "P.3": Phosphorus (sp3)
+        # "Ru.oh": Ruthenium
+        # "S.2": Sulfur (sp2)
+        # "S.3": Sulfur (sp3)
+    # List of heteroatoms to predict
+    # O.3.wat  C.ar N.am O.co2 N.1 N.2 N.3 N.4 N.pl3 O.2 C.2 C.3 C.cat O.2 O.3
+
+tag_threshold = 1
+    # Default : 6
+    # Possible values : Any positive value superior to 0 (Int)
+    # Note : Determines the minimal number of time that a position has to be tagged as optimal
+    # to be considered as a hotspot.
+
+bad_score_threshold = 0.8
+    # Default : 0.4
+    # Possible values : Any positive value inferior to 1.
+    # Note : Determines the minimal atom score value to be considered as "low scored"
+    # determining around which atoms the hotspots will be generated.
+
+good_score_threshold = 0.2
+    # Default : 0.6
+    # Possible values : Any positive value inferior to 1.
+    # Note : Determines the minimal hotspot score value to be considered as "high scored"
+    # determining which hotspots will be kept.
+
+number_of_rounds = 1
+    # Default : 3
+    # Possible values : Any positive value superior to 0 (Int)
+    # 0 : No hotspot generation only the scoring is performed
+    # Note : Determines the number of rounds of hotspot generation.

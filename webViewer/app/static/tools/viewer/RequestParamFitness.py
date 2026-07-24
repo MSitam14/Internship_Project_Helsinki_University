@@ -1,5 +1,6 @@
 from enum import Enum
 import json
+from typing import Optional
 
 class AtomType(Enum):
     sybyl = "Sybyl"
@@ -17,12 +18,12 @@ class RequestParamFitness:
     water_env: bool
     atom_type: AtomType
     environment_size: int
-    pocket_num: str|None
+    pocket_num: Optional[str]
     model_num: int
-    l_ori: int|None
+    l_ori: Optional[int]
 
 
-    def __init__(self, pdb_name: str, pdb_content: str, run_frequencies: bool, water_env: bool, atom_type: AtomType, environment_size: int, pocket_num: str|None, model_num: int, l_ori: int|None = None):
+    def __init__(self, pdb_name: str, pdb_content: str, run_frequencies: bool, water_env: bool, atom_type: AtomType, environment_size: int, pocket_num: Optional[str], model_num: int, l_ori: Optional[int] = None):
         self.pdb_name = pdb_name
         self.pdb_content = pdb_content
         self.run_frequencies = run_frequencies

@@ -1,0 +1,225 @@
+# Information ---------------------------------------------------------------- #
+# Author :	Loïc Dreano, Samuel Besseau
+# Contact : samuelbesseau77@gmail.com
+# University of Helsinki
+# Created : June 2020
+# Updated : May 2023
+# ---------------------------------------------------------------------------- #
+
+
+# METHODS PARAMETERS ------------------------------------ #
+
+run_comparison = True
+	# Default : True
+	# Possible values :
+		# True : Runs a structure comparison analysis
+		# False : Do not run a structure comparison analysis
+
+run_hotspot = False
+	# Default : True
+	# Possible values :
+		# True : Runs a structure hotspot analysis
+		# False : Do not run a structure hotspot analysis
+
+# ------------------------------------------------------- #
+
+# GRID PARAMETERS --------------------------------------- #
+
+explicit_grid = False
+    # Default : False
+    # Possible values :
+        # True : Uses an explicit grid. A 3D numpy array is created. Useful for visualisation and analysis of the grid.
+        # False : Uses an implicit grid. A 1D numpy array is created. Only the grid coordinates are stored.
+    # Note : An explicit grid is a grid that is defined by the user, an implicit grid is a grid that is defined by the program
+
+atom_type = SYBYL
+    # Default : normal
+    # Possible values :
+        # normal : Uses the normal atom types
+        # SYBYL : Uses the SYBYL atom types
+    # Note : The atom types used for the comparison
+
+grid_spacing = 0.35
+	# Default : 0.25
+	# Possible values :
+		# Any positive value, represents the angstrom distance between two points of the grid
+	# Note : Small values makes the comparison slower
+	# Note : It may be interesting to use a value similar to the structure resolution
+	# Warning : Distances inferiors to 0.2 A are time and memory consuming
+
+grid_padding = 1.0
+    # Default : 3.0
+    # Possible values :
+        # Any positive value, represents the angstrom distance between the grid edge and the structure
+    # Note : Big values use more memory and time
+
+align_principal_axes = True
+    # Default : False
+    # Possible values :
+        # True : Aligns the principal axes of the structures to the origin of the coordinate system
+        # False : Does not align the principal axes of the structures
+    # Note : The principal axes are used to align the structures therefore to optimize the size of the grid
+
+# ------------------------------------------------------- #
+
+# POCKET PARAMETERS ------------------------------------- #
+
+pocket_res_name = False
+    # Default : False
+	# Possible values :
+	    # False : if dataset_type = proteins or dockings or if your pockets already prepared
+	    # List of 3 letter residue names : pocket will be created around them
+	# Note : 3 letter residue name, if you already have pocket pdb files ready, put False
+
+pocket_res_id = False
+    # Default : False
+    # Possible values :
+        # False : if dataset_type = proteins or dockings, or if you want to create pockets around every res_name
+        # any residue number : pocket will be created around it
+    # Note : residue number, if you already have pocket pdb files ready, put False
+
+lig_chain = False
+    # Default : False
+    # Possible values :
+        # any chain id : chain containing the ligand to create the pocket
+
+pocket_size = 5
+    # Default : 4.5
+    # Possible values :
+        # Any positive value, represents the size of the pocket in angstrom
+    # Note : 4.5 angstroms is the default value for a pocket-size
+
+# ------------------------------------------------------- #
+
+
+# CLEANING INPUT STRUCTURES ----------------------------- #
+
+discard_hetatm = False
+	# Default : True
+	# Possible values :
+		# True : Ignores any HETATM line in a PDB file
+		# False : Keeps the HETATM lines
+
+discard_atom = False
+	# Default : True
+	# Possible values :
+		# True : Ignores any ATOM line in a PDB file
+		# False : Keeps the ATOM lines
+
+discard_hydrogen = True
+	# Default : True
+	# Possible values :
+		# True : Ignores any Hydrogen element in a PDB file
+		# False : Keeps the Hydrogen element
+
+discard_water = True
+	# Default : True
+	# Possible values :
+		# True : Ignores any water molecules in a PDB file
+		# False : Keeps the water molecules
+
+discard_alternative = True
+	# Default : False
+	# Possible values :
+		# True : Ignores any atom alternative position in a PDB file
+		# False : Keeps the atom alternative position
+
+keep_chains =
+	# Default :
+	# Possible values :
+		# : (Empty char) No specific chain to keep with other being discarded
+		# A, B, C : Any list of chain ID to keep, with the other being discarded
+
+discard_chains =
+	# Default :
+	# Possible values :
+		# : (Empty char) No specific chain to keep with other being discarded
+		# A, B, C : Any list of chain ID to discard, with the other being kept
+
+keep_residues =
+	# Default :
+	# Possible values :
+		# : (Empty char) No specific residue to keep with other being discarded
+		# MET, TYR : Any list of residues type to keep, with the other being discarded
+
+discard_residues =
+	# Default :
+	# Possible values :
+		# : (Empty char) No specific residue to keep with other being discarded
+		# MET, TYR : Any list of residues type to discard, with the other being kept
+
+keep_residue_ids =
+	# Default :
+	# Possible values :
+		# : (Empty char) No specific residue id to keep with other being discarded
+		# 2, 5 : Any list of residues id to keep, with the other being discarded
+
+discard_residue_ids =
+	# Default :
+	# Possible values :
+		# : (Empty char) No specific residue id to keep with other being discarded
+		# 2, 5 : Any list of residues id to discard, with the other being kept
+
+keep_atoms =
+	# Default :
+	# Possible values :
+		# : (Empty char) No specific atom type to keep with other being discarded
+		# H, Fe, C : Any list of atom type to keep, with the other being discarded
+
+discard_atoms =
+	# Default :
+	# Possible values :
+		# : (Empty char) No specific atom type to keep with other being discarded
+		# H, Fe, C : Any list of atom type to discard, with the other being kept
+
+# ------------------------------------------------------- #
+
+# BASE PARAMETERS --------------------------------------- #
+
+cpu_allocated = None
+	# Default : None
+	# Possible values :
+		# None : Uses the all the CPU of the computer
+		# Any positive integer value, represents the number of CPU to use
+	# Note : More CPU used means less computation time
+
+# ------------------------------------------------------- #
+
+# PARAMETERS PATHS -------------------------------------- #
+
+path_to_comparison_parameters = ../config/comparison_parameters.txt
+	# Default : ../config/comparison_parameters.txt
+	# Possible values :
+		# Any path leading to a valid file of parameters for structures comparison
+	# Note : A default value is set in the program, you can let this path empty
+
+path_to_hotspot_parameters = ../config/hotspot_parameters.txt
+	# Default : ../config/hotspot_parameters.txt
+	# Possible values :
+		# Any path leading to a valid file of parameters for structure hotspot
+	# Note : A default value is set in the program, you can let this path empty
+
+# ------------------------------------------------------- #
+
+# PYMOL PARAMETERS -------------------------------------- #
+
+watch_live = False
+    # Default : False
+    # Possible values :
+        # True : Will display the pymol session in real time
+        # False : Will not display the pymol session in real time
+    # Note : If you have a large dataset, it is recommended to set this parameter to False. Slows down the process.
+
+
+create_pymol_session = True
+    # Default : False
+    # Possible values :
+        # True : Creates a PyMOL session with the different steps of the hotspot process
+        # False : Do not create a PyMOL session
+    # Note : A PyMOL session is created in the output directory
+
+session_name = None
+	# Default : None -> 'structural_alignment'
+	# Possible values : any name for the .pse pymol session file
+
+# ------------------------------------------------------- #

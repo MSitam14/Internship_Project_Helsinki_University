@@ -1,0 +1,229 @@
+# Information ---------------------------------------------------------------- #
+# Author :	Loïc Dreano, Samuel Besseau
+# Contact : samuelbesseau77@gmail.com
+# University of Helsinki
+# Created : June 2020
+# Updated : May 2023
+# ---------------------------------------------------------------------------- #
+
+# INPUT AND OUTPUT PATHS ------------------------------------------- #
+
+path_to_PDB_directory = ../data/input/structures_comparison/
+	# Default : ../data/input/structures_comparison/
+	# Possible values :
+		# Any path leading to a existing, or not, directory for PDB files to solubilize
+	# Note : A default value is set in the program, you can let this path empty
+
+path_to_output_directory = ../data/output/structures_comparison/
+	# Default : ../data/output/structures_comparison/
+	# Possible values :
+		# Any path leading to a existing, or not, directory for solubilized structures
+	# Note : A default value is set in the program, you can let this path empty
+
+path_to_cleaned_directory  ../data/output/structures_comparison/cleaned_dataset/
+	# Default : ../data/output/structures_comparison/cleaned_dataset/
+	# Possible values :
+		# Any path leading to a existing, or not, directory for cleaned structures
+	# Note : A default value is set in the program, you can let this path empty
+
+# COMPARISON PARAMETERS --------------------------------- #
+
+consider_elements = True
+	# Default : True
+	# Possible values :
+		# True : Compares by distinguishing between different types of atoms
+		# False : Compares only the volumes of the structures, without considering the types of elements
+	# Note : Comparing the volumes only increases the similarity score, often generating a stronger tree
+
+comparison_normalisation = Min
+	# Default : Max
+	# Possible values :
+		# Max : Normalizes the similarity score with the maximal number of occupied points between the grids
+		# Min : Normalizes the similarity score with the minimal number of occupied points between the grids
+	# Note :
+
+grid_geometry = Sphere
+	# Default : Sphere
+	# Possible values :
+		# Sphere : Uses the default sphere formula for the euclidean geometry
+		# Taxicab : Uses the taxicab geometry, where the distance between 2 points is the sum of the absolute differences of their coordinates
+		# Uniform : Applies an uniform scaling in the euclidean geometry
+	# Note : Approximation used for the Van der Waals radius determination
+
+delete_grid = False
+    # Default : True
+    # Possible values :
+        # True : Deletes the grid after the comparison
+        # False : Keeps the grid after the comparison
+    # Note : The grid is used to compare the structures
+
+# ------------------------------------------------------- #
+
+
+# OUTPUT PARAMETERS -------------------------------------- #
+
+save_parameters_files = True
+    # Default : False
+    # Possible values :
+        # True : Saves the parameters file in the output folder
+        # False : Does not save the parameters file in the output folder
+    # Note : The parameters used for the comparison
+
+
+
+# DATA MANAGEMENT --------------------------------------- #
+
+database = False
+    # default : GPCRs (table available in input/GPCRs folder)
+    # Possible values : your database_name (put your database_name folder of structures in input folder)
+    # Note : If your dataset is not cleaned, structures must come from OPM database
+
+
+# PYMOL SESSION --------------------------------------- #
+
+dataset_status = 2
+	# Default : 0
+	# Possible values :
+	    # 0 : The dataset is not cleaned and proteins are not structurally aligned
+        # 1 : The dataset is cleaned but proteins are not yet structurally aligned
+        # 2 : The dataset is cleaned and proteins are already structurally aligned
+	# Note : The status of your dataset guides Voxeler in its data cleaning process
+
+tmalign_reference = None
+	# Default : None
+	# Possible values :
+		# first : will choose the first PDB file (in pymol session) as the reference for the tmalign alignement
+		# 'pdb_ref' : will choose the pdb file corresponding to this id as the reference for the tmalign alignement
+	# Note : The reference is used to align all the other PDB files, with tmalign plugin
+
+
+# TREE GENERATION --------------------------------------- #
+
+tree = structures
+    # Default : structures
+    # Possible values :
+        # structures : Generates a tree based on the structural similarity after structural alignment
+        # sequences : Generates a tree based on the sequence similarity after structural alignment
+        # both : Generates both trees
+    # Note : The type of tree to be generated
+
+tree_name = None
+	# Default : None
+	# Possible values :
+		# None : Uses the default file name for the output
+		# Any possible file name (without the file extension)
+	# Note : The name of the output tree to be generated in the output directory
+
+display_alignment = False
+    # Default : True
+    # Possible values :
+        # True : Displays the muscle multiple alignement
+        # False : Does not displays the muscle multiple alignement
+    # Note : The alignement is displayed beside the tree
+
+node_name = pdb_organism
+    # Default : pdb
+    # Possible values :
+        # pdb : Displays the PDB id of the protein
+        # ligand : Displays the name of the protein
+        # protein : Displays both the PDB id and the name of the protein
+        # pdb_protein : Displays the PDB id and the name of the protein
+        # pdb_organism
+    # Note : The name of the node in the tree
+
+spheres_size = 0
+    # Default : 5
+    # Possible values :
+        # Any positive value, represents the size of the spheres in the tree
+
+sphere_color = True
+    # Default : True
+    # Possible values :
+        # True : Colors the spheres according to the similarity score
+        # False : Does not color the spheres according to the similarity score
+
+label_color = True
+    # Default : True
+    # Possible values :
+        # True : Colors the labels according to the similarity score
+        # False : Does not color the labels according to the similarity score
+
+show_distances = True
+    # Default : True
+    # Possible values :
+        # True : Displays the scores/distances over branches
+        # False : Does not displays the scores/distances
+
+line_width = 5
+    # Default : 1
+    # Possible values :
+        # Any positive value, represents the width of the lines in the tree
+    # Note : 1 is thin, 5 is thick
+
+tree_scale = 80
+    # Default : 80
+    # Possible values :
+        # Any positive value, represents the size of the branch lengths in the tree
+    # Note : 10 is small, 100 is big
+
+save_structures_tree = True
+    # Default : True
+    # Possible values :
+        # True : Saves the tree in a file
+        # False : Does not save the tree in a file
+
+save_sequences_tree = False
+    # Default : True
+    # Possible values :
+        # True : Saves the tree in a file
+        # False : Does not save the tree in a file
+
+show_structures_tree = False
+	# Default : True
+	# Possible values :
+		# True : Displays the tree obtained at the end of Voxeler structures comparison
+		# False : Does not display the tree
+
+show_sequences_tree = False
+	# Default : True
+	# Possible values :
+		# True : Displays the tree obtained at the end of sequences comparison
+		# False : Does not display the tree
+
+save_newick_files = False
+    # Default : False
+    # Possible values :
+        # True : Saves the newick files in a file
+        # False : Does not save the newick files in a file
+
+tree_shape = Circular
+	# Default : Linear
+	# Possible values :
+		# Linear : The tree expands from left to right
+		# Semicircular : The tree has a semicircular shape, covering 180 degrees
+		# Circular : The tree has a circular shape, covering 360 degrees
+	# Note : The shape of the tree to be generated
+	# Note : The shape of the tree to be generated
+
+only_topology = False
+	# Default : False
+	# Possible values :
+		# True : Only displays the topology of the tree without displaying the similarity
+		# False : Displays the tree and branch lengths according to the similarity scores
+	# Note : Displaying the branch length is useless
+
+leaf_name = True
+	# Default : True
+	# Possible values :
+		# True : Displays the leaf names
+		# False : Do not displays the leaf names
+	# Note :
+
+branch_length = True
+	# Default : True
+	# Possible values :
+		# True : Displays the length of the branch
+		# False : Do not displays the length of the branch
+	# Note : The value on the branch indicates the similarity score, where 0 is 0% and 1 100%
+
+# ------------------------------------------------------- #
