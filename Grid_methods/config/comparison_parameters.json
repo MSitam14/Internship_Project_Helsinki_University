@@ -1,0 +1,44 @@
+{
+  "paths": {
+    "path_to_PDB_directory": "../data/input/structures_comparison/",
+    "path_to_output_directory": "../data/output/structures_comparison/",
+    "path_to_cleaned_directory": "../data/output/structures_comparison/cleaned_dataset/"
+  },
+  "comparison": {
+    "consider_elements": true,
+    "comparison_normalisation": "Min",
+    "grid_geometry": "Sphere",
+    "delete_grid": false
+  },
+  "output": {
+    "save_parameters_files": true
+  },
+  "database": {
+    "database": false
+  },
+  "pymol": {
+    "dataset_status": 2,
+    "tmalign_reference": null
+  },
+  "tree": {
+    "tree": "structures",
+    "tree_name": null,
+    "display_alignment": false,
+    "node_name": "pdb_organism",
+    "spheres_size": 0,
+    "sphere_color": true,
+    "label_color": true,
+    "show_distances": true,
+    "line_width": 5,
+    "tree_scale": 80,
+    "save_structures_tree": true,
+    "save_sequences_tree": false,
+    "show_structures_tree": false,
+    "show_sequences_tree": false,
+    "save_newick_files": false,
+    "tree_shape": "Circular",
+    "only_topology": false,
+    "leaf_name": true,
+    "branch_length": true
+  }
+}

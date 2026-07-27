@@ -112,6 +112,52 @@ def extract_valid_parameters(p_file, d_parameters, d_expected_parameters):
 # ---------------------------------------------------------------------------- #
 
 
+def extract_valid_parameters_json(json_parameters, d_parameters, d_expected_parameters):
+    """
+    Extrait et vérifie les paramètres depuis un dictionnaire JSON.
+
+    Parameters
+    ----------
+    json_parameters : dict
+        Dictionnaire JSON contenant les paramètres.
+    d_parameters : dict
+        Dictionnaire de sortie.
+    d_expected_parameters : dict
+        Dictionnaire des paramètres attendus.
+    """
+
+    date = datetime.datetime.now().strftime("%d_%m_%Y-%H_%M")
+
+    for s_key, l_properties in d_expected_parameters.items():
+
+        # Nom interne utilisé dans le programme
+        internal_key = l_properties[0]
+
+        # Type attendu
+        expected_type = l_properties[1]
+
+        # Valeur par défaut
+        default_value = l_properties[2]
+
+        # Valeur provenant du JSON ou valeur par défaut
+        value = json_parameters.get(s_key, default_value)
+
+        # Ajout de la date aux dossiers de sortie
+        if s_key in (
+            "path_to_output_directory",
+            "path_to_cleaned_directory"
+        ):
+            value = str(value) + date + "/"
+
+        # Conversion du type
+        verified_value = convert_value_type(
+            s_value=value,
+            s_type=expected_type,
+            s_default_value=default_value
+        )
+
+        d_parameters[internal_key] = verified_value
+
 
 
 # Reference ------------------------------------------------------------------ #
