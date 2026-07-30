@@ -82,6 +82,7 @@ function replaceBFactorByFitness(cifContent) {
 
     let bIndex = -1;
     let fitnessIndex = -1;
+    let altIdIndex = -1;
 
     for (let i = 0; i < lines.length; i++) {
 
@@ -103,6 +104,8 @@ function replaceBFactorByFitness(cifContent) {
 
             if (line === "_atom_site.pdbx_fitness_score")
                 fitnessIndex = headers.length - 1;
+            if (line === "_atom_site.label_alt_id")
+                altIdIndex = headers.length - 1;
 
             continue;
         }
@@ -113,7 +116,7 @@ function replaceBFactorByFitness(cifContent) {
             readingHeaders = false;
 
             // Ce n'est pas le bon loop
-            if (bIndex === -1 || fitnessIndex === -1)
+            if (bIndex === -1 || fitnessIndex === -1 || altIdIndex === -1)
                 break;
 
             atomLoop = true;
@@ -126,14 +129,21 @@ function replaceBFactorByFitness(cifContent) {
 
             const cols = lines[i].trim().split(/\s+/);
 
-            if (cols[fitnessIndex] === ".") {
+            if (cols[altIdIndex] !== (".") && cols[altIdIndex] !== ("A")) {
                 lines.splice(i, 1);
                 i--;
-                continue;
             }
+            else {
+                if (cols[fitnessIndex] === ".") {
+                    lines.splice(i, 1);
+                    i--;
+                    continue;
+                }
 
-            cols[bIndex] = cols[fitnessIndex];
-            lines[i] = cols.join(" ");
+                cols[bIndex] = cols[fitnessIndex];
+                lines[i] = cols.join(" ");
+            }
+            
         }
     }
 
