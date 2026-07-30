@@ -12,6 +12,7 @@
 
 # Importations --------------------------------------------------------------- #
 # Universal modules
+import json
 import os
 # Allows file system operations
 # Allows file system operations
@@ -33,6 +34,7 @@ from hotspots.launch_structure_hotspots import launch_structure_hotspot
 from lib import global_parameters as gp
 # General library
 from lib.extract_valid_parameters import extract_valid_parameters
+from lib.extract_valid_parameters import extract_valid_parameters_json
 # Contains the global variables
 from lib.save_parameters import save_parameters
 
@@ -127,8 +129,6 @@ def main():
 	# STEP 2 : Structure hotspot ----------------- #
 	# If a structure hotspot must be done
 
-	print(gp.D_PARAMETERS_GLOBAL["run_hotspot"])
-
 	if gp.D_PARAMETERS_GLOBAL["run_hotspot"]:
 
 		print("RUN EXCTRACTION OF HOTSPOT PARAMETERS")
@@ -155,11 +155,124 @@ def main():
 	# END STEP 2 ---------------------------------------- #
 
 
+def main_api(json_parameters):
+	"""
+	TODO
+	:param :
+	:return:
+	"""
+	# STEP 0 : Loading parameters ----------------------- #
+	gp.init()							# Initializes the global parameters variables
+	gp.loads_default_parameters()		# Loads the base parameters
+
+	extract_valid_parameters_json(										# Retrieves the program global parameters
+		json_parameters=json_parameters["global_parameters"],		# The path to the file containing the parameters
+		d_parameters=gp.D_PARAMETERS_GLOBAL,						# The dictionary container for the parameters
+		d_expected_parameters=gp.D_EXPECTED_PARAMETERS_GLOBAL		# The dictionary guiding the extraction
+	)
+	# END STEP 0 ---------------------------------------- #
+
+	# STEP 1 : Structure comparison --------------------- #
+	# If a structure comparison must be done
+	if gp.D_PARAMETERS_GLOBAL["run_comparison"]:
+
+		t_start = time.time()												# Gets the actual time
+		extract_valid_parameters_json(											# Retrieves the program structure comparison parameters
+			json_parameters=json_parameters["comparison_parameters"],		# The path to the file containing the parameters
+			d_parameters=gp.D_PARAMETERS_COMPARISON,						# The dictionary container for the parameters
+			d_expected_parameters=gp.D_EXPECTED_PARAMETERS_COMPARISON		# The dictionary guiding the extraction
+		)
+
+		save_parameters(gp.D_PARAMETERS_GLOBAL)
+		prepare_dataset(gp.D_PARAMETERS_COMPARISON)
+
+		if len(os.listdir(gp.D_PARAMETERS_COMPARISON['p_output_comparison'] + '/cleaned_dataset/')) == 0:
+			print("No valid cleaned structures found in the dataset.")
+			exit()
+		time_mid = time.time()
+
+		if gp.D_PARAMETERS_COMPARISON['display_alignment'] == True or gp.D_PARAMETERS_COMPARISON['tree'] == 'both' or gp.D_PARAMETERS_COMPARISON['tree'] == 'sequences':
+			multiple_alignment()
+
+		if gp.D_PARAMETERS_COMPARISON['tree'] == 'both':
+			try :
+				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON)
+				print("Comparison done in {:.1f} seconds".format(time.time() - time_mid))
+				t2 = tree_sequences()
+
+			except:
+				pass
+
+		elif gp.D_PARAMETERS_COMPARISON['tree'] == 'structures':
+			try :
+				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON)
+				t2 = None
+				print("Comparison done in {:.1f} seconds".format(time.time() - time_mid))
+			except:
+				pass
+
+		elif gp.D_PARAMETERS_COMPARISON['tree'] == 'sequences':
+			try :
+				t1 = None
+				t2 = tree_sequences()
+			except:
+				pass
+
+		plot_tree(gp.D_PARAMETERS_COMPARISON, t1, t2)
+
+
+		if gp.D_PARAMETERS_COMPARISON['save_newick_files'] == 'False':
+			for filename in os.listdir(gp.D_PARAMETERS_COMPARISON['p_output_comparison']+'/'):
+				if filename.endswith(".nwk"):
+					os.remove(gp.D_PARAMETERS_COMPARISON['p_output_comparison'] + '/' + filename)
+
+		print('')
+		print('')
+
+	# END STEP 1 ---------------------------------------- #
+
+	# STEP 2 : Structure hotspot ----------------- #
+	# If a structure hotspot must be done
+
+	if gp.D_PARAMETERS_GLOBAL["run_hotspot"]:
+
+		print("RUN EXCTRACTION OF HOTSPOT PARAMETERS")
+
+		t_start = time.time()													# Gets the actual time
+		extract_valid_parameters_json(											# Retrieves the program structure hotspot parameters
+			json_parameters=json_parameters["hotspot_parameters"],		# The path to the file containing the parameters
+			d_parameters=gp.D_PARAMETERS_HOTSPOT,						# The dictionary container for the parameters
+			d_expected_parameters=gp.D_EXPECTED_PARAMETERS_HOTSPOT		# The dictionary guiding the extraction
+		)
+
+		save_parameters(gp.D_PARAMETERS_GLOBAL)
+		prepare_dataset(gp.D_PARAMETERS_HOTSPOT)
+
+		if len(os.listdir(gp.D_PARAMETERS_HOTSPOT['p_input_pdb'])) == 0:
+			print("No valid cleaned structures found in the dataset.")
+			exit()
+		time_mid = time.time()
+
+
+
+		launch_structure_hotspot()		# Manages the comparison of structures
+		print("Hotspot done in {:.1f} seconds".format(time.time() - t_start))
+	# END STEP 2 ---------------------------------------- #
+
 
 # Auxiliary functions -------------------------------------------------------- #
 
 if __name__ == "__main__":
-	main()		# Launches the main function
+	# main()		# Launches the main function
+	params = None
+	
+	with open('Grid_methods/config/parameters.json', 'r') as file:
+		params = json.load(file)
+
+	main_api(params)
+
+
+# todo input need to have a file white date for name
 
 # ---------------------------------------------------------------------------- #
 

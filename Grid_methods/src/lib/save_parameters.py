@@ -1,9 +1,9 @@
 from lib import global_parameters as gp
 
 def save_parameters(d_parameters):
-    input_global = '../config/global_parameters.txt'
-    input_comparison = '../config/comparison_parameters.txt'
-    input_hotspot = '../config/hotspot_parameters.txt'
+    input_global = 'Grid_methods/config/global_parameters.txt'
+    input_comparison = 'Grid_methods/config/comparison_parameters.txt'
+    input_hotspot = 'Grid_methods/config/hotspot_parameters.txt'
 
 
     if d_parameters['run_comparison'] == True and d_parameters['run_hotspot'] == False:

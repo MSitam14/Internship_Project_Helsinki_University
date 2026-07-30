@@ -9,13 +9,13 @@
 
 # METHODS PARAMETERS ------------------------------------ #
 
-run_comparison = True
+run_comparison = False
 	# Default : True
 	# Possible values :
 		# True : Runs a structure comparison analysis
 		# False : Do not run a structure comparison analysis
 
-run_hotspot = False
+run_hotspot = True
 	# Default : True
 	# Possible values :
 		# True : Runs a structure hotspot analysis
