@@ -11,8 +11,8 @@ from Bio.Align.Applications import MuscleCommandline
 from Bio.PDB import PDBParser
 from Bio.SeqUtils import seq1
 
-from lib import global_parameters as gp
-from lib.progress_bar_color import get_color
+from Grid_methods.src.lib import global_parameters as gp
+from Grid_methods.src.lib.progress_bar_color import get_color
 
 ########### 1 : GLOBAL ###########
 def multiple_alignment():

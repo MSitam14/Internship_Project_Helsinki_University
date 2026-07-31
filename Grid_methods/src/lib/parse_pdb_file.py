@@ -8,9 +8,9 @@
 # Importing modules ---------------------------------------------------------- #
 import numpy as np
 
-from cla.pdb_structure import PdbStructure
-from lib.read_file_content import read_file_content
-from lib.terminate_program_process import terminate_program_process
+from Grid_methods.src.cla.pdb_structure import PdbStructure
+from Grid_methods.src.lib.read_file_content import read_file_content
+from Grid_methods.src.lib.terminate_program_process import terminate_program_process
 
 
 def parse_pdb_file(p_file):

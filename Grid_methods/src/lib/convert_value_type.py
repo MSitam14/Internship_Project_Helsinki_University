@@ -13,14 +13,14 @@
 import os
 
 # Parameters
-from lib import global_parameters as gp
+from Grid_methods.src.lib import global_parameters as gp
 # Writes content to a file
 # In : (p) output file's path, (c) writing mode,
 # In : (l(s)) content to write
 # Out : None
-from lib.terminate_program_process import terminate_program_process
+from Grid_methods.src.lib.terminate_program_process import terminate_program_process
 # General library
-from lib.write_file_content import write_file_content
+from Grid_methods.src.lib.write_file_content import write_file_content
 
 
 # Allows file system operations

@@ -1,7 +1,7 @@
 from Bio import SeqIO
 from ete3 import Tree, SeqMotifFace, TextFace, TreeStyle, NodeStyle
 
-from lib import global_parameters as gp
+from Grid_methods.src.lib import global_parameters as gp
 
 
 def read_multiple_alignement():

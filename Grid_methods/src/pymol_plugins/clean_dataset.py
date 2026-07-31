@@ -13,12 +13,12 @@ import numpy as np
 from pymol import cmd, finish_launching
 from tqdm import tqdm
 
-from lib import global_parameters as gp
-from pymol_plugins.extract_pocket import extract_pocket, extract_pocket_global
-from pymol_plugins.first_chains import first_chains
-from pymol_plugins.gridbox import drawgridbox, align_principal_axes
-from pymol_plugins.tmalign import tmalign
-from lib.progress_bar_color import get_color
+from Grid_methods.src.lib import global_parameters as gp
+from Grid_methods.src.pymol_plugins.extract_pocket import extract_pocket, extract_pocket_global
+from Grid_methods.src.pymol_plugins.first_chains import first_chains
+from Grid_methods.src.pymol_plugins.gridbox import drawgridbox, align_principal_axes
+from Grid_methods.src.pymol_plugins.tmalign import tmalign
+from Grid_methods.src.lib.progress_bar_color import get_color
 
 cmd.extend('extract_pocket', extract_pocket)
 def hex_to_rgb(hex_color):

@@ -18,10 +18,10 @@ from openbabel import openbabel as ob
 from openbabel import pybel
 
 # Program external resources
-from lib import elem_config
+from Grid_methods.src.lib import elem_config
 # Parameters
-from lib import global_parameters as gp
-from lib.terminate_program_process import terminate_program_process
+from Grid_methods.src.lib import global_parameters as gp
+from Grid_methods.src.lib.terminate_program_process import terminate_program_process
 
 
 # Contains chemical elements custom properties

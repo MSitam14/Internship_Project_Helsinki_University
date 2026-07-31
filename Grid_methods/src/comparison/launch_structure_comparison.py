@@ -29,26 +29,26 @@ from scipy.spatial.distance import squareform
 import matplotlib.pyplot as plt
 # Contains the global variables
 # Classes
-from cla.systeme_class import System
+from Grid_methods.src.cla.systeme_class import System
 # Specific modules
-from comparison.compute_grid_similarity import compute_grid_similarity
-from comparison.tree_object import TreePlot
+from Grid_methods.src.comparison.compute_grid_similarity import compute_grid_similarity
+from Grid_methods.src.comparison.tree_object import TreePlot
 # Parameters
-from lib import global_parameters as gp
+from Grid_methods.src.lib import global_parameters as gp
 # Retrieves files path, recursively or not, matching a specific pattern, or not
 # In : (p) directory to retrieve files from, (s) pattern to match,
 # In : (b) if the search needs to be recursive, (i) minimum number of match,
 # In : (i) maximum number of match
 # Out : (l(p)) a list of the file paths founds
-from lib.parse_pdb_file import parse_pdb_file
+from Grid_methods.src.lib.parse_pdb_file import parse_pdb_file
 # General library
-from lib.retrieve_specific_files import retrieve_specific_files
+from Grid_methods.src.lib.retrieve_specific_files import retrieve_specific_files
 # Extracts a PDB structure from a file and applies filters
 # In : (p) PDB file to extract, (d) parsing filters to apply
 # Out : (o) the object containing the structure
-from lib.terminate_program_process import terminate_program_process
-from lib.Grid_plot import *
-from lib.progress_bar_color import get_color
+from Grid_methods.src.lib.terminate_program_process import terminate_program_process
+from Grid_methods.src.lib.Grid_plot import *
+from Grid_methods.src.lib.progress_bar_color import get_color
 # Generates, renders and saves trees
 # Stops the program and prints content
 # In : (l(s)) content to prompt

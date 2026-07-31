@@ -14,7 +14,7 @@
 import os
 
 # General library
-from lib.write_file_content import write_file_content
+from Grid_methods.src.lib.write_file_content import write_file_content
 
 
 # Allows file system operations

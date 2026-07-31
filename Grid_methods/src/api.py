@@ -10,6 +10,14 @@ from flask import Blueprint, request, jsonify
 api = Blueprint('api-hot-comp', __name__, url_prefix='/api-hot-comp')
 
 
+@api.route('/status', methods=['GET'])
+def status():
+    """GET /api-hot-comp/status - check the status of the API"""
+    return jsonify({
+        'status': 'success',
+        'message': 'API is running'
+    }), 200
+
 def _json_safe(value):
     """Convert non-JSON values (notably bytes) into JSON-serializable values."""
     if isinstance(value, bytes):

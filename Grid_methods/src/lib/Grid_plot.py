@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import seaborn as sns
 from matplotlib.colors import ListedColormap, BoundaryNorm,Normalize,LinearSegmentedColormap
-from lib.progress_bar_color import create_color_mapping,create_custom_color_mapping
+from Grid_methods.src.lib.progress_bar_color import create_color_mapping,create_custom_color_mapping
 
 def plot_grid_3D(a_grid):
     # Assuming a_grid is a 3D numpy array

@@ -3,7 +3,7 @@ from Bio import AlignIO
 from Bio import Phylo
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 
-import lib.global_parameters as gp
+import Grid_methods.src.lib.global_parameters as gp
 
 
 def tree_sequences():

@@ -11,8 +11,8 @@ import time
 import numpy as np
 from tqdm import tqdm
 
-from lib import global_parameters as gp  # Parameters
-from lib.progress_bar_color import get_color
+from Grid_methods.src.lib import global_parameters as gp  # Parameters
+from Grid_methods.src.lib.progress_bar_color import get_color
 
 def write_pdb(filename, d_atoms,b_factor='score_total'):
     with open(filename, 'w') as f:

@@ -11,16 +11,16 @@ import numpy as np
 
 # Universal modules
 import pandas as pd
-from sklearn.neighbors import KDTree
-from pymol import cmd
-from cla.systeme_class import System
-from hotspots.compute_structure_score import *
-from lib.parse_pdb_file import parse_pdb_file
-from lib.retrieve_specific_files import retrieve_specific_files
-from lib.Grid_plot import *
 import os
 import shutil
-from lib.read_file_content import read_file_content
+from sklearn.neighbors import KDTree
+from pymol import cmd
+from Grid_methods.src.cla.systeme_class import System
+from Grid_methods.src.hotspots.compute_structure_score import *
+from Grid_methods.src.lib.parse_pdb_file import parse_pdb_file
+from Grid_methods.src.lib.retrieve_specific_files import retrieve_specific_files
+from Grid_methods.src.lib.Grid_plot import *
+from Grid_methods.src.lib.read_file_content import read_file_content
 
 def launch_structure_hotspot():
     explicit_grid = gp.D_PARAMETERS_GLOBAL['explicit_grid']

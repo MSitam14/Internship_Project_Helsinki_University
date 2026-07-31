@@ -1,4 +1,4 @@
-from lib import global_parameters as gp
+from Grid_methods.src.lib import global_parameters as gp
 
 def save_parameters(d_parameters):
     input_global = 'Grid_methods/config/global_parameters.txt'

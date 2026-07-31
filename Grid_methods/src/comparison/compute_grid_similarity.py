@@ -13,9 +13,9 @@
 import numpy as np
 
 # Parameters
-from lib import global_parameters as gp
+from Grid_methods.src.lib import global_parameters as gp
 # General library
-from lib.terminate_program_process import terminate_program_process
+from Grid_methods.src.lib.terminate_program_process import terminate_program_process
 
 
 # Allows Numpy array manipulation

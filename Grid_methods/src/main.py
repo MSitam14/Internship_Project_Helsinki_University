@@ -16,27 +16,30 @@ import json
 import os
 # Allows file system operations
 # Allows file system operations
+import shutil
 import time
 # Enables time manipulation
 import warnings
 
+from pkg_resources import require
+
 # Specific modules
-from comparison.launch_structure_comparison import launch_structure_comparison
-from comparison.multiple_alignement import multiple_alignment
-from pymol_plugins.clean_dataset import prepare_dataset
-from comparison.tree_building import  plot_tree
-from comparison.tree_sequences import tree_sequences
+from Grid_methods.src.comparison.launch_structure_comparison import launch_structure_comparison
+from Grid_methods.src.comparison.multiple_alignement import multiple_alignment
+from Grid_methods.src.pymol_plugins.clean_dataset import prepare_dataset
+from Grid_methods.src.comparison.tree_building import  plot_tree
+from Grid_methods.src.comparison.tree_sequences import tree_sequences
 # Manages the comparison of structures
 # In : None
 # Out : None
-from hotspots.launch_structure_hotspots import launch_structure_hotspot
+from Grid_methods.src.hotspots.launch_structure_hotspots import launch_structure_hotspot
 # Parameters
-from lib import global_parameters as gp
+from Grid_methods.src.lib import global_parameters as gp
 # General library
-from lib.extract_valid_parameters import extract_valid_parameters
-from lib.extract_valid_parameters import extract_valid_parameters_json
+from Grid_methods.src.lib.extract_valid_parameters import extract_valid_parameters
+from Grid_methods.src.lib.extract_valid_parameters import extract_valid_parameters_json
 # Contains the global variables
-from lib.save_parameters import save_parameters
+from Grid_methods.src.lib.save_parameters import save_parameters
 
 # Extract parameters from a file and checks the validity of the values
 # In : (p) path to the parameters, (d) dictionary to complete,
@@ -229,6 +232,12 @@ def main_api(json_parameters):
 		print('')
 		print('')
 
+		json_return = compileFolderToJson(gp.D_PARAMETERS_COMPARISON['path_to_output_directory'])
+
+		shutil.rmtree(gp.D_PARAMETERS_COMPARISON['path_to_output_directory'])
+
+		return json_return
+
 	# END STEP 1 ---------------------------------------- #
 
 	# STEP 2 : Structure hotspot ----------------- #
@@ -275,6 +284,22 @@ if __name__ == "__main__":
 # todo input need to have a file white date for name
 
 # ---------------------------------------------------------------------------- #
+
+def compileFolderToJson(folderPath):
+	"""
+	Compiles all files in a folder into a JSON object, recursively handling subfolders.
+	:param folderPath: Path to the folder containing the files.
+	:return: A JSON object with file names as keys and their contents as values.
+	"""
+	result = {}
+	for filename in os.listdir(folderPath):
+		filePath = os.path.join(folderPath, filename)
+		if os.path.isfile(filePath):
+			with open(filePath, 'r') as file:
+				result[filename] = file.read()
+		elif os.path.isdir(filePath):
+			result[filename] = compileFolderToJson(filePath)
+	return result
 
 
 

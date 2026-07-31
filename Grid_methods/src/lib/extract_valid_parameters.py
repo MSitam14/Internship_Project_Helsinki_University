@@ -16,13 +16,13 @@
 import datetime
 
 # Parameters
-from lib import global_parameters as gp
+from Grid_methods.src.lib import global_parameters as gp
 # Extracts the content of a file
 # In : (p) file's path
 # Out : (l(s)) the file's content
-from lib.convert_value_type import convert_value_type
+from Grid_methods.src.lib.convert_value_type import convert_value_type
 # General library
-from lib.read_file_content import read_file_content
+from Grid_methods.src.lib.read_file_content import read_file_content
 
 
 # Contains the global variables

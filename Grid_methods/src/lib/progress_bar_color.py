@@ -1,7 +1,7 @@
 from matplotlib.colors import Normalize
 import numpy as np
 import seaborn as sns
-from lib import global_parameters as gp
+from Grid_methods.src.lib import global_parameters as gp
 
 
 def get_color(progress):

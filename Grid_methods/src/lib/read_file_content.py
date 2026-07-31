@@ -13,7 +13,7 @@
 from os import path
 
 # General library
-from lib.terminate_program_process import terminate_program_process
+from Grid_methods.src.lib.terminate_program_process import terminate_program_process
 
 
 # Interacting with OS paths

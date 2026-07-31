@@ -13,11 +13,11 @@ import sys
 import mendeleev
 import numpy as np
 
-from lib import global_parameters as gp
-from lib.read_file_content import read_file_content
-from lib.retrieve_specific_files import retrieve_specific_files
-from lib.terminate_program_process import terminate_program_process
-from lib.Grid_plot  import plot_heatmap
+from Grid_methods.src.lib import global_parameters as gp
+from Grid_methods.src.lib.read_file_content import read_file_content
+from Grid_methods.src.lib.retrieve_specific_files import retrieve_specific_files
+from Grid_methods.src.lib.terminate_program_process import terminate_program_process
+from Grid_methods.src.lib.Grid_plot  import plot_heatmap
 
 # ---------------------------------------------------------------------------- #
 
