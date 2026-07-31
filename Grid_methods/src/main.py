@@ -232,9 +232,9 @@ def main_api(json_parameters):
 		print('')
 		print('')
 
-		json_return = compileFolderToJson(gp.D_PARAMETERS_COMPARISON['path_to_output_directory'])
+		json_return = compileFolderToJson(gp.D_PARAMETERS_COMPARISON['p_output_comparison'])
 
-		shutil.rmtree(gp.D_PARAMETERS_COMPARISON['path_to_output_directory'])
+		shutil.rmtree(gp.D_PARAMETERS_COMPARISON['p_output_comparison'])
 
 		return json_return
 
@@ -293,9 +293,10 @@ def compileFolderToJson(folderPath):
 	"""
 	result = {}
 	for filename in os.listdir(folderPath):
+		print(f"Processing {filename}...")
 		filePath = os.path.join(folderPath, filename)
 		if os.path.isfile(filePath):
-			with open(filePath, 'r') as file:
+			with open(filePath, 'r', encoding='utf-8', errors='replace') as file:
 				result[filename] = file.read()
 		elif os.path.isdir(filePath):
 			result[filename] = compileFolderToJson(filePath)

@@ -63,6 +63,8 @@ def calculate_comparison():
 
     params['comparison_parameters']["path_to_PDB_directory"] = file_path
 
+    os.makedirs(file_path, exist_ok=True)
+
     with open(pdb1_path, 'w') as f:
         f.write(pdb1["content"])
     
@@ -80,7 +82,7 @@ def calculate_comparison():
             'message': f'Error during comparison: {str(e)}'
         }), 400
     
-    print(f"Comparison completed for {pdb1['name']} and {pdb2['name']}. Cleaning up temporary files.")
+    print(f"\nComparison completed for {pdb1['name']} and {pdb2['name']}. Cleaning up temporary files.")
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
 
     try: shutil.rmtree(file_path)

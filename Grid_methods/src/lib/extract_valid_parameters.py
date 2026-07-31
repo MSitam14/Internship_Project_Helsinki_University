@@ -149,8 +149,6 @@ def extract_valid_parameters_json(json_parameters, d_parameters, d_expected_para
         ):
             value = str(value) + date + "/"
 
-        print(f"Parameter: {s_key}, Value: {value}")
-
         if s_key != "comment_delimiters_string" and s_key != "comment_delimiters_char":
         	# Conversion du type
             verified_value = convert_value_type(
