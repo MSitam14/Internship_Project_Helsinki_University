@@ -281,8 +281,6 @@ if __name__ == "__main__":
 	main_api(params)
 
 
-# todo input need to have a file white date for name
-
 # ---------------------------------------------------------------------------- #
 
 def compileFolderToJson(folderPath):

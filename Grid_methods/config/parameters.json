@@ -50,6 +50,7 @@
         "spheres_size": "0",
         "sphere_color": "True",
         "label_color": "True",
+        "show_distances": "True",
         "line_width": "5",
         "tree_scale": "80",
         "save_structures_tree": "True",
