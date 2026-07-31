@@ -2,7 +2,8 @@ import datetime
 import json
 import os
 import base64
-from .main import main
+import shutil
+from .main import main_api
 
 from flask import Blueprint, request, jsonify
 
@@ -22,52 +23,62 @@ def _json_safe(value):
         return [_json_safe(v) for v in value]
     return value
 
+# input: {  
+#           "params": {"param1": "value1", "param2": "value2"}, 
+#           "pdb1": {"name": "file1.pdb", "content": "PDB content 1"}, 
+#           "pdb2": {"name": "file2.pdb", "content": "PDB content 2"}
+#       }
+@api.route('/comparison', methods=['POST'])
+def calculate_comparison():
+    """POST /api-hot-comp/comparison - calculate hot spot comparison"""
+    date = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    data = request.get_json()
+    if not data:
+        return jsonify({
+            'status': 'error',
+            'message': 'No input data provided'
+        }), 400
 
-# @api.route('/score', methods=['POST'])
-# def calculate_score():    
-#     """POST /api-score/score - calculate fitness score"""
-#     data = request.get_json()
-#     if not data:
-#         return jsonify({
-#             'status': 'error',
-#             'message': 'No input data provided'
-#         }), 400
+    try:
+        params = data['params']
+        pdb1 = data['pdb1']
+        pdb2 = data['pdb2']
+    except KeyError as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Missing parameter: {str(e)}'
+        }), 400
 
-#     try:
-#         params = data['params']
-#         pdb = data['pdb']
-#     except KeyError as e:
-#         return jsonify({
-#             'status': 'error',
-#             'message': f'Missing parameter: {str(e)}'
-#         }), 400
+    file_path = 'Grid_methods/data/input/structures/' + date + '/'
+    pdb1_path = file_path + pdb1["name"]
+    pdb2_path = file_path + pdb2["name"]
 
-#     params = data['params']
-#     pdb = data['pdb']
-#     pdb_path = 'Fitness_score/data/input/structures/'+pdb["name"]
-#     file_path = 'Fitness_score/data/input/structures/'
+    params['comparison_parameters']["path_to_PDB_directory"] = file_path
 
-#     with open(pdb_path, 'w') as f:
-#         f.write(pdb["content"])
+    with open(pdb1_path, 'w') as f:
+        f.write(pdb1["content"])
     
-#     print(f"\nReceived scoring request for {pdb['name']} with parameters: {params}")
-#     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-#     try:
-#         out = apiMain(params, pdb_path, file_path) 
-#     except Exception as e:
-#         os.remove(pdb_path)
-#         return jsonify({
-#             'status': 'error',
-#             'message': f'Error during scoring: {str(e)}'
-#         }), 400
+    with open(pdb2_path, 'w') as f:
+        f.write(pdb2["content"])
     
-#     print(f"Scoring completed for {pdb['name']}. Cleaning up temporary files.")
-#     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
+    print(f"\nReceived comparison request for {pdb1['name']} and {pdb2['name']}")
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    try:
+        out = main_api(params) 
+    except Exception as e:
+        shutil.rmtree(file_path)
+        return jsonify({
+            'status': 'error',
+            'message': f'Error during comparison: {str(e)}'
+        }), 400
+    
+    print(f"Comparison completed for {pdb1['name']} and {pdb2['name']}. Cleaning up temporary files.")
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
 
-#     try: os.remove(pdb_path)
-#     except OSError: print(f"File '{pdb_path}' not found.")
+    try: shutil.rmtree(file_path)
+    except OSError: print(f"Directory '{file_path}' not found.")
 
-#     return jsonify({
-#         'status': 'success',
-#         'content': _json_safe(out)
-#     })
+    return jsonify({
+        'status': 'success',
+        'content': _json_safe(out)
+    })
