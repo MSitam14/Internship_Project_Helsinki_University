@@ -1,5 +1,6 @@
 from flask import render_template, flash, redirect, \
     url_for, abort, request, current_app
+from webViewer.app.static.tools.viewer.RequestParamGrid import RequestGridComparisonParameters
 from ..static.tools.viewer.RequestParamFitness import AtomType
 from ..static.tools.viewer.RequestParamFitness import RequestParamFitness
 from ..import db
@@ -65,6 +66,44 @@ def pdbInfoRequest():
         model_num=int(request.form.get('model_num')))
     
     return pdbInfo(json.loads(params.toJson()))
+
+@viewer.route('/requestFormComparison', methods=['GET'])
+def requestFormComparison():
+    return render_template('viewer/comparisonForm.html')
+
+
+@viewer.route('/infoComparison', methods=['POST'])
+def infoComparison(parameters):
+
+    return render_template(
+        'viewer/comparisonInfo.html',
+        params=parameters
+    )
+
+@viewer.route('/infoComparisonUserKey', methods=['POST'])
+def infoComparisonUserKey():
+    return None
+
+
+@viewer.route('/infoComparisonRequest', methods=['POST'])
+def infoComparisonRequest():
+
+    the_file1 = request.files['the_file1']
+    the_file2 = request.files['the_file2']
+    file_content1 = the_file1.read().decode('utf-8', errors='replace')
+    file_content2 = the_file2.read().decode('utf-8', errors='replace')
+
+    params = RequestGridComparisonParameters()
+
+    params.pdb1_name = the_file1.filename
+    params.pdb1_content = file_content1
+    params.pdb2_name = the_file2.filename
+    params.pdb2_content = file_content2
+
+    return infoComparison(json.loads(params.toJson()))
+
+
+
 
 @viewer.errorhandler(404)
 def page_not_found(error):

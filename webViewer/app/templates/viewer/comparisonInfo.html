@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1> info comaprison</h1>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    console.log({{ params | tojson }});
+
+
+    function init(){
+
+    }
+
+    init();
+
+
+
+
+
+
+
+
+</script>
+
+{% endblock %}
