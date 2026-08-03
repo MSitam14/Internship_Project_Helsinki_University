@@ -1,5 +1,8 @@
 .venv/
 __pycache__/
 Fitness_score/data/output/
+Fitness_score/data/densities/
+Fitness_score/data/frequencies/
 Grid_methods/data/output/
+Grid_methods/data/densities/
 .env
