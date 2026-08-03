@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from ..models import TempSaveScoreOneFile
 
-api = Blueprint('api', __name__, url_prefix='/api')
+api = Blueprint('api', __name__, url_prefix='/api') # add score to the url prefix
 
 # ===== ROUTES API =====
 
