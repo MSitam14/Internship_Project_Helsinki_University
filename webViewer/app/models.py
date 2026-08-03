@@ -102,3 +102,78 @@ class TempSaveScoreOneFile(db.Model):
             if not TempSaveScoreOneFile.user_key_exists(userKey):
                 return userKey
          
+
+
+class TempSaveComparison(db.Model):
+    """Modèle pour le stockage temporaire des comparaisons"""
+    __tablename__ = 'temp_save_comparison'
+    
+    __table_args__ = (
+        db.Index('idx_user_key', 'user_key'),
+        db.Index('idx_last_used', 'date_last_used'),
+    )
+    
+    user_key = db.Column(db.String(16), primary_key=True)
+    parameter = db.Column(db.JSON, nullable=False)
+    date_last_used = db.Column(db.DateTime, nullable=False)
+
+    @staticmethod
+    def clean_old_entries():
+        """Supprime les entrées plus anciennes que le nombre de jours spécifié"""
+        threshold_date = datetime.now() - timedelta(minutes=30)
+        old_entries = TempSaveComparison.query.filter(TempSaveComparison.date_last_used < threshold_date).all()
+        for entry in old_entries:
+            db.session.delete(entry)
+        db.session.commit()
+    
+    @staticmethod
+    def get_by_user_key(userKey):
+
+        TempSaveComparison.clean_old_entries()
+
+        """Récupère les données de score par user_key"""
+
+        data = TempSaveComparison.query.filter_by(user_key=userKey).first()
+
+        if data:
+            data.date_last_used = datetime.now()
+            db.session.commit()
+            return data
+        
+        return None
+    
+    @staticmethod
+    def user_key_exists(userKey):
+        """Vérifie si un user_key existe dans la table"""
+        return db.session.query(TempSaveComparison.query.filter_by(user_key=userKey).exists()).scalar()
+    
+    @staticmethod
+    def save_comparison_data(userKey ,parameter):
+
+        TempSaveComparison.clean_old_entries()
+
+        """Sauvegarde les données de score dans la BD"""
+        if(TempSaveComparison.user_key_exists(userKey)):
+            # Mettre à jour l'entrée existante
+            comparison_data = TempSaveComparison.get_by_user_key(userKey)
+            comparison_data.parameter = parameter
+            comparison_data.date_last_used = datetime.now()
+        else:
+            # Créer une nouvelle entrée
+            comparison_data = TempSaveComparison(
+                user_key=userKey,
+                parameter=parameter,
+                date_last_used=db.func.now()
+            )
+            db.session.add(comparison_data)
+        db.session.commit()
+
+    @staticmethod
+    def generate_user_key():
+        """Génère un user_key unique"""
+        
+        while True:
+            userKey = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+            if not TempSaveComparison.user_key_exists(userKey):
+                return userKey
+
