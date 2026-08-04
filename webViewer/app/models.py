@@ -114,7 +114,7 @@ class TempSaveComparison(db.Model):
     )
     
     user_key = db.Column(db.String(16), primary_key=True)
-    parameter = db.Column(db.JSON, nullable=False)
+    data = db.Column(db.JSON, nullable=False)
     date_last_used = db.Column(db.DateTime, nullable=False)
 
     @staticmethod
@@ -133,12 +133,12 @@ class TempSaveComparison(db.Model):
 
         """Récupère les données de score par user_key"""
 
-        data = TempSaveComparison.query.filter_by(user_key=userKey).first()
+        save = TempSaveComparison.query.filter_by(user_key=userKey).first()
 
-        if data:
-            data.date_last_used = datetime.now()
+        if save:
+            save.date_last_used = datetime.now()
             db.session.commit()
-            return data
+            return save
         
         return None
     
@@ -148,7 +148,7 @@ class TempSaveComparison(db.Model):
         return db.session.query(TempSaveComparison.query.filter_by(user_key=userKey).exists()).scalar()
     
     @staticmethod
-    def save_comparison_data(userKey ,parameter):
+    def save_comparison_data(userKey ,data):
 
         TempSaveComparison.clean_old_entries()
 
@@ -156,13 +156,13 @@ class TempSaveComparison(db.Model):
         if(TempSaveComparison.user_key_exists(userKey)):
             # Mettre à jour l'entrée existante
             comparison_data = TempSaveComparison.get_by_user_key(userKey)
-            comparison_data.parameter = parameter
+            comparison_data.data = data
             comparison_data.date_last_used = datetime.now()
         else:
             # Créer une nouvelle entrée
             comparison_data = TempSaveComparison(
                 user_key=userKey,
-                parameter=parameter,
+                parameter=data,
                 date_last_used=db.func.now()
             )
             db.session.add(comparison_data)

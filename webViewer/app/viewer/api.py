@@ -92,3 +92,49 @@ def generate_user_key():
         'status': 'success',
         'user_key': user_key
     })
+
+@apiComparison.route('/getDataWhithUserKey/<string:userKey>', methods=['GET'])
+def get_data_with_user_key(userKey):
+    """Récupère les données de score par user_key"""
+    comparison_data = TempSaveComparison.get_by_user_key(userKey)
+    if not comparison_data:
+        return jsonify({
+            'status': 'error',
+            'message': 'Aucune donnée trouvée pour ce user_key'
+        })
+    
+    return jsonify({
+        'status': 'success',
+        'user_key': comparison_data.user_key,
+        'data': comparison_data.data
+    })
+
+@apiComparison.route('/saveDataWithUserKey/<string:userKey>', methods=['POST'])
+def save_data_with_user_key(userKey):
+    """Sauvegarde les données de score dans la BD par user_key"""
+    data_request = request.json
+    if not data_request:
+        return jsonify({
+            'status': 'error',
+            'message': 'Données JSON manquantes'
+        }), 400
+    
+    data = data_request.get('data')
+    
+    if not data:
+        return jsonify({
+            'status': 'error',
+            'message': 'Champs requis : data'
+        }), 400
+    
+    try:
+        TempSaveComparison.save_comparison_data(userKey, data)
+        return jsonify({
+            'status': 'success',
+            'message': f'Données sauvegardées pour le user_key {userKey}'
+        }), 201
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
