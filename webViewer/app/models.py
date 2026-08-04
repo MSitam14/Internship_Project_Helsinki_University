@@ -13,8 +13,8 @@ class TempSaveScoreOneFile(db.Model):
     __tablename__ = 'temp_save_score_one_file'
     
     __table_args__ = (
-        db.Index('idx_user_key', 'user_key'),
-        db.Index('idx_last_used', 'date_last_used'),
+        db.Index('idx_user_key_TempSaveScoreOneFile', 'user_key'),
+        db.Index('idx_date_last_used_TempSaveScoreOneFile', 'date_last_used'),
     )
     
     user_key = db.Column(db.String(16), primary_key=True)
@@ -109,8 +109,8 @@ class TempSaveComparison(db.Model):
     __tablename__ = 'temp_save_comparison'
     
     __table_args__ = (
-        db.Index('idx_user_key', 'user_key'),
-        db.Index('idx_last_used', 'date_last_used'),
+        db.Index('idx_user_key_TempSaveComparison', 'user_key'),
+        db.Index('idx_last_used_TempSaveComparison', 'date_last_used'),
     )
     
     user_key = db.Column(db.String(16), primary_key=True)
