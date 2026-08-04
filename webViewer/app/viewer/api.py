@@ -1,7 +1,12 @@
+import random
+import string
+
 from flask import Blueprint, request, jsonify
 from ..models import TempSaveScoreOneFile
+from ..models import TempSaveComparison
 
 apiScore = Blueprint('api-database-score', __name__, url_prefix='/api-database-score')
+apiComparison = Blueprint('api-database-comparison', __name__, url_prefix='/api-database-comparison')
 
 apiKey = Blueprint('api-key', __name__, url_prefix='/api-key')
 # ===== ROUTES API =====
@@ -68,7 +73,21 @@ def save_data_with_user_key(userKey):
 @apiKey.route('/generateUserKey', methods=['GET'])
 def generate_user_key():
     """Génère un user_key unique"""
-    user_key = TempSaveScoreOneFile.generate_user_key()
+
+    user_key = None
+
+    is_unique = False
+    while not is_unique:
+
+        is_unique = True
+        user_key = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+
+        if TempSaveScoreOneFile.user_key_exists(user_key):
+            is_unique = False
+
+        if TempSaveComparison.user_key_exists(user_key):
+            is_unique = False
+        
     return jsonify({
         'status': 'success',
         'user_key': user_key
