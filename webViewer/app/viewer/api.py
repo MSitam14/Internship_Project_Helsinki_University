@@ -1,11 +1,12 @@
 from flask import Blueprint, request, jsonify
 from ..models import TempSaveScoreOneFile
 
-api = Blueprint('api', __name__, url_prefix='/api') # add score to the url prefix
+apiScore = Blueprint('api-database-score', __name__, url_prefix='/api-database-score')
 
+apiKey = Blueprint('api-key', __name__, url_prefix='/api-key')
 # ===== ROUTES API =====
 
-@api.route('/getDataWhithUserKey/<string:userKey>', methods=['GET'])
+@apiScore.route('/getDataWhithUserKey/<string:userKey>', methods=['GET'])
 def get_data_with_user_key(userKey):
     """Récupère les données de score par user_key"""
     score_data = TempSaveScoreOneFile.get_by_user_key(userKey)
@@ -27,16 +28,7 @@ def get_data_with_user_key(userKey):
         'log_file_content': score_data.log_file_content
     })
 
-@api.route('/generateUserKey', methods=['GET'])
-def generate_user_key():
-    """Génère un user_key unique"""
-    user_key = TempSaveScoreOneFile.generate_user_key()
-    return jsonify({
-        'status': 'success',
-        'user_key': user_key
-    })
-
-@api.route('/saveDataWithUserKey/<string:userKey>', methods=['POST'])
+@apiScore.route('/saveDataWithUserKey/<string:userKey>', methods=['POST'])
 def save_data_with_user_key(userKey):
     """Sauvegarde les données de score dans la BD par user_key"""
     data = request.json
@@ -71,3 +63,13 @@ def save_data_with_user_key(userKey):
             'status': 'error',
             'message': str(e)
         }), 500
+
+
+@apiKey.route('/generateUserKey', methods=['GET'])
+def generate_user_key():
+    """Génère un user_key unique"""
+    user_key = TempSaveScoreOneFile.generate_user_key()
+    return jsonify({
+        'status': 'success',
+        'user_key': user_key
+    })

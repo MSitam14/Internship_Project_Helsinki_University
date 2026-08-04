@@ -167,7 +167,7 @@ async function fetchData() {
 
             if (!userKey) {
                 console.log("No userKey found, generating new userKey");
-                userKey = await fetch("/api/generateUserKey", {
+                userKey = await fetch("/api-key/generateUserKey", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -199,7 +199,7 @@ async function fetchData() {
 }
 
 function saveDataInDB(userKey, params, data) {
-    fetch(`/api/saveDataWithUserKey/${userKey}`, {
+    fetch(`/api-database-score/saveDataWithUserKey/${userKey}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -248,7 +248,7 @@ onload = async () => {
     
     if (userKey) {
 
-        fetch(`/api/getDataWhithUserKey/` + userKey, {
+        fetch(`/api-database-score/getDataWhithUserKey/` + userKey, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
