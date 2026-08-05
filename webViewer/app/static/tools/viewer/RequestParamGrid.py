@@ -59,7 +59,7 @@ class RequestGridComparisonParameters(RequestGridGlobalParameters):
 
     # ---------- Comparison parameters ----------
     path_to_PDB_directory: str = "Grid_methods/data/input/structures_comparison/"
-    path_to_output_directory: str = "Grid_methods/data/output/structures_comparison/"
+    path_to_output_directory: str = "Grid_methods/data/output/structures/"
     path_to_cleaned_directory: str = "Grid_methods/data/output/structures_comparison/cleaned_dataset/"
 
     consider_elements: str = "True"
@@ -70,7 +70,7 @@ class RequestGridComparisonParameters(RequestGridGlobalParameters):
     save_parameters_files: str = "False"
     database: str = "False"
 
-    dataset_status: str = "0"
+    dataset_status: str = "1"
     tmalign_reference: str = "None"
 
     tree: str = "structures"
@@ -107,20 +107,88 @@ class RequestGridComparisonParameters(RequestGridGlobalParameters):
 
     def toJson(self):
 
-        params = {
+        global_parameters = {
             k: v
             for k, v in self.__dict__.items()
-            if k not in (
-                "pdb1_name",
-                "pdb1_content",
-                "pdb2_name",
-                "pdb2_content"
+            if k
+            in (
+                "run_comparison",
+                "run_hotspot",
+                "explicit_grid",
+                "atom_type",
+                "grid_spacing",
+                "grid_padding",
+                "align_principal_axes",
+                "pocket_res_name",
+                "pocket_res_id",
+                "lig_chain",
+                "pocket_size",
+                "discard_hetatm",
+                "discard_atom",
+                "discard_hydrogen",
+                "discard_water",
+                "discard_alternative",
+                "keep_chains",
+                "discard_chains",
+                "keep_residues",
+                "discard_residues",
+                "keep_residue_ids",
+                "discard_residue_ids",
+                "keep_atoms",
+                "discard_atoms",
+                "cpu_allocated",
+                "path_to_comparison_parameters",
+                "path_to_hotspot_parameters",
+                "watch_live",
+                "create_pymol_session",
+                "session_name",
+            )
+        }
+
+        comparison_parameters = {
+            k: v
+            for k, v in self.__dict__.items()
+            if k
+            in (
+                "path_to_PDB_directory",
+                "path_to_output_directory",
+                "path_to_cleaned_directory",
+                "consider_elements",
+                "comparison_normalisation",
+                "grid_geometry",
+                "delete_grid",
+                "save_parameters_files",
+                "database",
+                "dataset_status",
+                "tmalign_reference",
+                "tree",
+                "tree_name",
+                "display_alignment",
+                "node_name",
+                "spheres_size",
+                "sphere_color",
+                "label_color",
+                "show_distances",
+                "line_width",
+                "tree_scale",
+                "save_structures_tree",
+                "save_sequences_tree",
+                "show_structures_tree",
+                "show_sequences_tree",
+                "save_newick_files",
+                "tree_shape",
+                "only_topology",
+                "leaf_name",
+                "branch_length",
             )
         }
 
         return json.dumps(
             {
-                "params": params,
+                "params": {
+                    "comparison_parameters": comparison_parameters,
+                    "global_parameters": global_parameters,
+                },
                 "pdb1": {
                     "name": self.pdb1_name,
                     "content": self.pdb1_content
