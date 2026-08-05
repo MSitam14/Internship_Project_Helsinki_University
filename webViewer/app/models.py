@@ -114,6 +114,7 @@ class TempSaveComparison(db.Model):
     )
     
     user_key = db.Column(db.String(16), primary_key=True)
+    parameter = db.Column(db.JSON, nullable=False)
     data = db.Column(db.JSON, nullable=False)
     date_last_used = db.Column(db.DateTime, nullable=False)
 

@@ -106,7 +106,8 @@ def get_data_with_user_key(userKey):
     return jsonify({
         'status': 'success',
         'user_key': comparison_data.user_key,
-        'data': comparison_data.data
+        'data': comparison_data.data,
+        'parameter': comparison_data.parameter
     })
 
 @apiComparison.route('/saveDataWithUserKey/<string:userKey>', methods=['POST'])
@@ -120,15 +121,16 @@ def save_data_with_user_key(userKey):
         }), 400
     
     data = data_request.get('data')
+    parameter = data_request.get('parameter')
     
-    if not data:
+    if not all([data, parameter]):
         return jsonify({
             'status': 'error',
-            'message': 'Champs requis : data'
+            'message': 'Champs requis : data and parameter'
         }), 400
     
     try:
-        TempSaveComparison.save_comparison_data(userKey, data)
+        TempSaveComparison.save_comparison_data(userKey, data, parameter)
         return jsonify({
             'status': 'success',
             'message': f'Données sauvegardées pour le user_key {userKey}'
