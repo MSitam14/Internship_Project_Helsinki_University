@@ -227,14 +227,6 @@ function saveDataInDB(userKey, params, data) {
         });
 }
 
-function loadDataFromSession() {
-
-    const compressed = sessionStorage.getItem("lastDataLoadedResult");
-    if (!compressed) return null;
-    const decompressed = JSON.parse(LZString.decompressFromUTF16(compressed));
-    return JSON.parse(decompressed);
-}
-
 function compareParams(params1, params2) {
     return JSON.stringify(params1) === JSON.stringify(params2);
 }
