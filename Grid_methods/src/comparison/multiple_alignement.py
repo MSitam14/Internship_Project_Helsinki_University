@@ -71,5 +71,7 @@ def multiple_alignment():
         muscle_cline()
         print(get_color(index / len(pdbs)) + "Muscle multiple alignment done in {:.1f} seconds".format(time() - t_multi))
         print('')
-    except:
+    except Exception as e:
         print("Muscle multiple alignment failed")
+        print("Error: {}".format(e))
+

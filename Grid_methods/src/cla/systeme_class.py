@@ -393,11 +393,11 @@ class System:
             o_structure.a_vdw = np.zeros(0, dtype=gp.a_vdw_dtype)
             # For each atom type in the structure
             for i_element in range(len(l_l_elements)):
+                print(f"Processing element {l_l_elements[i_element][0]} ({i_element + 1}/{len(l_l_elements)})")
                 try:
                     i_radius = self.d_scaled_vdw[l_l_elements[i_element][0]]  # Retrieves the VdW radius of the element
-                except:
-                    i_radius = self.d_scaled_vdw[
-                        gp.D_SYBYL_TYPE[l_l_elements[i_element][0]]]  # Retrieves the VdW radius of the element
+                except Exception as e:
+                    i_radius = self.d_scaled_vdw[gp.D_SYBYL_TYPE[l_l_elements[i_element][0].capitalize()]]  # Retrieves the VdW radius of the element
 
                 l_i_radius_range = list(
                     range(-i_radius, i_radius + 1))  # Builds a list of distances included in the sphere

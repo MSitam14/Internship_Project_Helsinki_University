@@ -179,6 +179,8 @@ def main_api(json_parameters):
 	# If a structure comparison must be done
 	if gp.D_PARAMETERS_GLOBAL["run_comparison"]:
 
+		print("RUN EXCTRACTION OF COMPARISON PARAMETERS")
+
 		t_start = time.time()												# Gets the actual time
 		extract_valid_parameters_json(											# Retrieves the program structure comparison parameters
 			json_parameters=json_parameters["comparison_parameters"],		# The path to the file containing the parameters
@@ -197,13 +199,20 @@ def main_api(json_parameters):
 		if gp.D_PARAMETERS_COMPARISON['display_alignment'] == True or gp.D_PARAMETERS_COMPARISON['tree'] == 'both' or gp.D_PARAMETERS_COMPARISON['tree'] == 'sequences':
 			multiple_alignment()
 
+		# t1, t2 = None, None  # Initialize t1 and t2 to None
+
+		print("Running comparison with the following parameters:")
+
+		print(f"Tree option selected: {gp.D_PARAMETERS_COMPARISON['tree']}")
+
 		if gp.D_PARAMETERS_COMPARISON['tree'] == 'both':
 			try :
 				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON)
 				print("Comparison done in {:.1f} seconds".format(time.time() - time_mid))
 				t2 = tree_sequences()
 
-			except:
+			except Exception as e:
+				print(f"Error during tree generation: {str(e)}")
 				pass
 
 		elif gp.D_PARAMETERS_COMPARISON['tree'] == 'structures':
@@ -211,18 +220,23 @@ def main_api(json_parameters):
 				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON)
 				t2 = None
 				print("Comparison done in {:.1f} seconds".format(time.time() - time_mid))
-			except:
+			except Exception as e:
+				print(f"Error during tree generation: {str(e)}")
 				pass
 
 		elif gp.D_PARAMETERS_COMPARISON['tree'] == 'sequences':
 			try :
 				t1 = None
 				t2 = tree_sequences()
-			except:
+			except Exception as e:
+				print(f"Error during tree generation: {str(e)}")
 				pass
+
+		print(f"t1: {t1}, t2: {t2}")  # Debugging line to check the values of t1 and t2
 
 		plot_tree(gp.D_PARAMETERS_COMPARISON, t1, t2)
 
+		print("Tree plotting completed.")
 
 		if gp.D_PARAMETERS_COMPARISON['save_newick_files'] == 'False':
 			for filename in os.listdir(gp.D_PARAMETERS_COMPARISON['p_output_comparison']+'/'):
