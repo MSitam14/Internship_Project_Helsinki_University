@@ -24,10 +24,12 @@ def create_app(config_name):
     from webViewer.app.viewer import viewer as viewer_blueprint
     from webViewer.app.viewer.api import apiScore as api_database_score_blueprint
     from webViewer.app.viewer.api import apiKey as api_key_blueprint
+    from webViewer.app.viewer.api import apiComparison as api_comparison_blueprint
     from Fitness_score.src.api import api as api_score_blueprint
     from Grid_methods.src.api import api as api_hot_comp_blueprint
     app.register_blueprint(viewer_blueprint)
     app.register_blueprint(api_database_score_blueprint)
+    app.register_blueprint(api_comparison_blueprint)
     app.register_blueprint(api_key_blueprint)
     app.register_blueprint(api_score_blueprint)
     app.register_blueprint(api_hot_comp_blueprint)

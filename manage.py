@@ -41,6 +41,7 @@ def main():
         app.run(host=args.host, port=args.port, debug=args.debug)
     elif args.command == 'init_db':
         init_db()
+        print("Database initialized: all tables dropped and recreated.")
     else:
         parser.print_help()
 
