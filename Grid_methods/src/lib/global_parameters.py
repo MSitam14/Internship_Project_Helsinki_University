@@ -126,13 +126,13 @@ def init():
     D_EXPECTED_PARAMETERS_COMPARISON = {
 
         # Input paths
-        "path_to_PDB_directory": ["p_input_pdb", "path", "input/structures_comparison/"],
+        "path_to_PDB_directory": ["p_input_pdb", "path", "Grid_methods/data/input/structures_comparison/"],
 
         # Clean paths
-        "path_to_cleaned_PDB_directory": ["p_cleaned_pdb", "path", "output/structures_comparison/cleaned_pdb/"],
+        "path_to_cleaned_PDB_directory": ["p_cleaned_pdb", "path", "Grid_methods/data/output/structures_comparison/cleaned_pdb/"],
 
         # Output paths
-        "path_to_output_directory": ["p_output_comparison", "path", "output/structures_comparison/"],
+        "path_to_output_directory": ["p_output_comparison", "path", "Grid_methods/data/output/structures_comparison/"],
 
         # Database
         "database": ["database", "str", "GPCRs"],
@@ -182,11 +182,11 @@ def init():
     D_EXPECTED_PARAMETERS_HOTSPOT = {
 
         # Input paths
-        "path_to_PDB_directory": ["p_input_pdb", "path", "input/hotspot/"],
+        "path_to_PDB_directory": ["p_input_pdb", "path", "Grid_methods/data/input/hotspot/"],
 
 
         # Output paths
-        "path_to_output_directory": ["p_output_hotspot", "path", "output/hotspot/"],
+        "path_to_output_directory": ["p_output_hotspot", "path", "Grid_methods/data/output/hotspot/"],
 
 
         # Hotspot parameters
@@ -201,7 +201,7 @@ def init():
         "good_score_threshold": ["f_good_score_threshold", "float", "0.6"],
         "number_of_rounds": ["i_number_of_rounds", "int", "3"],
         # Atom scoring
-        "electronic_densities_folder": ["p_electronic_densities", "path", "resources/densities"],
+        "electronic_densities_folder": ["p_electronic_densities", "path", "Grid_methods/data/densities"],
         "normalize_electronic_densities": ["b_normalize_densities", "bool", "False"],
 
 

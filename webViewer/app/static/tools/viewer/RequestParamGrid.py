@@ -25,7 +25,7 @@ class RequestGridGlobalParameters:
     lig_chain: str = "False"
     pocket_size: str = "4.5"
 
-    discard_hetatm: str = "False"
+    discard_hetatm: str = "True"                # TODO ask loic
     discard_atom: str = "False"
     discard_hydrogen: str = "True"
     discard_water: str = "True"
@@ -75,7 +75,7 @@ class RequestGridComparisonParameters(RequestGridGlobalParameters):
 
     tree: str = "structures"
     tree_name: str = "None"
-    display_alignment: str = "True"
+    display_alignment: str = "False"            # don't modify this parameter
     node_name: str = "pdb"
 
     spheres_size: str = "5"
@@ -88,8 +88,8 @@ class RequestGridComparisonParameters(RequestGridGlobalParameters):
     save_structures_tree: str = "True"
     save_sequences_tree: str = "True"
 
-    show_structures_tree: str = "True"
-    show_sequences_tree: str = "True"
+    show_structures_tree: str = "False"         # don't modify this parameter
+    show_sequences_tree: str = "False"          # don't modify this parameter
 
     save_newick_files: str = "False"
 
