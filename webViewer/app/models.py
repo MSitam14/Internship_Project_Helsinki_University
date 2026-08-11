@@ -149,7 +149,7 @@ class TempSaveComparison(db.Model):
         return db.session.query(TempSaveComparison.query.filter_by(user_key=userKey).exists()).scalar()
     
     @staticmethod
-    def save_comparison_data(userKey ,data):
+    def save_comparison_data(userKey ,data, parameter):
 
         TempSaveComparison.clean_old_entries()
 
@@ -158,12 +158,14 @@ class TempSaveComparison(db.Model):
             # Mettre à jour l'entrée existante
             comparison_data = TempSaveComparison.get_by_user_key(userKey)
             comparison_data.data = data
+            comparison_data.parameter = parameter
             comparison_data.date_last_used = datetime.now()
         else:
             # Créer une nouvelle entrée
             comparison_data = TempSaveComparison(
                 user_key=userKey,
-                parameter=data,
+                parameter=parameter,
+                data=data,
                 date_last_used=db.func.now()
             )
             db.session.add(comparison_data)
