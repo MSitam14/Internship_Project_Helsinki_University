@@ -6,6 +6,7 @@ import shutil
 from .main import main_api
 
 from flask import Blueprint, request, jsonify
+from pymol import cmd, finish_launching
 
 api = Blueprint('api-hot-comp', __name__, url_prefix='/api-hot-comp')
 
@@ -32,7 +33,14 @@ def _json_safe(value):
     return value
 
 # input: {  
-#           "params": {"param1": "value1", "param2": "value2"}, 
+#           "params": {
+#               "comparison_parameters": {
+#                   "param1":"value1", ...
+#               },
+#               "global_parameters": {
+#                   "param1":"value1", ...
+#               }
+#           }, 
 #           "pdb1": {"name": "file1.pdb", "content": "PDB content 1"}, 
 #           "pdb2": {"name": "file2.pdb", "content": "PDB content 2"}
 #       }
@@ -57,13 +65,13 @@ def calculate_comparison():
             'message': f'Missing parameter: {str(e)}'
         }), 400
 
-    file_path = 'Grid_methods/data/input/structures/' + date + '/'
-    pdb1_path = file_path + pdb1["name"]
-    pdb2_path = file_path + pdb2["name"]
+    file_path_input = 'Grid_methods/data/input/structures/' + date + '/'
+    pdb1_path = file_path_input + pdb1["name"]
+    pdb2_path = file_path_input + pdb2["name"]
 
-    params['comparison_parameters']["path_to_PDB_directory"] = file_path
+    params['comparison_parameters']["path_to_PDB_directory"] = file_path_input
 
-    os.makedirs(file_path, exist_ok=True)
+    os.makedirs(file_path_input, exist_ok=True)
 
     with open(pdb1_path, 'w') as f:
         f.write(pdb1["content"])
@@ -76,7 +84,10 @@ def calculate_comparison():
     try:
         out = main_api(params) 
     except Exception as e:
-        shutil.rmtree(file_path)
+        shutil.rmtree(file_path_input)
+        cmd.quit()  # Ensure PyMOL quits to free resources
+        cmd.reinitialize()
+        print(f"Error during comparison: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error during comparison: {str(e)}'
@@ -85,8 +96,8 @@ def calculate_comparison():
     print(f"\nComparison completed for {pdb1['name']} and {pdb2['name']}. Cleaning up temporary files.")
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
 
-    try: shutil.rmtree(file_path)
-    except OSError: print(f"Directory '{file_path}' not found.")
+    try: shutil.rmtree(file_path_input)
+    except OSError: print(f"Directory '{file_path_input}' not found.")
 
     return jsonify({
         'status': 'success',
