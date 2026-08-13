@@ -1,4 +1,4 @@
-name: webViewerTest
+name: webViewer
 channels:
   - conda-forge
   - bioconda
