@@ -26,7 +26,21 @@ function initPage(data) {
 
     connectDownloadButton();
 
+    fillFilesInfo()
 
+
+}
+
+function fillFilesInfo() {
+    const filesNameDiv = document.getElementById("FilesNameDiv");
+
+    let i = 0;
+    
+    for ( [name, data] of Object.entries(dataResult.cleaned_dataset)) {
+        i++;
+        let innerHTML = `<div class="col-8" id="fileName${i}">${name}</div>`;
+        filesNameDiv.insertAdjacentHTML('beforeend', innerHTML);
+    }
 }
 
 function connectDownloadButton() {
