@@ -128,9 +128,6 @@
         }
     }
 
-    
-
-
     function compareParams(params1, params2) {
         return JSON.stringify(params1) === JSON.stringify(params2);
     }
@@ -204,7 +201,7 @@
         .catch(error => {
             console.error("Error:", error);
             hideLoading();
-            alert("Error from comparison. Please try again later.");
+            showErrorPopup("Error from comparison. Please try again later.");
         });
     }
 
@@ -245,7 +242,7 @@
             .catch(error => {
                 console.error("Error fetching data:", error);
                 hideLoading();
-                alert("Error from database. Please try again later.");
+                showErrorPopup("Error from database. Please try again later.");
             });
         }
         else {

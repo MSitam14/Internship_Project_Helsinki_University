@@ -195,6 +195,7 @@ async function fetchData() {
         .catch(error => {
             console.error("Error:", error);
             hideLoading();
+            showErrorPopup("Error from scoring. Please try again later.");
         });
 }
 
@@ -285,6 +286,7 @@ onload = async () => {
             .catch(error => {
                 console.error("Error:", error);
                 hideLoading();
+                showErrorPopup("Error from database. Please try again later.");
             });
     }
     else {
