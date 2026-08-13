@@ -15,7 +15,7 @@ class RequestGridGlobalParameters:
     run_hotspot: str = "False"
 
     explicit_grid: str = "False"
-    atom_type: str = "normal"
+    atom_type: str = "SYBYL"
     grid_spacing: str = "0.25"
     grid_padding: str = "3.0"
     align_principal_axes: str = "False"
@@ -25,7 +25,7 @@ class RequestGridGlobalParameters:
     lig_chain: str = "False"
     pocket_size: str = "4.5"
 
-    discard_hetatm: str = "True"                # TODO ask loic
+    discard_hetatm: str = "False"
     discard_atom: str = "False"
     discard_hydrogen: str = "True"
     discard_water: str = "True"
