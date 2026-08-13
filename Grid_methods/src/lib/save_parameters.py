@@ -1,3 +1,5 @@
+from flask import json
+
 from Grid_methods.src.lib import global_parameters as gp
 
 def save_parameters(d_parameters):
@@ -39,3 +41,32 @@ def save_parameters(d_parameters):
             f_out.write(input_file_1_contents)
             f_out.write("\n\n=== Hotspot Parameters ===\n\n")
             f_out.write(input_file_2_contents)
+
+def save_parameters_for_api(d_parameters ,json_parameters, comp = False, hot = False):
+
+    if d_parameters['run_comparison'] == True and d_parameters['run_hotspot'] == False:
+        gp.D_PARAMETERS_GLOBAL['choice'] = 'comparison'
+    elif d_parameters['run_comparison'] == False and d_parameters['run_hotspot'] == True:
+        gp.D_PARAMETERS_GLOBAL['choice'] = 'hotspot'
+    elif d_parameters['run_comparison'] == True and d_parameters['run_hotspot'] == True:
+        gp.D_PARAMETERS_GLOBAL['choice'] = 'both'
+
+    choice = gp.D_PARAMETERS_GLOBAL['choice']
+
+    if choice in ['comparison', 'both']:
+        output_comparison = gp.D_PARAMETERS_COMPARISON['p_output_comparison'] + '/selected_parameters.txt'
+        with open(output_comparison, "w") as f_out:
+            f_out.write("=== Global Parameters ===\n\n")
+            f_out.write(json.dumps(json_parameters["global_parameters"], indent=4))
+            f_out.write("\n\n=== Comparison Parameters ===\n\n")
+            f_out.write(json.dumps(json_parameters["comparison_parameters"], indent=4))
+
+    elif choice in ['hotspot', 'both']:
+        output_hotspot = gp.D_PARAMETERS_HOTSPOT['p_output_hotspot'] +'/selected_parameters.txt'
+        with open(output_hotspot, "w") as f_out:
+            f_out.write("=== Global Parameters ===\n\n")
+            f_out.write(json.dumps(json_parameters["global_parameters"], indent=4))
+            f_out.write("\n\n=== Hotspot Parameters ===\n\n")
+            f_out.write(json.dumps(json_parameters["hotspot_parameters"], indent=4))
+
+

@@ -40,7 +40,7 @@ from Grid_methods.src.lib import global_parameters as gp
 from Grid_methods.src.lib.extract_valid_parameters import extract_valid_parameters
 from Grid_methods.src.lib.extract_valid_parameters import extract_valid_parameters_json
 # Contains the global variables
-from Grid_methods.src.lib.save_parameters import save_parameters
+from Grid_methods.src.lib.save_parameters import save_parameters, save_parameters_for_api
 
 # Extract parameters from a file and checks the validity of the values
 # In : (p) path to the parameters, (d) dictionary to complete,
@@ -189,7 +189,7 @@ def main_api(json_parameters):
 			d_expected_parameters=gp.D_EXPECTED_PARAMETERS_COMPARISON		# The dictionary guiding the extraction
 		)
 
-		save_parameters(gp.D_PARAMETERS_GLOBAL)
+		save_parameters_for_api(gp.D_PARAMETERS_GLOBAL ,json_parameters, comp=True)
 		prepare_dataset(gp.D_PARAMETERS_COMPARISON)
 
 		if len(os.listdir(gp.D_PARAMETERS_COMPARISON['p_output_comparison'] + '/cleaned_dataset/')) == 0:
@@ -269,7 +269,7 @@ def main_api(json_parameters):
 			d_expected_parameters=gp.D_EXPECTED_PARAMETERS_HOTSPOT		# The dictionary guiding the extraction
 		)
 
-		save_parameters(gp.D_PARAMETERS_GLOBAL)
+		save_parameters_for_api(gp.D_PARAMETERS_GLOBAL, json_parameters, hot=True)
 		prepare_dataset(gp.D_PARAMETERS_HOTSPOT)
 
 		if len(os.listdir(gp.D_PARAMETERS_HOTSPOT['p_input_pdb'])) == 0:
