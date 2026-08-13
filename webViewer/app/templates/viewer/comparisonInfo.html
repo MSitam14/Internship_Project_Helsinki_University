@@ -2,25 +2,44 @@
 
 {% block content %}
 
-<!-- Loading overlay -->
-<div id="loading"
-    style="display:none;position:fixed;inset:0;background:rgba(255,255,255,0.8);align-items:center;justify-content:center;z-index:9999;">
-    <div style="display:flex;flex-direction:column;align-items:center;">
-        <div
-            style="width:48px;height:48px;border:6px solid #ddd;border-top-color:#007bff;border-radius:50%;animation:spin 1s linear infinite">
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Loading overlay -->
+            <div id="loading"
+                style="display:none;position:fixed;inset:0;background:rgba(255,255,255,0.8);align-items:center;justify-content:center;z-index:9999;">
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                    <div
+                        style="width:48px;height:48px;border:6px solid #ddd;border-top-color:#007bff;border-radius:50%;animation:spin 1s linear infinite">
+                    </div>
+                    <div style="margin-top:8px;font-size:14px;color:#333">Loading…</div>
+                </div>
+            </div>
+
+
+            <!-- ACTION BUTTONS -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
+
+                    <button id="buttonDownloadZip" class="btn btn-primary">
+                        Download Analized folder (.zip)
+                    </button>
+
+                </div>
+            </div>
+
         </div>
-        <div style="margin-top:8px;font-size:14px;color:#333">Loading…</div>
     </div>
 </div>
-
-
-<h1> info comaprison</h1>
 
 {% endblock %}
 
 {% block scripts %}
 
 <script src="{{ url_for('static', filename='tools/viewer/webCache.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <script>
 
@@ -41,10 +60,76 @@
     console.log("paramObject", paramObject);
 
     function initPage(data) {
-        dataResult = data;
-        console.log("Data received:", data);
+        dataResult = data.content;
+        console.log("Data received:", dataResult);
         hideLoading();
+
+        connectDownloadButton();
+
+
     }
+
+    function connectDownloadButton() {
+
+        const buttonDownloadZip = document.getElementById("buttonDownloadZip");
+        buttonDownloadZip.addEventListener("click", async () => {
+            try {
+                const zip = new JSZip();
+
+                addFolderToZip(zip, dataResult);
+
+                const blob = await zip.generateAsync({
+                    type: "blob"
+                });
+
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "analized_folder.zip";
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+
+                setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                }, 1000);
+                
+            } catch (error) {
+                console.error("Error creating ZIP:", error);
+            }
+        });
+    }
+
+    function addFolderToZip(zip, data) {
+
+        for (const [name, content] of Object.entries(data)) {
+            // FICHIER
+            if ( content && typeof content === "object" && content.encoding !== undefined ) {
+                if (content.encoding === "base64") {
+                    zip.file(name, content.content, {
+                        base64: true
+                    });
+
+                } else if (content.encoding === "utf8") {
+
+                    zip.file(name, content.content);
+
+                } else {
+                    throw new Error(
+                        `Unknown encoding: ${content.encoding}`
+                    );
+                }
+            }
+            // DOSSIER
+            else {
+                const folder = zip.folder(name);
+                addFolderToZip(folder, content);
+            }
+        }
+    }
+
+    
+
 
     function compareParams(params1, params2) {
         return JSON.stringify(params1) === JSON.stringify(params2);
@@ -168,6 +253,7 @@
             fetchData(paramObject);
         }
     };
+
 
 
 

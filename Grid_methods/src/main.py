@@ -12,6 +12,7 @@
 
 # Importations --------------------------------------------------------------- #
 # Universal modules
+import base64
 import json
 import os
 # Allows file system operations
@@ -314,5 +315,75 @@ def compileFolderToJson(folderPath):
 			result[filename] = compileFolderToJson(filePath)
 	return result
 
+def compileFolderToJson(folderPath):
+    """
+    Compiles all files in a folder into a JSON-compatible dictionary.
+
+    Text files:
+        {
+            "encoding": "utf8",
+            "content": "..."
+        }
+
+    Binary files:
+        {
+            "encoding": "base64",
+            "content": "..."
+        }
+
+    Subfolders are handled recursively.
+
+    :param folderPath: Path to the folder to compile
+    :return: Dictionary representing the folder structure
+    """
+
+    result = {}
+
+    # Files that should be treated as text
+    text_extensions = {
+        ".txt",
+        ".svg",
+        ".pdb",
+        ".json",
+        ".csv",
+        ".fasta",
+        ".fa",
+        ".xml",
+        ".html",
+        ".css",
+        ".js",
+        ".py",
+        ".yaml",
+        ".yml",
+        ".ini",
+        ".log",
+        ".nwk",
+        ".newick"
+    }
+
+    for filename in os.listdir(folderPath):
+        print(f"Processing {filename}...")
+        filePath = os.path.join(folderPath, filename)
+        # FILE
+        if os.path.isfile(filePath):
+
+            extension = os.path.splitext(filename)[1].lower()
+            # Text file
+            if extension in text_extensions:
+                with open(filePath, "r", encoding="utf-8") as file:
+                    result[filename] = {"encoding": "utf8","content": file.read()}
+            # Binary file
+            else:
+                with open(filePath, "rb") as file:
+                    content = file.read()
+                result[filename] = {
+                    "encoding": "base64",
+                    "content": base64.b64encode(content).decode("ascii")
+                }
+        # FOLDER
+        elif os.path.isdir(filePath):
+            result[filename] = compileFolderToJson(filePath)
+
+    return result
 
 
