@@ -23,6 +23,7 @@ import time
 import warnings
 
 from pkg_resources import require
+from pymol import cmd
 
 # Specific modules
 from Grid_methods.src.comparison.launch_structure_comparison import launch_structure_comparison
@@ -165,6 +166,10 @@ def main_api(json_parameters):
 	:param :
 	:return:
 	"""
+
+	cmd.reinitialize()
+	cmd.delete("all")
+	
 	# STEP 0 : Loading parameters ----------------------- #
 	gp.init()							# Initializes the global parameters variables
 	gp.loads_default_parameters()		# Loads the base parameters
