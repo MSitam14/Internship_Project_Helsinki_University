@@ -85,13 +85,13 @@ class RequestGridComparisonParameters(RequestGridGlobalParameters):
     line_width: str = "1"
     tree_scale: str = "80"
 
-    save_structures_tree: str = "True"
-    save_sequences_tree: str = "True"
+    save_structures_tree: str = "False"
+    save_sequences_tree: str = "False"
 
     show_structures_tree: str = "False"         # don't modify this parameter
     show_sequences_tree: str = "False"          # don't modify this parameter
 
-    save_newick_files: str = "False"
+    save_newick_files: str = "True"
 
     tree_shape: str = "Linear"
     only_topology: str = "False"
