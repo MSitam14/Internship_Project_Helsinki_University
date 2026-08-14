@@ -28,8 +28,44 @@ function initPage(data) {
 
     fillFilesInfo()
 
+    fillComparisonInfo();
+
+    loadViewer();
 
 }
+
+function loadViewer() {
+    const container = document.getElementById('container-frame');
+
+    const config = { id: "3DMol_viewer", backgroundColor: 'white' };
+    const viewer = $3Dmol.createViewer(container, config);
+
+    for ( [name, data] of Object.entries(dataResult.cleaned_dataset)) {
+        viewer.addModel(data.content, 'pdb');
+    }
+
+    viewer.setStyle({}, { cartoon: { colorscheme: "chainHetatm" } });
+
+    viewer.zoomTo();
+    viewer.zoom(1.2, 1000);
+
+    const viewerHeight = window.innerHeight - 200;
+    container.style.height = viewerHeight + "px";
+    document.getElementById('3DMol_viewer').style.height = viewerHeight + "px";
+    viewer.resize();
+    viewer.render();
+
+    window.addEventListener('resize', () => {
+        const viewerHeight = window.innerHeight - 200;
+        container.style.height = viewerHeight + "px";
+        document.getElementById('3DMol_viewer').style.height = viewerHeight + "px";
+        viewer.resize();
+        viewer.render();
+    });
+
+
+}
+
 
 function fillFilesInfo() {
     const filesNameDiv = document.getElementById("FilesNameDiv");
@@ -38,9 +74,48 @@ function fillFilesInfo() {
     
     for ( [name, data] of Object.entries(dataResult.cleaned_dataset)) {
         i++;
-        let innerHTML = `<div class="col-8" id="fileName${i}">${name}</div>`;
+        let innerHTML = `<div class="col-3" id="fileName${i}">${name}</div>`;
         filesNameDiv.insertAdjacentHTML('beforeend', innerHTML);
     }
+
+}
+
+function fillComparisonInfo() { 
+
+    const comparisonInfoDiv = document.getElementById("comparisonInfoDiv");
+
+    for ( [name, data] of Object.entries(dataResult)) {
+        if (String(name).toLowerCase().endsWith(".svg")) {
+
+            const svg = resizeSVG(data.content);
+
+            const innerHTML = `
+                <div class="row mb-2">
+                    <div class="col-12 fw-bold">${name}</div>
+                    <div class="col-12">
+                        <div class="svg-container">${svg}</div>
+                    </div>
+                </div>
+            `;
+
+            comparisonInfoDiv.insertAdjacentHTML('beforeend', innerHTML);
+        }
+    }
+}
+
+function resizeSVG(svgContent) {
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgContent, "image/svg+xml");
+
+    const svg = doc.documentElement;
+
+    svg.removeAttribute("width");
+    svg.removeAttribute("height");
+
+    svg.setAttribute("width", "75%");
+
+    return new XMLSerializer().serializeToString(svg);
 }
 
 function connectDownloadButton() {

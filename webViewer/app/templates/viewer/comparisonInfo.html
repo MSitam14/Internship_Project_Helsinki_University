@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
 
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/viewer/comparisonInfo.css') }}">
+{% endblock %}
+
 {% block content %}
 
-<div class="container py-4">
+<div class="container pt-4">
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -18,22 +22,6 @@
                 </div>
             </div>
 
-            <!-- FILE INFO -->
-            <div class="card shadow-sm mb-3">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Analyse informations</h5>
-                </div>
-                <div class="card-body">
-
-                    <div class="row mb-2" id="FilesNameDiv">
-                        <div class="col-4 fw-bold">Files name</div>
-                        <div class="col-8" id="fileName"></div>
-                    </div>
-
-                </div>
-            </div>
-
-
             <!-- ACTION BUTTONS -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
@@ -45,7 +33,52 @@
                 </div>
             </div>
 
+            <!-- FILE INFO -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Analyse informations</h5>
+                </div>
+                <div class="card-body" id="filesInfoDiv">
+
+                    <div class="row mb-2" id="FilesNameDiv">
+                        <div class="col-4 fw-bold">Files name</div>
+                        <div class="col-" id="fileName"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- comparison result -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Comparison result</h5>
+                </div>
+                <div class="card-body" id="comparisonInfoDiv">
+
+                </div>
+            </div>
+
         </div>
+    </div>
+</div>
+
+<hr class="my-4" />
+
+<div class="row justify-content-center">
+    <div class="col-12 col-xl-10">
+
+        <div id="buttonDiv3DMol" class="mb-4">
+            <input class="btn btn-info" type="button" id="style_cartoon" value="Cartoon">
+            <input class="btn btn-info" type="button" id="style_cross" value="Cross">
+            <input class="btn btn-info" type="button" id="style_line" value="Line">
+            <input class="btn btn-info" type="button" id="style_sphere" value="Sphere">
+            <input class="btn btn-info" type="button" id="style_stick" value="Stick">
+        </div>
+
+        <div class="mb-4 border border-2 border-secondary rounded-3 p-2 bg-white shadow-sm mol-frame">
+            <div id="container-frame" height="1000" class="mol-container"></div>
+        </div>
+
     </div>
 </div>
 
@@ -55,6 +88,7 @@
 
 <script src="{{ url_for('static', filename='tools/viewer/webCache.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
 
 <script id="params-data" type="application/json">{{ params | tojson }}</script>
 <script src="{{ url_for('static', filename='js/viewer/comparisonInfo.js') }}"></script>
