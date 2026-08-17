@@ -31,7 +31,39 @@ function initPage(data) {
     fillComparisonInfo();
 
     loadViewer();
+}
 
+function connectButtonViewer(viewer) {
+    document.querySelectorAll('input[id^="style_"]').forEach(button => {
+        button.addEventListener('click', () => {
+            const style = button.id.replace('style_', '');
+            viewer.setStyle({}, { [style]: { colorscheme: "chain" } });
+            viewer.render();
+        });
+    });
+}
+
+function displayTree(newick) {
+
+    const container = document.getElementById(
+        "compGraphsDiv"
+    );
+
+    container.innerHTML = "";
+
+    try {
+
+        const root = parseNewick(newick);
+
+        drawTree(root, container);
+
+    } catch (error) {
+
+        console.error(
+            "Error while displaying Newick tree:",
+            error
+        );
+    }
 }
 
 function loadViewer() {
@@ -44,7 +76,7 @@ function loadViewer() {
         viewer.addModel(data.content, 'pdb');
     }
 
-    viewer.setStyle({}, { cartoon: { colorscheme: "chainHetatm" } });
+    viewer.setStyle({}, { cartoon: { colorscheme: "chain" } });
 
     viewer.zoomTo();
     viewer.zoom(1.2, 1000);
@@ -63,7 +95,7 @@ function loadViewer() {
         viewer.render();
     });
 
-
+    connectButtonViewer(viewer);
 }
 
 
@@ -99,6 +131,9 @@ function fillComparisonInfo() {
             `;
 
             comparisonInfoDiv.insertAdjacentHTML('beforeend', innerHTML);
+        } 
+        else if(String(name).toLowerCase().endsWith(".nwk")) {
+            displayTree(data.content);
         }
     }
 }
