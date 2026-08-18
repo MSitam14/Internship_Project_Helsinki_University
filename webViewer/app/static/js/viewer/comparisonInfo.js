@@ -33,16 +33,6 @@ function initPage(data) {
     loadViewer();
 }
 
-function connectButtonViewer(viewer) {
-    document.querySelectorAll('input[id^="style_"]').forEach(button => {
-        button.addEventListener('click', () => {
-            const style = button.id.replace('style_', '');
-            viewer.setStyle({}, { [style]: { colorscheme: "chain" } });
-            viewer.render();
-        });
-    });
-}
-
 function displayTree(newick) {
 
     const container = document.getElementById(
@@ -66,17 +56,73 @@ function displayTree(newick) {
     }
 }
 
+function connectButtonViewer(viewer, modelColors) {
+    document.querySelectorAll('input[id^="style_"]').forEach(button => {
+
+        button.addEventListener('click', () => {
+
+            const style = button.id.replace('style_', '');
+
+            modelColors.forEach((color, index) => {
+                viewer.setStyle({ model: index }, { [style]: { color: color } });
+            });
+            viewer.render();
+        });
+    });
+}
+
+function hslToHex(h, s, l) {
+    s /= 100;
+    l /= 100;
+
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+
+    const f = n =>
+        l - a * Math.max(
+            -1,
+            Math.min(k(n) - 3, Math.min(9 - k(n), 1))
+        );
+
+    const r = Math.round(255 * f(0));
+    const g = Math.round(255 * f(8));
+    const b = Math.round(255 * f(4));
+
+    return "#" +
+        r.toString(16).padStart(2, "0") +
+        g.toString(16).padStart(2, "0") +
+        b.toString(16).padStart(2, "0");
+}
+
+function getModelColor(index, total) {
+    const hue = (index / total) * 360;
+
+    return hslToHex(
+        hue,
+        70,
+        50
+    );
+}
+
 function loadViewer() {
     const container = document.getElementById('container-frame');
 
     const config = { id: "3DMol_viewer", backgroundColor: 'white' };
     const viewer = $3Dmol.createViewer(container, config);
 
-    for ( [name, data] of Object.entries(dataResult.cleaned_dataset)) {
-        viewer.addModel(data.content, 'pdb');
-    }
+    const models = Object.entries(dataResult.cleaned_dataset);
+    const modelColors = [];
 
-    viewer.setStyle({}, { cartoon: { colorscheme: "chain" } });
+    models.forEach(([name, data], index) => {
+
+        viewer.addModel(data.content, 'pdb');
+
+        const color = getModelColor(index, models.length);
+
+        modelColors.push(color);
+
+        viewer.setStyle({ model: index },{cartoon: {color: color}});
+    });
 
     viewer.zoomTo();
     viewer.zoom(1.2, 1000);
@@ -95,9 +141,8 @@ function loadViewer() {
         viewer.render();
     });
 
-    connectButtonViewer(viewer);
+    connectButtonViewer(viewer, modelColors);
 }
-
 
 function fillFilesInfo() {
     const filesNameDiv = document.getElementById("FilesNameDiv");
