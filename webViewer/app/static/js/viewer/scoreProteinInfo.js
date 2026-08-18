@@ -165,9 +165,7 @@ async function fetchData() {
     }).then(response => response.json())
         .then(async data => {
 
-            console.log("Data received:", data);
-
-            if (data.status !== "success") {
+            if (data.status == "success") {
                 if (!userKey) {
                     console.log("No userKey found, generating new userKey");
                     userKey = await fetch("/api-key/generateUserKey", {
