@@ -4,9 +4,11 @@ import string
 from flask import Blueprint, request, jsonify
 from ..models import TempSaveScoreOneFile
 from ..models import TempSaveComparison
+from ..models import TempSaveHotSpots
 
 apiScore = Blueprint('api-database-score', __name__, url_prefix='/api-database-score')
 apiComparison = Blueprint('api-database-comparison', __name__, url_prefix='/api-database-comparison')
+apiHotSpots = Blueprint('api-database-hotSpots', __name__, url_prefix='/api-database-hotSpots')
 
 apiKey = Blueprint('api-key', __name__, url_prefix='/api-key')
 # ===== ROUTES API =====
@@ -131,6 +133,54 @@ def save_data_with_user_key(userKey):
     
     try:
         TempSaveComparison.save_comparison_data(userKey, data, parameter)
+        return jsonify({
+            'status': 'success',
+            'message': f'Données sauvegardées pour le user_key {userKey}'
+        }), 201
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@apiHotSpots.route('/getDataWhithUserKey/<string:userKey>', methods=['GET'])
+def get_data_with_user_key(userKey):
+    """Récupère les données de hot spots par user_key"""
+    comparison_data = TempSaveHotSpots.get_by_user_key(userKey)
+    if not comparison_data:
+        return jsonify({
+            'status': 'error',
+            'message': 'Aucune donnée trouvée pour ce user_key'
+        })
+    
+    return jsonify({
+        'status': 'success',
+        'user_key': comparison_data.user_key,
+        'data': comparison_data.data,
+        'parameter': comparison_data.parameter
+    })
+
+@apiHotSpots.route('/saveDataWithUserKey/<string:userKey>', methods=['POST'])
+def save_data_with_user_key(userKey):
+    """Sauvegarde les données de hot spots dans la BD par user_key"""
+    data_request = request.json
+    if not data_request:
+        return jsonify({
+            'status': 'error',
+            'message': 'Données JSON manquantes'
+        }), 400
+    
+    data = data_request.get('data')
+    parameter = data_request.get('parameter')
+    
+    if not all([data, parameter]):
+        return jsonify({
+            'status': 'error',
+            'message': 'Champs requis : data and parameter'
+        }), 400
+    
+    try:
+        TempSaveHotSpots.save_comparison_data(userKey, data, parameter)
         return jsonify({
             'status': 'success',
             'message': f'Données sauvegardées pour le user_key {userKey}'
