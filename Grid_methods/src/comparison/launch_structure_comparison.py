@@ -111,9 +111,7 @@ def launch_structure_comparison(d_parameters):
 	# If there is not enough file
 	if len(gp.O_SYSTEM_COMPARISON.l_o_structures) < 2:
 		l_s_logs.append("ERROR : There is not enough valid PDB structure to run a comparison, at least 2 are required")		# Defines the error message
-		terminate_program_process(		# Stops the program
-			l_s_content=l_s_logs		# Content to save to logs
-		)
+		raise ValueError("There is not enough valid PDB structure to run a comparison, at least 2 are required")
 	# END STEP 3 ---------------------------------------- #
 
 	# STEP 4 : Grid generation using multiprocess -------------- #

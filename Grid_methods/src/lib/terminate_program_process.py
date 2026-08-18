@@ -57,7 +57,7 @@ def terminate_program_process(l_s_content=None):
 
 
 	# STEP 3 : Stopping the program --------------------- #
-	os._exit(1)		# Stops the program with the error exit code
+	raise Exception("Error : error during the program : "+ l_s_content)		# Stops the program
 	# END STEP 3 ---------------------------------------- #
 
 # ---------------------------------------------------------------------------- #

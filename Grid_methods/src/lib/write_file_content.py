@@ -89,7 +89,7 @@ def write_file_content(p_file, s_writing_mode, l_s_content):
 
 		# If the file cannot be opened or written
 		except OSError:
-			os._exit(1)		# Stops the program with the error exit code
+			raise Exception("Error : error during the program : "+ l_s_content)
 	# End if
 	# END STEP 1 ---------------------------------------- #
 
