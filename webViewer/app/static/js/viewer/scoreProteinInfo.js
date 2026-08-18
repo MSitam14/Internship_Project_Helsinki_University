@@ -165,32 +165,41 @@ async function fetchData() {
     }).then(response => response.json())
         .then(async data => {
 
-            if (!userKey) {
-                console.log("No userKey found, generating new userKey");
-                userKey = await fetch("/api-key/generateUserKey", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === "success") {
-                            saveUserKey(data.user_key);
-                        }
-                        else {
-                            console.error("Error generating userKey:", data.message);
-                        }
+            console.log("Data received:", data);
 
-                        return data.user_key;
+            if (data.status !== "success") {
+                if (!userKey) {
+                    console.log("No userKey found, generating new userKey");
+                    userKey = await fetch("/api-key/generateUserKey", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
                     })
-                    .catch(error => {
-                        console.error("Error generating userKey:", error);
-                    });
-            }
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === "success") {
+                                saveUserKey(data.user_key);
+                            }
+                            else {
+                                console.error("Error generating userKey:", data.message);
+                            }
 
-            saveDataInDB(userKey, paramObject, data);
-            initPage(data);
+                            return data.user_key;
+                        })
+                        .catch(error => {
+                            console.error("Error generating userKey:", error);
+                        });
+                }
+
+                saveDataInDB(userKey, paramObject, data);
+                initPage(data);
+            }
+            else {
+                console.error("Error from scoring API: " + data.message);
+                hideLoading();
+                showErrorPopup("Error from scoring. Please try again later.");
+            }
         })
         .catch(error => {
             console.error("Error:", error);
