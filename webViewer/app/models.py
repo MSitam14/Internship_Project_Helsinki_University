@@ -180,3 +180,78 @@ class TempSaveComparison(db.Model):
             if not TempSaveComparison.user_key_exists(userKey):
                 return userKey
 
+class TempSaveHotSpots(db.Model):
+    """Modèle pour le stockage temporaire des hot spots"""
+    __tablename__ = 'temp_save_hot_spots'
+    
+    __table_args__ = (
+        db.Index('idx_user_key_TempSaveHotSpots', 'user_key'),
+        db.Index('idx_last_used_TempSaveHotSpot', 'date_last_used'),
+    )
+    
+    user_key = db.Column(db.String(16), primary_key=True)
+    parameter = db.Column(db.JSON, nullable=False)
+    data = db.Column(db.JSON, nullable=False)
+    date_last_used = db.Column(db.DateTime, nullable=False)
+
+    @staticmethod
+    def clean_old_entries():
+        """Supprime les entrées plus anciennes que le nombre de jours spécifié"""
+        threshold_date = datetime.now() - timedelta(minutes=30)
+        old_entries = TempSaveHotSpots.query.filter(TempSaveHotSpots.date_last_used < threshold_date).all()
+        for entry in old_entries:
+            db.session.delete(entry)
+        db.session.commit()
+    
+    @staticmethod
+    def get_by_user_key(userKey):
+
+        TempSaveHotSpots.clean_old_entries()
+
+        """Récupère les données de score par user_key"""
+
+        save = TempSaveHotSpots.query.filter_by(user_key=userKey).first()
+
+        if save:
+            save.date_last_used = datetime.now()
+            db.session.commit()
+            return save
+        
+        return None
+    
+    @staticmethod
+    def user_key_exists(userKey):
+        """Vérifie si un user_key existe dans la table"""
+        return db.session.query(TempSaveHotSpots.query.filter_by(user_key=userKey).exists()).scalar()
+    
+    @staticmethod
+    def save_comparison_data(userKey ,data, parameter):
+
+        TempSaveHotSpots.clean_old_entries()
+
+        """Sauvegarde les données de score dans la BD"""
+        if(TempSaveHotSpots.user_key_exists(userKey)):
+            # Mettre à jour l'entrée existante
+            comparison_data = TempSaveHotSpots.get_by_user_key(userKey)
+            comparison_data.data = data
+            comparison_data.parameter = parameter
+            comparison_data.date_last_used = datetime.now()
+        else:
+            # Créer une nouvelle entrée
+            comparison_data = TempSaveHotSpots(
+                user_key=userKey,
+                parameter=parameter,
+                data=data,
+                date_last_used=db.func.now()
+            )
+            db.session.add(comparison_data)
+        db.session.commit()
+
+    @staticmethod
+    def generate_user_key():
+        """Génère un user_key unique"""
+        
+        while True:
+            userKey = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+            if not TempSaveHotSpots.user_key_exists(userKey):
+                return userKey
