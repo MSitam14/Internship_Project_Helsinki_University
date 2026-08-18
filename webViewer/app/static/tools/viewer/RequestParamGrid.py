@@ -231,18 +231,69 @@ class RequestGridHotspotParameters(RequestGridGlobalParameters):
 
     def toJson(self):
 
-        params = {
+        global_parameters = {
             k: v
             for k, v in self.__dict__.items()
-            if k not in (
-                "pdb_name",
-                "pdb_content"
+            if k
+            in (
+                "run_comparison",
+                "run_hotspot",
+                "explicit_grid",
+                "atom_type",
+                "grid_spacing",
+                "grid_padding",
+                "align_principal_axes",
+                "pocket_res_name",
+                "pocket_res_id",
+                "lig_chain",
+                "pocket_size",
+                "discard_hetatm",
+                "discard_atom",
+                "discard_hydrogen",
+                "discard_water",
+                "discard_alternative",
+                "keep_chains",
+                "discard_chains",
+                "keep_residues",
+                "discard_residues",
+                "keep_residue_ids",
+                "discard_residue_ids",
+                "keep_atoms",
+                "discard_atoms",
+                "cpu_allocated",
+                "path_to_comparison_parameters",
+                "path_to_hotspot_parameters",
+                "watch_live",
+                "create_pymol_session",
+                "session_name",
+            )
+        }
+
+        hotSpot_parameters = {
+            k: v
+            for k, v in self.__dict__.items()
+            if k
+            in (
+                "path_to_PDB_directory",
+                "path_to_output_directory",
+                "grid_geometry",
+                "max_neighbor_number",
+                "hotspot_type",
+                "tag_threshold",
+                "bad_score_threshold",
+                "good_score_threshold",
+                "number_of_rounds",
+                "electronic_densities_folder",
+                "normalize_electronic_densities"
             )
         }
 
         return json.dumps(
             {
-                "params": params,
+                "params": {
+                    "hotspot_parameters": hotSpot_parameters,
+                    "global_parameters": global_parameters,
+                },
                 "pdb": {
                     "name": self.pdb_name,
                     "content": self.pdb_content
