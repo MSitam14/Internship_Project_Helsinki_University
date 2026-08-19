@@ -35,21 +35,6 @@ def pdbInfo(parameters):
         params=parameters
     )
 
-@viewer.route('/pdbInfoUserKey', methods=['POST'])
-def pdbInfoParameters():
-    
-    userKey = request.form.get('userKey')
-
-    data = TempSaveScoreOneFile.get_by_user_key(userKey)
-
-    if not data:
-        return fitnessForm()
-    
-    else:
-        parameters = data.parameter
-    
-        return pdbInfo((parameters))
-
 @viewer.route('/pdbInfoRequest', methods=['POST'])
 def pdbInfoRequest():
     the_file = request.files['the_file']
@@ -71,7 +56,6 @@ def pdbInfoRequest():
 def requestFormComparison():
     return render_template('viewer/comparisonForm.html')
 
-
 @viewer.route('/infoComparison', methods=['POST'])
 def infoComparison(parameters):
 
@@ -79,11 +63,6 @@ def infoComparison(parameters):
         'viewer/comparisonInfo.html',
         params=parameters
     )
-
-@viewer.route('/infoComparisonUserKey', methods=['POST'])
-def infoComparisonUserKey():
-    return None
-
 
 @viewer.route('/infoComparisonRequest', methods=['POST'])
 def infoComparisonRequest():
@@ -102,7 +81,30 @@ def infoComparisonRequest():
 
     return infoComparison(json.loads(params.toJson()))
 
+@viewer.route('/requestFormHotSpots', methods=['GET'])
+def requestFormHotSpots():
+    return render_template('viewer/hotSpotsForm.html')
 
+# @viewer.route('/infoHotSpots', methods=['POST'])
+# def infoHotSpots(parameters):
+
+#     return render_template(
+#         'viewer/comparisonInfo.html',
+#         params=parameters
+#     )
+
+# @viewer.route('/infoHotSpotsRequest', methods=['POST'])
+# def infoHotSpotsRequest():
+
+#     the_file = request.files['the_file']
+#     file_content = the_file.read().decode('utf-8', errors='replace')
+
+#     params = RequestGridComparisonParameters()
+
+#     params.pdb1_name = the_file.filename
+#     params.pdb1_content = file_content
+
+#     return infoHotSpots(json.loads(params.toJson()))
 
 
 @viewer.errorhandler(404)

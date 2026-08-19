@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-3">Hot Spots</h2>
+
+                <form action="/infoHotSpotsRequest" method="post" enctype="multipart/form-data">
+
+                    <div class="mb-3">
+                        <label for="the_file" class="form-label">Choose a file (only .pdb files are allowed):</label>
+                        <input class="form-control" type="file" id="the_file" name="the_file" accept=".pdb" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Run</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}
