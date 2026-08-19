@@ -11,7 +11,7 @@ import json
 class RequestGridGlobalParameters:
 
     # ---------- Global parameters ----------
-    run_comparison: str = "True"
+    run_comparison: str = "False"
     run_hotspot: str = "False"
 
     explicit_grid: str = "False"
@@ -57,6 +57,8 @@ class RequestGridGlobalParameters:
 @dataclass
 class RequestGridComparisonParameters(RequestGridGlobalParameters):
 
+    run_comparison: str = "True"
+
     # ---------- Comparison parameters ----------
     path_to_PDB_directory: str = "Grid_methods/data/input/structures_comparison/"
     path_to_output_directory: str = "Grid_methods/data/output/structures/"
@@ -70,7 +72,7 @@ class RequestGridComparisonParameters(RequestGridGlobalParameters):
     save_parameters_files: str = "False"
     database: str = "False"
 
-    dataset_status: str = "1"
+    dataset_status: str = "0"
     tmalign_reference: str = "None"
 
     tree: str = "structures"
@@ -209,18 +211,20 @@ class RequestGridComparisonParameters(RequestGridGlobalParameters):
 @dataclass
 class RequestGridHotspotParameters(RequestGridGlobalParameters):
 
+    run_hotspot: str = "True"
+
     # ---------- Hotspot parameters ----------
     path_to_PDB_directory: str = "Grid_methods/data/input/hotspot_lig/"
-    path_to_output_directory: str = "Grid_methods/data/output/hotspot/"
+    path_to_output_directory: str = "Grid_methods/data/output/structures/"
 
     grid_geometry: str = "Sphere"
     max_neighbor_number: str = "3"
 
-    hotspot_type: str = "None"
+    hotspot_type: str = "C.ar"
     tag_threshold: str = "6"
     bad_score_threshold: str = "0.4"
     good_score_threshold: str = "0.6"
-    number_of_rounds: str = "3"
+    number_of_rounds: str = "1"
 
     electronic_densities_folder: str = "Grid_methods/data/densities"
     normalize_electronic_densities: str = "False"
