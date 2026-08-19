@@ -288,9 +288,9 @@ def main_api(json_parameters):
 		print('')
 		print('')
 
-		json_return = compileFolderToJson(gp.D_PARAMETERS_COMPARISON['p_output_hotspot'])
+		json_return = compileFolderToJson(gp.D_PARAMETERS_HOTSPOT['p_output_hotspot'])
 		
-		shutil.rmtree(gp.D_PARAMETERS_COMPARISON['p_output_hotspot'])
+		shutil.rmtree(gp.D_PARAMETERS_HOTSPOT['p_output_hotspot'])
 		
 		return json_return
 	# END STEP 2 ---------------------------------------- #
