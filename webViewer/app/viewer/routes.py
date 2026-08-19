@@ -1,6 +1,7 @@
 from flask import render_template, flash, redirect, \
     url_for, abort, request, current_app
 from webViewer.app.static.tools.viewer.RequestParamGrid import RequestGridComparisonParameters
+from webViewer.app.static.tools.viewer.RequestParamGrid import RequestGridHotspotParameters
 from ..static.tools.viewer.RequestParamFitness import AtomType
 from ..static.tools.viewer.RequestParamFitness import RequestParamFitness
 from ..import db
@@ -85,26 +86,26 @@ def infoComparisonRequest():
 def requestFormHotSpots():
     return render_template('viewer/hotSpotsForm.html')
 
-# @viewer.route('/infoHotSpots', methods=['POST'])
-# def infoHotSpots(parameters):
+@viewer.route('/infoHotSpots', methods=['POST'])
+def infoHotSpots(parameters):
 
-#     return render_template(
-#         'viewer/comparisonInfo.html',
-#         params=parameters
-#     )
+    return render_template(
+        'viewer/hotSpotsInfo.html',
+        params=parameters
+    )
 
-# @viewer.route('/infoHotSpotsRequest', methods=['POST'])
-# def infoHotSpotsRequest():
+@viewer.route('/infoHotSpotsRequest', methods=['POST'])
+def infoHotSpotsRequest():
 
-#     the_file = request.files['the_file']
-#     file_content = the_file.read().decode('utf-8', errors='replace')
+    the_file = request.files['the_file']
+    file_content = the_file.read().decode('utf-8', errors='replace')
 
-#     params = RequestGridComparisonParameters()
+    params = RequestGridHotspotParameters()
 
-#     params.pdb1_name = the_file.filename
-#     params.pdb1_content = file_content
+    params.pdb_name = the_file.filename
+    params.pdb_content = file_content
 
-#     return infoHotSpots(json.loads(params.toJson()))
+    return infoHotSpots(json.loads(params.toJson()))
 
 
 @viewer.errorhandler(404)
