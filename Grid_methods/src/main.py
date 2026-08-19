@@ -282,10 +282,17 @@ def main_api(json_parameters):
 			exit()
 		time_mid = time.time()
 
-
-
 		launch_structure_hotspot()		# Manages the comparison of structures
 		print("Hotspot done in {:.1f} seconds".format(time.time() - t_start))
+
+		print('')
+		print('')
+
+		json_return = compileFolderToJson(gp.D_PARAMETERS_COMPARISON['p_output_hotspot'])
+		
+		shutil.rmtree(gp.D_PARAMETERS_COMPARISON['p_output_hotspot'])
+		
+		return json_return
 	# END STEP 2 ---------------------------------------- #
 
 
