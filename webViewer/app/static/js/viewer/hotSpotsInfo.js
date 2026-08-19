@@ -24,7 +24,32 @@ function initPage(data) {
     console.log("Data received:", dataResult);
     hideLoading();
 
-    
+
+}
+
+function saveDataInDB(userKey, params, data) {
+    fetch(`/api-database-hotSpots/saveDataWithUserKey/${userKey}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            parameter: params,
+            data: data
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                console.log("Data saved successfully with userKey");
+            }
+            else {
+                console.error("Error saving data with userKey:", data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error during fetch for saving data with userKey:", error);
+        });
 }
 
 async function fetchData() {
@@ -42,30 +67,30 @@ async function fetchData() {
                 throw new Error("Error from hot spots API: " + data.message);
             }
 
-            // if (!userKey) {
-            //     console.log("No userKey found, generating new userKey");
-            //     userKey = await fetch("/api-key/generateUserKey", {
-            //         method: "GET",
-            //         headers: {
-            //             "Content-Type": "application/json"
-            //         }
-            //     })
-            //         .then(response => response.json())
-            //         .then(data => {
-            //             if (data.status === "success") {
-            //                 saveUserKey(data.user_key);
-            //             }
-            //             else {
-            //                 console.error("Error generating userKey:", data.message);
-            //             }
-            //             return data.user_key;
-            //         })
-            //         .catch(error => {
-            //             console.error("Error generating userKey:", error);
-            //         });
-            // }
+            if (!userKey) {
+                console.log("No userKey found, generating new userKey");
+                userKey = await fetch("/api-key/generateUserKey", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            saveUserKey(data.user_key);
+                        }
+                        else {
+                            console.error("Error generating userKey:", data.message);
+                        }
+                        return data.user_key;
+                    })
+                    .catch(error => {
+                        console.error("Error generating userKey:", error);
+                    });
+            }
 
-            // saveDataInDB(userKey, paramObject, data);
+            saveDataInDB(userKey, paramObject, data);
             initPage(data);
         })
         .catch(error => {
@@ -75,50 +100,52 @@ async function fetchData() {
         });
 }
 
+function compareParams(params1, params2) {
+    return JSON.stringify(params1) === JSON.stringify(params2);
+}
+
 onload = async function () {
 
     showLoading();
 
-    fetchData();
+    userKey = await getUserKey();
 
-    // userKey = await getUserKey();
+    console.log("userKey", userKey);
 
-    // console.log("userKey", userKey);
+    if (userKey) {
+        fetch(`/api-database-hotSpots/getDataWhithUserKey/` + userKey, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    if (compareParams(data.parameter, paramObject)) {
 
-    // if (userKey) {
-    //     fetch(`/api-database-comparison/getDataWhithUserKey/` + userKey, {
-    //         method: "GET",
-    //         headers: {
-    //             "Content-Type": "application/json"
-    //         }
-    //     })
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             if (data.status === "success") {
-    //                 if (compareParams(data.parameter, paramObject)) {
+                        console.log("Params match, loading cached data");
 
-    //                     console.log("Params match, loading cached data");
-
-    //                     initPage(data.data);
-    //                 }
-    //                 else {
-    //                     console.log("Params do not match, fetching new data");
-    //                     fetchData(paramObject);
-    //                 }
-    //             }
-    //             else {
-    //                 console.log("No cached data found, fetching new data");
-    //                 fetchData(paramObject);
-    //             }
-    //         })
-    //         .catch(error => {
-    //             console.error("Error fetching data:", error);
-    //             hideLoading();
-    //             showErrorPopup("Error from database. Please try again later.");
-    //         });
-    // }
-    // else {
-    //     console.log("No user key found, fetching new data");
-    //     fetchData(paramObject);
-    // }
+                        initPage(data.data);
+                    }
+                    else {
+                        console.log("Params do not match, fetching new data");
+                        fetchData(paramObject);
+                    }
+                }
+                else {
+                    console.log("No cached data found, fetching new data");
+                    fetchData(paramObject);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                hideLoading();
+                showErrorPopup("Error from database. Please try again later.");
+            });
+    }
+    else {
+        console.log("No user key found, fetching new data");
+        fetchData(paramObject);
+    }
 };
