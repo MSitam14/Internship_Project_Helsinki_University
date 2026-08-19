@@ -288,6 +288,8 @@ def main_api(json_parameters):
 		print('')
 		print('')
 
+		os.chdir("../../../../../../") 
+
 		json_return = compileFolderToJson(gp.D_PARAMETERS_HOTSPOT['p_output_hotspot'])
 		
 		shutil.rmtree(gp.D_PARAMETERS_HOTSPOT['p_output_hotspot'])
@@ -310,22 +312,22 @@ if __name__ == "__main__":
 
 # ---------------------------------------------------------------------------- #
 
-def compileFolderToJson(folderPath):
-	"""
-	Compiles all files in a folder into a JSON object, recursively handling subfolders.
-	:param folderPath: Path to the folder containing the files.
-	:return: A JSON object with file names as keys and their contents as values.
-	"""
-	result = {}
-	for filename in os.listdir(folderPath):
-		print(f"Processing {filename}...")
-		filePath = os.path.join(folderPath, filename)
-		if os.path.isfile(filePath):
-			with open(filePath, 'r', encoding='utf-8', errors='replace') as file:
-				result[filename] = file.read()
-		elif os.path.isdir(filePath):
-			result[filename] = compileFolderToJson(filePath)
-	return result
+# def compileFolderToJson(folderPath):
+# 	"""
+# 	Compiles all files in a folder into a JSON object, recursively handling subfolders.
+# 	:param folderPath: Path to the folder containing the files.
+# 	:return: A JSON object with file names as keys and their contents as values.
+# 	"""
+# 	result = {}
+# 	for filename in os.listdir(folderPath):
+# 		print(f"Processing {filename}...")
+# 		filePath = os.path.join(folderPath, filename)
+# 		if os.path.isfile(filePath):
+# 			with open(filePath, 'r', encoding='utf-8', errors='replace') as file:
+# 				result[filename] = file.read()
+# 		elif os.path.isdir(filePath):
+# 			result[filename] = compileFolderToJson(filePath)
+# 	return result
 
 def compileFolderToJson(folderPath):
     """
