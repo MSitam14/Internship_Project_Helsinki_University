@@ -3,6 +3,7 @@ import json
 import os
 import base64
 import shutil
+import traceback
 from .main import main_api
 
 from flask import Blueprint, request, jsonify
@@ -137,16 +138,16 @@ def calculate_hotSpots():
         }), 400
     
     file_path_input = 'Grid_methods/data/input/structures/' + date + '/'
-    pdb1_path = file_path_input + pdb["name"]
+    pdb_path = file_path_input + pdb["name"]
     
     params['hotspot_parameters']["path_to_PDB_directory"] = file_path_input
     
     os.makedirs(file_path_input, exist_ok=True)
     
-    with open(pdb1_path, 'w') as f:
+    with open(pdb_path, 'w') as f:
         f.write(pdb["content"])
     
-    print(f"\nReceived comparison request for {pdb['name']}")
+    print(f"\nReceived hot spots request for {pdb['name']}")
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     try:
         out = main_api(params) 
@@ -155,6 +156,7 @@ def calculate_hotSpots():
         cmd.quit()  # Ensure PyMOL quits to free resources
         cmd.reinitialize()
         print(f"Error during hot spots: {str(e)}")
+        traceback.print_exc()
         return jsonify({
             'status': 'error',
             'message': f'Error during hot spots: {str(e)}'

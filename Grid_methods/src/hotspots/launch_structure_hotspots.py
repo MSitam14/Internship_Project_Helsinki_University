@@ -5,6 +5,7 @@
 # Updated :
 # ---------------------------------------------------------------------------- #
 from random import random
+import traceback
 
 import numpy as np
 # Importing modules ---------------------------------------------------------- #
@@ -377,6 +378,7 @@ def launch_structure_hotspot():
         except Exception as e:
             print('Error in structure hotspot', o_structure.s_name)
             print(e)
+            traceback.print_exc()
         # ---------------------------------------------------------------------------- #
 
 #
