@@ -17,12 +17,12 @@ import json
 
 @viewer.route('/')
 def base():
-    return redirect(url_for('viewer.index'))
+    return redirect(url_for('viewer.home'))
 
-@viewer.route('/index')
-def index():
+@viewer.route('/home')
+def home():
 
-    return render_template('viewer/index.html', a_variable='Home Page')
+    return render_template('viewer/home.html')
 
 @viewer.route('/fitnessForm', methods=['GET'])
 def fitnessForm():
@@ -107,6 +107,10 @@ def infoHotSpotsRequest():
 
     return infoHotSpots(json.loads(params.toJson()))
 
+
+@viewer.route('/credits')
+def credits():
+    return render_template('viewer/credits.html')
 
 @viewer.errorhandler(404)
 def page_not_found(error):

@@ -1,7 +1,7 @@
 const logo = document.getElementById("divNavBarLogo");
 
 logo.addEventListener("click", () => {
-    window.location.href = "{{ url_for('viewer.index') }}";
+    window.location.href = "/";
 });
 
 const sidebar = document.getElementById("sidebar");
