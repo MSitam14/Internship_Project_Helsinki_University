@@ -10,6 +10,14 @@ Before getting started, make sure you have:
 * Python 3.9
 * PostgreSQL
 * A Linux environment
+* OpenGL system libraries required by PyMOL
+
+On Ubuntu/Debian-based systems, install the required system libraries with:
+
+```bash
+sudo apt update
+sudo apt install libgl1
+```
 
 ## 1. Clone the Repository
 
