@@ -24,7 +24,67 @@ function initPage(data) {
     console.log("Data received:", dataResult);
     hideLoading();
 
+    connectDownloadButton();
 
+}
+
+function connectDownloadButton() {
+
+    const buttonDownloadZip = document.getElementById("buttonDownloadZip");
+    buttonDownloadZip.addEventListener("click", async () => {
+        try {
+            const zip = new JSZip();
+
+            addFolderToZip(zip, dataResult);
+
+            const blob = await zip.generateAsync({
+                type: "blob"
+            });
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "analized_folder.zip";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 1000);
+
+        } catch (error) {
+            console.error("Error creating ZIP:", error);
+        }
+    });
+}
+
+function addFolderToZip(zip, data) {
+
+    for (const [name, content] of Object.entries(data)) {
+        // FICHIER
+        if (content && typeof content === "object" && content.encoding !== undefined) {
+            if (content.encoding === "base64") {
+                zip.file(name, content.content, {
+                    base64: true
+                });
+
+            } else if (content.encoding === "utf8") {
+
+                zip.file(name, content.content);
+
+            } else {
+                throw new Error(
+                    `Unknown encoding: ${content.encoding}`
+                );
+            }
+        }
+        // DOSSIER
+        else {
+            const folder = zip.folder(name);
+            addFolderToZip(folder, content);
+        }
+    }
 }
 
 function saveDataInDB(userKey, params, data) {

@@ -105,6 +105,8 @@ def infoHotSpotsRequest():
     params.pdb_name = the_file.filename
     params.pdb_content = file_content
 
+    params.pocket_res_name = request.form.get('pocket_res_name') if request.form.get('pocket_res_name') != "" else "False"
+
     return infoHotSpots(json.loads(params.toJson()))
 
 
