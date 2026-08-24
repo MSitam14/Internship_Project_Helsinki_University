@@ -47,6 +47,7 @@ class PdbStructure:
         self.s_name = ""  # Name of the structure
         self.l_s_leading_data = []  # PDB information written above the atom properties
         self.l_s_trailing_data = []  # PDB information written under the atom properties
+        self.s_pdb_content = None  # Optional in-memory PDB content used for atom typing
 
         # Structural fields
         self.i_atom_count = 0  # Number of atoms in the structure
@@ -57,7 +58,7 @@ class PdbStructure:
         # Grid fields
         self.a_grid = None  # 3D grid containing the structure
         self.l_l_elements = None  # Set of atoms contained in the structure
-
+        self.pocket_l_l_elements = None  # Set of atoms contained in the pocket
         # Hotspot fields
         self.o_tree = None  # A KDTree object representing the exact placement of atoms, used for distance determination
 
@@ -127,6 +128,7 @@ class PdbStructure:
         self.s_name = kwargs["s_name"]  # Name of the structure
         self.l_s_leading_data = kwargs["l_s_leading_data"]  # PDB information written above the atom properties
         self.l_s_trailing_data = kwargs["l_s_trailing_data"]  # PDB information written under the atom properties
+        self.s_pdb_content = kwargs.get("s_pdb_content", None)  # Optional in-memory PDB block
         # Structural fields
         self.i_atom_count = len(kwargs["d_atoms"]["HetAtom"])  # Retrieves the number of atoms
         self.a_atoms = np.arange(self.i_atom_count).astype(  # Array of atoms properties
@@ -148,32 +150,32 @@ class PdbStructure:
         # Translate custom and Sybyl element types
         self.translate_custom_types()
         self.translate_sybyl_types()
-
+        if self.s_name in gp.D_POCKET_RES_ID.keys():
+            self.pocket_indexes = np.where(np.isin(self.a_atoms['residue_serial'], gp.D_POCKET_RES_ID[self.s_name]))[0]
+            self.a_pocket_atoms = self.a_atoms[self.pocket_indexes]
         # Actualize the properties of the structure
         if gp.D_PARAMETERS_GLOBAL['atom_type'].lower() == 'sybyl':
             l_type = 'sybyl_type'
             self.a_atoms["type_number"] = [gp.D_ELEMENT_NUMBER[atom.capitalize()] for atom in
                                            self.a_atoms["sybyl_type"]]
-            self.l_l_elements = set(
-                self.a_atoms["sybyl_type"])  # List all the different elements contained in the structure
+            self.l_l_elements = set(self.a_atoms["sybyl_type"])  # List all the different elements contained in the structure
+            if self.a_pocket_atoms is not None:
+                self.pocket_l_l_elements = set(self.a_pocket_atoms["sybyl_type"])  # List all the different elements contained in the pocket
         else:
             l_type = 'custom_type'
             self.a_atoms["type_number"] = [gp.D_ELEMENT_NUMBER[atom.capitalize()] for atom in
                                            self.a_atoms['custom_type']]
             self.l_l_elements = set(self.a_atoms["custom_type"])
-
             # l_type = 'element_symbol'
             # self.a_atoms["type_number"] = [gp.D_ELEMENT_NUMBER[atom.capitalize()] for atom in
             #                                self.a_atoms["element_symbol"]]
             # self.l_l_elements = set(
             #     self.a_atoms["element_symbol"])  # List all the different elements contained in the structure
 
-        if self.s_name in gp.D_POCKET_RES_ID.keys():
-            self.pocket_indexes = np.where(np.isin(self.a_atoms['residue_serial'], gp.D_POCKET_RES_ID[self.s_name]))[0]
-            self.a_pocket_atoms = self.a_atoms[self.pocket_indexes]
+
 
         l_s_elements = [None] * 300  # Creates an empty list with a slot for each possible element
-
+        pocket_l_l_elements = [None] * 300  # Creates an empty list with a slot for each possible element in the pocket
         # For each chemical element
         for s_element in self.l_l_elements:
             if l_type == 'sybyl_type':
@@ -184,12 +186,22 @@ class PdbStructure:
                     i_element_number = 999
                 # Retrieves the indexes of the elements
                 a_element_indexes = np.where(self.a_atoms["sybyl_type"] == s_element)
+                if self.a_pocket_atoms is not None and s_element in self.pocket_l_l_elements:
+                    a_pocket_element_indexes = np.where(self.a_pocket_atoms["sybyl_type"] == s_element) 
             else:
                 # Retrieves the atomic number of the element
                 i_element_number = gp.D_ELEMENT_NUMBER[s_element.capitalize()]
                 # Retrieves the indexes of the elements
                 a_element_indexes = np.where(self.a_atoms["custom_type"] == s_element)
-
+            if self.a_pocket_atoms is not None and s_element in self.pocket_l_l_elements:
+                pocket_l_l_elements[i_element_number] = [  # Orders each element by their atomic number
+                    s_element,  # Element symbol
+                    i_element_number,  # Atomic number of the element
+                    a_pocket_element_indexes,  # Indexes of the element in the pocket
+                    None,  # Coordinates of the element in the grid
+                    None,  # VdW radius of the element
+                    None  # Sphere coordinates of the element
+                ]
             l_s_elements[i_element_number] = [  # Orders each element by their atomic number
                 s_element,  # Element symbol
                 i_element_number,  # Atomic number of the element
@@ -198,10 +210,11 @@ class PdbStructure:
                 None,  # VdW radius of the element
                 None  # Sphere coordinates of the element
             ]
+            
         # End for
-
+    
         self.l_l_elements = list(filter(None, l_s_elements))  # Removes empty elements in the list
-
+        self.pocket_l_l_elements = list(filter(None, pocket_l_l_elements))  # Removes empty elements in the list
         # Miscellaneous fields
         self.f_mass = sum(self.a_atoms["element_mass"])  # Sums the mass of each element
 
@@ -245,29 +258,62 @@ class PdbStructure:
         ttab.SetFromType("INT")
         ttab.SetToType("SYB")
         ob.obErrorLog.SetOutputLevel(0)
-        # Find the path to the pdb file
-        if gp.D_PARAMETERS_GLOBAL['run_hotspot']:
-            pdb_file = gp.D_PARAMETERS_HOTSPOT["p_input_pdb"] + self.s_name + ".pdb"
-        elif gp.D_PARAMETERS_GLOBAL['run_comparison']:
-            pdb_file = gp.D_PARAMETERS_COMPARISON["p_input_pdb"] + "/" + self.s_name + ".pdb"
-        if os.path.isfile(pdb_file) == False:
-            if gp.D_PARAMETERS_GLOBAL['run_hotspot']:
-                pdb_file = gp.D_PARAMETERS_HOTSPOT["p_output_hotspot"] + "/" + self.s_name + ".pdb"
-            elif gp.D_PARAMETERS_GLOBAL['run_comparison']:
-                pdb_file = gp.D_PARAMETERS_COMPARISON[
-                               'p_output_comparison'] + '/cleaned_dataset/' + self.s_name + '.pdb'
-
         l_syb = []  # Empty list for the Sybyl atom types
 
         # Setting up Openbabel atom type conversion and iterating through the atoms
         mol = ob.OBMol()
-        obConversion = ob.OBConversion()
-        obConversion.ReadFile(mol, pdb_file)
+        # obConversion = ob.OBConversion()
+
+        # For hotspot, structures can reach here without s_pdb_content set at
+        # creation time - fetch the cleaned structure straight from the live
+        # PyMOL session (if still loaded under self.s_name) rather than falling
+        # back to the uncleaned on-disk PDB below.
+        if not self.s_pdb_content:
+            try:
+                from pymol import cmd as _pm_cmd
+                if self.s_name in _pm_cmd.get_names():
+                    self.s_pdb_content = _pm_cmd.get_pdbstr(self.s_name)
+            except Exception:
+                pass
+
+        b_loaded = False
+        if self.s_pdb_content is not None and len(self.s_pdb_content) > 0:
+            b_loaded = obConversion.ReadString(mol, self.s_pdb_content)
+
+        # Backward-compatible fallback for legacy code paths that still rely on disk files.
+        if not b_loaded:
+            if gp.D_PARAMETERS_GLOBAL['run_hotspot']:
+                pdb_file = gp.D_PARAMETERS_HOTSPOT["p_input_pdb"] + "/" + self.s_name + ".pdb"
+            elif gp.D_PARAMETERS_GLOBAL['run_comparison']:
+                pdb_file = gp.D_PARAMETERS_COMPARISON["p_input_pdb"] + "/" + self.s_name + ".pdb"
+            else:
+                pdb_file = ""
+
+            if pdb_file != "" and os.path.isfile(pdb_file) == False:
+                if gp.D_PARAMETERS_GLOBAL['run_hotspot']:
+                    pdb_file = gp.D_PARAMETERS_HOTSPOT["p_output_hotspot"] + "/" + self.s_name + ".pdb"
+                elif gp.D_PARAMETERS_GLOBAL['run_comparison']:
+                    pdb_file = gp.D_PARAMETERS_COMPARISON[
+                                   'p_output_comparison'] + '/cleaned_dataset/' + self.s_name + '.pdb'
+
+            if pdb_file != "":
+                b_loaded = obConversion.ReadFile(mol, pdb_file)
+
+        if not b_loaded:
+            self.a_atoms["sybyl_type"] = ["X"] * len(self.a_atoms)
+            return
+
         for obatom in ob.OBMolAtomIter(mol):
             if obatom.GetResidue().GetName() == 'HOH':  # Use a special type for oxygens in water molecules
                 l_syb.append('O.3.wat')
             else:
                 l_syb.append(str(ttab.Translate(obatom.GetType())).capitalize())
+
+        # Ensure SYBYL list length always matches the cleaned atom table length.
+        if len(l_syb) > len(self.a_atoms):
+            l_syb = l_syb[:len(self.a_atoms)]
+        elif len(l_syb) < len(self.a_atoms):
+            l_syb.extend(["X"] * (len(self.a_atoms) - len(l_syb)))
 
         self.a_atoms["sybyl_type"] = l_syb  # Saves the list of translated sybyl types
     # def translate_sybyl_types(self):

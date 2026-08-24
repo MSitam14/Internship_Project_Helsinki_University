@@ -44,6 +44,8 @@ def init():
     global D_SYBYL_NUMBER  # Dictionary of atom number associated to the atom type
     global D_SYBYL_TYPE  # Dictionary of the nature of atom associated to the atom type
     global D_POCKET_RES_ID # Dictionary of the pocket residue ID will be used to generate the pocket subset
+    global D_COMPARISON_VIEW_META  # Comparison view metadata captured from PyMOL
+    global D_HOTSPOT_VIEW_META  # Per-structure hotspot view metadata captured from PyMOL
 
     global D_WATER_POSITION  # Dictionary of positions of the water
     global D_WATER_SCORING   # Dictionary of the association grid position - score
@@ -207,6 +209,8 @@ def init():
 
     }
     D_POCKET_RES_ID = {}
+    D_COMPARISON_VIEW_META = {}
+    D_HOTSPOT_VIEW_META = {}
     D_ELEMENT_NUMBER = {}
     for e in mendeleev.elements.__all__:
         tmp = eval('mendeleev.' + e + '.atomic_number')
@@ -260,8 +264,10 @@ def init():
             ])
     p_atom_dtype = np.dtype([('grid_x', '<i2'), ('grid_y', '<i2'), ('grid_z', '<i2'), ('tag_1', '<f2'), ('tag_2', '<f2'),
                               ('tag_3', '<f2'), ('tag_total','<f2'), ('score_1', '<f2'), ('score_2', '<f2'),
-                              ('score_3', '<f2'), ('score_total', '<f2'),("residue_serial", np.int16, 1)], )
-
+                              ('score_3', '<f2'), ('score_total', '<f2'),("residue_serial", np.int16, 1),
+                              ("coord_x", np.float32, 1),("coord_y", np.float32, 1),("coord_z", np.float32, 1),
+                              ("generation", np.int16, 1), ])
+    
     a_vdw_dtype = np.dtype([("type_number", np.int16, 1), ("grid_x", np.int16, 1), ("grid_y", np.int16, 1),
                             ("grid_z", np.int16, 1)])
 

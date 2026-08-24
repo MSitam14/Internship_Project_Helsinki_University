@@ -5,7 +5,6 @@
 # Updated :
 # ---------------------------------------------------------------------------- #
 from random import random
-import traceback
 
 import numpy as np
 # Importing modules ---------------------------------------------------------- #
@@ -18,25 +17,32 @@ from sklearn.neighbors import KDTree
 from pymol import cmd
 from Grid_methods.src.cla.systeme_class import System
 from Grid_methods.src.hotspots.compute_structure_score import *
+from Grid_methods.src.lib.cif_generation import hotspot_cif, build_hotspot_rows
 from Grid_methods.src.lib.parse_pdb_file import parse_pdb_file
 from Grid_methods.src.lib.retrieve_specific_files import retrieve_specific_files
 from Grid_methods.src.lib.Grid_plot import *
 from Grid_methods.src.lib.read_file_content import read_file_content
 
-def launch_structure_hotspot():
+def launch_structure_hotspot(l_o_structures=None):
     explicit_grid = gp.D_PARAMETERS_GLOBAL['explicit_grid']
     d_parameters = gp.D_PARAMETERS_HOTSPOT
 
     # Initialize hotspot system object and set global parameters
     gp.O_SYSTEM_HOTSPOT = System()
     gp.O_SYSTEM_HOTSPOT.initialize_system(d_parameters)
-    # Find PDB files
-    l_p_input_pdb = retrieve_specific_files(d_parameters["p_input_pdb"], "*.pdb")
+    
+    # If structures are provided, use them directly (from prepare_dataset)
+    if l_o_structures is not None:
+        gp.O_SYSTEM_HOTSPOT.l_o_structures = l_o_structures
+    else:
+        # Fallback: load from disk (backward compatibility)
+        l_p_input_pdb = retrieve_specific_files(d_parameters["p_input_pdb"], "*.pdb")
 
-    # For each PDB file to parse, extract the PDB structure into an object
-    for p_pdb in l_p_input_pdb:
-        o_structure = parse_pdb_file(p_pdb)
-        gp.O_SYSTEM_HOTSPOT.l_o_structures.append(o_structure)  # Registers the structure in the system
+        # For each PDB file to parse, extract the PDB structure into an object
+        for p_pdb in l_p_input_pdb:
+            o_structure = parse_pdb_file(p_pdb)
+            gp.O_SYSTEM_HOTSPOT.l_o_structures.append(o_structure)  # Registers the structure in the system
+    
     # Actualize the system properties depending of the structures
     gp.O_SYSTEM_HOTSPOT.update_system_properties()
 
@@ -53,6 +59,9 @@ def launch_structure_hotspot():
             # plot_grid_2D(o_structure.a_grid['element_symbol'])
             # plot_heatmap(o_structure.a_grid['element_symbol'],palette='viridis')
             gp.O_SYSTEM_HOTSPOT.a_offset = o_structure.a_offset
+            # accumulates every hotspot candidate point found across every round/type/tier,
+            # written out in one combined CIF (see hotspot_cif() calls below)
+            l_hotspot_rows = []
             # loop over the rounds to add hotspot atoms
             if d_parameters['i_number_of_rounds'] == 0:
                 # just score the atoms
@@ -75,6 +84,10 @@ def launch_structure_hotspot():
                 file_name = fold_out + '/' + o_structure.s_name
                 # write all the atoms in a pdb
                 write_pdb(file_name + '_scored.pdb', o_structure.a_atoms)
+                # combined CIF equivalent - no hotspot search ran, so no _hotspot rows
+                hotspot_cif(fold_out + '/' + o_structure.s_name + '_combined.cif', o_structure,
+                           gp.O_SYSTEM_HOTSPOT, d_parameters, l_hotspot_rows=[],
+                           d_view_meta=gp.D_HOTSPOT_VIEW_META.get(o_structure.s_name))
                 print('No hotspot atoms added')
                 continue
             for hotspots_round in range(1,d_parameters['i_number_of_rounds']+1):
@@ -240,9 +253,14 @@ def launch_structure_hotspot():
                         p_atoms['score_2'] = np.array(l_p_score)[:, 1]
                         p_atoms['score_3'] = np.array(l_p_score)[:, 2]
                         p_atoms['score_total'] = [np.sum(score) / 3 for score in l_p_score]
+                        p_atoms['coord_x'], p_atoms['coord_y'], p_atoms['coord_z'] = box_coordinates_to_euclidean_coordinates(
+                            p_atoms['grid_x'], p_atoms['grid_y'], p_atoms['grid_z'])
+                        p_atoms['generation'] = 1 # generation round of the hotspot atom initialization to 1 
                         # write all the atoms in a pdb
                         update_atoms_and_write(o_structure.a_atoms, p_atoms, file_name + '_step_1.pdb',res_name=resn_spot,
                                                res_number=900,atm_number=10000,hotspot_type=hotspots_type,b_factor='score_1')
+                        # accumulate this round/type's tier-1 candidates (all points past the tag threshold)
+                        
                         # find the hotspot score greater than score_lim_hotspot
                         # ind_step_2 = np.where(p_atoms['score_1'] > d_parameters['f_good_score_threshold']) # HERE we can change which score we want to keep
                         # select ind where p_atoms['score_1'] > d_parameters['f_good_score_threshold'] and p_atoms['score_total'] > 0.6
@@ -251,17 +269,22 @@ def launch_structure_hotspot():
                             print('No hotspot atoms found')
                             continue
                         p_atoms_2 = p_atoms[ind_step_2]
+                        p_atoms['generation'][ind_step_2] = 2 # generation round of the hotspot atom initialization to 2
                         # write all the atoms in a pdb
                         update_atoms_and_write(o_structure.a_atoms, p_atoms_2, file_name + '_step_2.pdb',res_name=resn_spot,
                                                res_number=901, atm_number=10000,hotspot_type=hotspots_type)
+                        # accumulate this round/type's tier-2 candidates (past the good-score filter)
+                        
 
 
                         ### STEP 4: Merge hotspot atoms to close from each other into only one point
 
                         # sort the atoms by score decreasing
-                        p_atoms_2 = np.sort(p_atoms_2, order='score_total')[::-1] # parameter of selection for step 3 to keep the best atoms
+                        ord_score = np.argsort(-p_atoms_2['score_total'], kind='stable')  # sort by score decreasing
+                        p_atoms_3 = p_atoms_2[ord_score]
+       
                         # convert to numpy array
-                        a_hotspot_coord_2 = np.array([p_atoms_2['grid_x'], p_atoms_2['grid_y'], p_atoms_2['grid_z']]).T
+                        a_hotspot_coord_2 = np.array([p_atoms_3['grid_x'], p_atoms_3['grid_y'], p_atoms_3['grid_z']]).T
 
                         o_hotspot_tree = KDTree(a_hotspot_coord_2, leaf_size=50000, metric='euclidean')  # create KDTree
 
@@ -280,12 +303,19 @@ def launch_structure_hotspot():
                         if len(ind_step_3) == 0:
                             print('No hotspot atoms found')
                             continue
-                        p_atoms_cleaned = p_atoms_2[ind_step_3]
+                        p_atoms_cleaned = p_atoms_3[ind_step_3]
+                        # update generation round of the hotspot atom initialization to 3
+                        ind_final_hotspot = ind_step_2[0][ord_score[ind_step_3]] # get the index of the final hotspot in the original p_atoms
+                        p_atoms['generation'][ind_final_hotspot] = 3
 
                         print('Number of', hotspots_type, 'hotspot atoms added to', o_structure.s_name, ': ',
                               len(p_atoms_cleaned))
                         l_atoms = update_atoms_and_write(o_structure.a_atoms, p_atoms_cleaned, file_name + '_step_3.pdb',
                                                          res_name=resn_spot,hotspot_type=hotspots_type)
+                        # accumulate this round/type's tier-3 candidates (final, deduplicated positions)
+                    
+                        l_hotspot_rows.extend(build_hotspot_rows(
+                            p_atoms,  int(o_structure.a_atoms['residue_serial'][-1]), hotspots_round, resn_spot, hotspots_type))
                     setattr(o_structure, resn_spot + '_a_atoms', l_atoms)
                     # save the atoms as CSV
                     pd.DataFrame(getattr(o_structure,resn_spot + '_a_atoms')).to_csv(file_name + '_scored.csv', index=False)
@@ -372,13 +402,17 @@ def launch_structure_hotspot():
                 print("Pymol session created in {:.1f} seconds".format(time.time() - pymol_time))
                 if 'O_3_wat' in os.listdir(fold_out):
                     distance_hotspot_water(fold_out+'/O_3_wat', str(hotspots_round),
-                    # gp.D_PARAMETERS_HOTSPOT['p_input_pdb'] + '/' + o_structure.s_name + '.pdb')
-                    '/home/dreano/Desktop/Grid_methods/data/output/hotspot/Score_test_set/test_set_scored/'+pdb+'/'+pdb+'_scored.pdb')
+                    gp.D_PARAMETERS_HOTSPOT['p_input_pdb'] + '/' + o_structure.s_name + '.pdb')
+                    #'/home/dreano/Desktop/Grid_methods/data/output/hotspot/Score_test_set/test_set_scored/'+pdb+'/'+pdb+'_scored.pdb')
                     # '/mnt/c9cf456b-9a69-4cb2-a7d6-4f9b7533bd83/test_set_hotspot/04_11_2024-17_37/5WQC/5WQC_scored.pdb')
+            # combined CIF : scored structure atoms + every hotspot candidate point found
+            # across every round/type/tier, in one file
+            hotspot_cif(fold_out + '/' + o_structure.s_name + '_hotspot.cif', o_structure,
+                       gp.O_SYSTEM_HOTSPOT, d_parameters, l_hotspot_rows=l_hotspot_rows,
+                       d_view_meta=gp.D_HOTSPOT_VIEW_META.get(o_structure.s_name))
         except Exception as e:
             print('Error in structure hotspot', o_structure.s_name)
             print(e)
-            traceback.print_exc()
         # ---------------------------------------------------------------------------- #
 
 #

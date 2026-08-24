@@ -84,9 +84,9 @@ def main():
 		)
 
 		save_parameters(gp.D_PARAMETERS_GLOBAL)
-		prepare_dataset(gp.D_PARAMETERS_COMPARISON)
+		l_o_structures = prepare_dataset(gp.D_PARAMETERS_COMPARISON)
 
-		if len(os.listdir(gp.D_PARAMETERS_COMPARISON['p_output_comparison'] + '/cleaned_dataset/')) == 0:
+		if l_o_structures is None or len(l_o_structures) == 0:
 			print("No valid cleaned structures found in the dataset.")
 			exit()
 		time_mid = time.time()
@@ -96,7 +96,7 @@ def main():
 
 		if gp.D_PARAMETERS_COMPARISON['tree'] == 'both':
 			try :
-				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON)
+				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON, l_o_structures)
 				print("Comparison done in {:.1f} seconds".format(time.time() - time_mid))
 				t2 = tree_sequences()
 
@@ -105,7 +105,7 @@ def main():
 
 		elif gp.D_PARAMETERS_COMPARISON['tree'] == 'structures':
 			try :
-				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON)
+				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON, l_o_structures)
 				t2 = None
 				print("Comparison done in {:.1f} seconds".format(time.time() - time_mid))
 			except:
@@ -146,16 +146,16 @@ def main():
 		)
 
 		save_parameters(gp.D_PARAMETERS_GLOBAL)
-		prepare_dataset(gp.D_PARAMETERS_HOTSPOT)
+		l_o_structures = prepare_dataset(gp.D_PARAMETERS_HOTSPOT)
 
-		if len(os.listdir(gp.D_PARAMETERS_HOTSPOT['p_input_pdb'])) == 0:
+		if l_o_structures is None or len(l_o_structures) == 0:
 			print("No valid cleaned structures found in the dataset.")
 			exit()
 		time_mid = time.time()
 
 
 
-		launch_structure_hotspot()		# Manages the comparison of structures
+		launch_structure_hotspot(l_o_structures)		# Manages the hotspot analysis
 		print("Hotspot done in {:.1f} seconds".format(time.time() - t_start))
 	# END STEP 2 ---------------------------------------- #
 
@@ -195,9 +195,9 @@ def main_api(json_parameters):
 		)
 
 		save_parameters_for_api(gp.D_PARAMETERS_GLOBAL ,json_parameters, comp=True)
-		prepare_dataset(gp.D_PARAMETERS_COMPARISON)
+		l_o_structures = prepare_dataset(gp.D_PARAMETERS_COMPARISON)
 
-		if len(os.listdir(gp.D_PARAMETERS_COMPARISON['p_output_comparison'] + '/cleaned_dataset/')) == 0:
+		if l_o_structures is None or len(l_o_structures) == 0:
 			print("No valid cleaned structures found in the dataset.")
 			exit()
 		time_mid = time.time()
@@ -213,7 +213,7 @@ def main_api(json_parameters):
 
 		if gp.D_PARAMETERS_COMPARISON['tree'] == 'both':
 			try :
-				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON)
+				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON, l_o_structures)
 				print("Comparison done in {:.1f} seconds".format(time.time() - time_mid))
 				t2 = tree_sequences()
 
@@ -223,7 +223,7 @@ def main_api(json_parameters):
 
 		elif gp.D_PARAMETERS_COMPARISON['tree'] == 'structures':
 			try :
-				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON)
+				t1 = launch_structure_comparison(gp.D_PARAMETERS_COMPARISON, l_o_structures)
 				t2 = None
 				print("Comparison done in {:.1f} seconds".format(time.time() - time_mid))
 			except Exception as e:
@@ -275,14 +275,14 @@ def main_api(json_parameters):
 		)
 
 		save_parameters_for_api(gp.D_PARAMETERS_GLOBAL, json_parameters, hot=True)
-		prepare_dataset(gp.D_PARAMETERS_HOTSPOT)
-
-		if len(os.listdir(gp.D_PARAMETERS_HOTSPOT['p_input_pdb'])) == 0:
+		l_o_structures = prepare_dataset(gp.D_PARAMETERS_HOTSPOT)
+		
+		if l_o_structures is None or len(l_o_structures) == 0:
 			print("No valid cleaned structures found in the dataset.")
 			exit()
 		time_mid = time.time()
 
-		launch_structure_hotspot()		# Manages the comparison of structures
+		launch_structure_hotspot(l_o_structures)		# Manages the hotspot analysis
 		print("Hotspot done in {:.1f} seconds".format(time.time() - t_start))
 
 		print('')

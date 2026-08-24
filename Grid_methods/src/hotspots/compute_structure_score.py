@@ -64,7 +64,8 @@ def score_environment(origin, o_structure, score_env=True, pseudo_type='O.3.wat'
     # Compute the score for each atom
     l_score = []
     t_score = time.time()
-    with mp.Pool(processes=i_cpu_count) as o_pool:
+    o_pool = mp.Pool(processes=i_cpu_count)
+    try:
         with tqdm(total=len(a_i_index), bar_format='{l_bar}{bar:80}{r_bar}', ncols=180, smoothing=1) as pbar:
             for i, result in enumerate(o_pool.imap(func=compute_atom_score,
                                                    iterable=range(len(a_i_index)),
@@ -75,7 +76,10 @@ def score_environment(origin, o_structure, score_env=True, pseudo_type='O.3.wat'
                 pbar.update()
         o_pool.close()  # Closes the pool of tasks
         o_pool.join()  # Waits for the results
-        o_pool.terminate()  # Kills the pool of tasks
+    except Exception:
+        o_pool.terminate()  # Kills the pool of tasks on failure
+        o_pool.join()
+        raise
     # l_score = []
     # t_score = time.time()
     # with mp.Pool(processes=i_cpu_count) as o_pool:
@@ -244,12 +248,19 @@ def multiprocess_over_ranks(a_atoms, atom_type, ranks=[1, 2, 3], score_lim=0.4):
     # Create data for compute_for_rank
     data = [(rank, a_atoms, atom_type, score_lim) for rank in ranks]
     l_p_atoms = np.zeros(0, dtype=gp.p_atom_dtype)
-    with mp.Pool(processes=gp.D_PARAMETERS_GLOBAL["i_cpu_allocated"]) as o_pool:
+    o_pool = mp.Pool(processes=gp.D_PARAMETERS_GLOBAL["i_cpu_allocated"])
+    try:
         # with tqdm(total=len(data), bar_format='{l_bar}{bar:80}{r_bar}', ncols=180, smoothing=1) as pbar:
         # pbar.set_description('\033[38;2;250;223;54m' + f"Processing optimal distance multiprocess")
         for results in o_pool.imap(func=compute_for_rank, iterable=data):
             l_p_atoms = np.append(l_p_atoms, results)
             # pbar.update()
+        o_pool.close()
+        o_pool.join()
+    except Exception:
+        o_pool.terminate()
+        o_pool.join()
+        raise
     return l_p_atoms
 
 
@@ -332,4 +343,3 @@ def points_at_exact_distance(origin, distance, rank):
     l_p_atoms['tag_total'] = -1
     l_p_atoms['residue_serial'] = origin[3]
     return l_p_atoms
-

@@ -299,28 +299,35 @@ class System:
             else:  # If system parameters are None
                 grid_src = o_structure
 
-            # Preparing variables
-            l_l_elements = o_structure.l_l_elements  # Shortcut for the structure field containing sorted data for each element
-
+      
             # Converting the structure real coordinates to grid coordinates
             o_structure.a_atoms["grid_x"] = np.floor(o_structure.a_atoms["coord_x"] / self.f_grid_spacing + grid_src.a_offset[0])
             o_structure.a_atoms["grid_y"] = np.floor(o_structure.a_atoms["coord_y"] / self.f_grid_spacing + grid_src.a_offset[1])
             o_structure.a_atoms["grid_z"] = np.floor(o_structure.a_atoms["coord_z"] / self.f_grid_spacing + grid_src.a_offset[2])
-
+            
             # If the pocket indexes are defined initialize the pocket atoms
             if isinstance(o_structure.pocket_indexes, np.ndarray):
                 o_structure.a_pocket_atoms = o_structure.a_atoms[o_structure.pocket_indexes]
+                l_l_elements = o_structure.pocket_l_l_elements  # Shortcut for the structure field containing sorted data for each element in the pocket
+                origin = o_structure.a_pocket_atoms
+            else:
+                # Preparing variables
+                l_l_elements = o_structure.l_l_elements  # Shortcut for the structure field containing sorted data for each element
+                origin = o_structure.a_atoms
 
             # For each chemical element in the structure
             for i_element in range(len(l_l_elements)):
                 a_element_indexes = l_l_elements[i_element][2]  # Loads the indexes of the element
                 l_l_elements[i_element][3] = (  # Retrieves the coordinates of the element
-                    o_structure.a_atoms["grid_x"][a_element_indexes],
-                    o_structure.a_atoms["grid_y"][a_element_indexes],
-                    o_structure.a_atoms["grid_z"][a_element_indexes])
+                    origin["grid_x"][a_element_indexes],
+                    origin["grid_y"][a_element_indexes],
+                    origin["grid_z"][a_element_indexes])
 
                 # Formats and saves the atom coordinates
-                o_structure.l_l_elements[i_element][3] = np.transpose(l_l_elements[i_element][3])
+                if isinstance(o_structure.pocket_indexes, np.ndarray):
+                    o_structure.pocket_l_l_elements[i_element][3] = np.transpose(l_l_elements[i_element][3])
+                else:
+                    o_structure.l_l_elements[i_element][3] = np.transpose(l_l_elements[i_element][3])
 
             # creating the grid explicitly
             if gp.D_PARAMETERS_GLOBAL["run_hotspot"] and gp.D_PARAMETERS_GLOBAL['explicit_grid']:
@@ -386,14 +393,16 @@ class System:
         """
 
         # Preparing variables
-        l_l_elements = o_structure.l_l_elements  # Shortcut for the structure field containing sorted data for each element
+        if isinstance(o_structure.pocket_indexes, np.ndarray):
+            l_l_elements = o_structure.pocket_l_l_elements  # Shortcut for the structure field containing sorted data for each element in the pocket
+        else:
+            l_l_elements = o_structure.l_l_elements  # Shortcut for the structure field containing sorted data for each element
         # If the VdW radius by element has not been already retrieved
         if o_structure.b_loaded is not True:
             o_structure.b_loaded = True  # Sets the structure as loaded
             o_structure.a_vdw = np.zeros(0, dtype=gp.a_vdw_dtype)
             # For each atom type in the structure
             for i_element in range(len(l_l_elements)):
-                print(f"Processing element {l_l_elements[i_element][0]} ({i_element + 1}/{len(l_l_elements)})")
                 try:
                     i_radius = self.d_scaled_vdw[l_l_elements[i_element][0]]  # Retrieves the VdW radius of the element
                 except Exception as e:
@@ -585,4 +594,3 @@ class System:
 
 
 # Reference ------------------------------------------------------------------ #
-

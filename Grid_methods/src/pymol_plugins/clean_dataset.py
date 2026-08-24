@@ -19,8 +19,89 @@ from Grid_methods.src.pymol_plugins.first_chains import first_chains
 from Grid_methods.src.pymol_plugins.gridbox import drawgridbox, align_principal_axes
 from Grid_methods.src.pymol_plugins.tmalign import tmalign
 from Grid_methods.src.lib.progress_bar_color import get_color
+from Grid_methods.src.cla.pdb_structure import PdbStructure
+from Grid_methods.src.lib.cif_generation import comparison_cif
 
 cmd.extend('extract_pocket', extract_pocket)
+
+def extract_pymol_structure_to_pdbstructure(pdb_name):
+    """
+    Extracts cleaned atom data from a PyMOL object and creates a PdbStructure object
+    :param pdb_name: Name of the PyMOL object
+    :return: PdbStructure object with cleaned atoms
+    """
+    model = cmd.get_model(pdb_name)
+    
+    # Dictionary to store atom properties
+    d_atoms = {
+        "HetAtom": [],
+        "atom_serial": [],
+        "atom_name": [],
+        "alternative_location": [],
+        "residue_name": [],
+        "chain_id": [],
+        "residue_serial": [],
+        "residue_insertion": [],
+        "coord_x": [],
+        "coord_y": [],
+        "coord_z": [],
+        "occupancy": [],
+        "temperature_factor": [],
+        "element_symbol": [],
+        "element_charge": []
+    }
+    
+    # Extract atom data from PyMOL model
+    for atom in model.atom:
+        d_atoms["HetAtom"].append("HETATM" if atom.hetatm else "ATOM")
+        d_atoms["atom_serial"].append(atom.id)
+        d_atoms["atom_name"].append(atom.name)
+        d_atoms["alternative_location"].append(atom.alt or "")
+        d_atoms["residue_name"].append(atom.resn)
+        d_atoms["chain_id"].append(atom.chain)
+        d_atoms["residue_serial"].append(atom.resi_number)
+        d_atoms["residue_insertion"].append("")
+        d_atoms["coord_x"].append(atom.coord[0])
+        d_atoms["coord_y"].append(atom.coord[1])
+        d_atoms["coord_z"].append(atom.coord[2])
+        d_atoms["occupancy"].append(atom.q)
+        d_atoms["temperature_factor"].append(atom.b)
+        d_atoms["element_symbol"].append(atom.symbol)
+        d_atoms["element_charge"].append("")
+    
+    # Create PdbStructure object
+    o_structure = PdbStructure()
+    o_structure.load_structure(
+        s_name=pdb_name,
+        l_s_leading_data=[],
+        l_s_trailing_data=[],
+        d_atoms=d_atoms,
+        s_pdb_content=cmd.get_pdbstr(pdb_name)
+    )
+    
+    return o_structure
+
+
+def _extent_to_corners(extent):
+    """Builds 8 corners with ix/iy/iz flags from a PyMOL extent tuple."""
+    (x_min, y_min, z_min), (x_max, y_max, z_max) = extent
+    corners = []
+    i_corner = 1
+    for ix, x in enumerate((x_min, x_max)):
+        for iy, y in enumerate((y_min, y_max)):
+            for iz, z in enumerate((z_min, z_max)):
+                corners.append({
+                    "id": i_corner,
+                    "Cartn_x": float(x),
+                    "Cartn_y": float(y),
+                    "Cartn_z": float(z),
+                    "ix": ix,
+                    "iy": iy,
+                    "iz": iz,
+                })
+                i_corner += 1
+    return corners
+
 def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip('#')
     return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
@@ -70,6 +151,7 @@ def prepare_dataset(d_parameters):
     pdbs = os.listdir(dir)
     pymol_time = time.time()
     glob_parameters = gp.D_PARAMETERS_GLOBAL
+    gp.D_COMPARISON_VIEW_META = {}
     global_pocket = False
     print('')
     print('')
@@ -131,16 +213,21 @@ def prepare_dataset(d_parameters):
         pdbs = [pdb.replace('.pdb', '') for pdb in pdbs]
         t_start = time.time()
         if d_parameters['dataset_status'] == 0 or d_parameters['dataset_status'] == 1:
-            if d_parameters['tmalign_reference'] is None:
+            tmalign_reference = d_parameters['tmalign_reference']
+            if tmalign_reference is None or tmalign_reference == 'first':
                 pdb_ref = pdbs[0]
             else:
+                pdb_ref = None
                 for pdb in pdbs:
-                    if pdb.startswith('2rh1'):
+                    if pdb.startswith(str(tmalign_reference)):
                         pdb_ref = pdb
+                        break
+                if pdb_ref is None:
+                    pdb_ref = pdbs[0]
             with tqdm(total=len(pdbs), bar_format='{l_bar}{bar:80}{r_bar}', ncols=180, smoothing=1) as pbar:
                 pbar.set_description('\033[38;2;250;231;104m' + f"Processing tmalign structural alignment")
                 for pdb in pdbs:
-                    if pdb != pdb_ref or pdb != pdb_ref + '*':
+                    if pdb != pdb_ref:
                         tmalign(pdb, pdb_ref, quiet=1)
                         pbar.update(1)
             print(
@@ -185,9 +272,9 @@ def prepare_dataset(d_parameters):
         if not global_pocket:
             for name in res_name.split():
                 try:
-                    pkt_name = [pkt for pkt in cmd.get_names('objects') if name in pkt]
+                    pkt_name = [pkt for pkt in cmd.get_names('objects') if 'Pocket_' + name in pkt]
                     for pkt in pkt_name:
-                        drawgridbox('Pockets_gridbox_' + pkt, pkt, padding=glob_parameters['f_grid_padding'], group=False)
+                        drawgridbox('Pocket_gridbox_' + pkt, pkt, padding=glob_parameters['f_grid_padding'], group=False)
                 except:
                     continue
         # cmd.group('pockets','*gridbox*')
@@ -220,19 +307,85 @@ def prepare_dataset(d_parameters):
         cmd.remove('elem ' + '+'.join(glob_parameters["l_discard_atoms"]))
 
     # update input pdb folder
-    d_parameters['p_input_pdb'] = folder_cleaned
+    #d_parameters['p_input_pdb'] = folder_cleaned
+    
+    # Extract cleaned structures from PyMOL and create PdbStructure objects
+    l_o_structures = []
+    for pdb in pdbs:
+        try:
+            o_structure = extract_pymol_structure_to_pdbstructure(pdb)
+            l_o_structures.append(o_structure)
+        except Exception as e:
+            print(f"Warning: Could not create PdbStructure for {pdb}: {e}")
+    
     if global_pocket:
-        for pdb in pdbs:
-            cmd.save(folder_cleaned + pdb + '.pdb', 'Pocket*'+pdb)
-        drawgridbox('Pockets_gridbox', 'Pocket*', padding=glob_parameters['f_grid_padding'], group=False)
+        drawgridbox('Pocket_gridbox', 'Pocket*', padding=glob_parameters['f_grid_padding'], group=False)
     else:
-        for pdb in pdbs:
-            cmd.save(folder_cleaned + pdb + '.pdb', pdb)
         for select in l_align:
             if select == 'all':
                 drawgridbox('full_gridbox','(all)',padding=glob_parameters['f_grid_padding'])
             else:
                 drawgridbox(select + '_gridbox', select, padding=glob_parameters['f_grid_padding'])
+
+    # Cache comparison view metadata for CIF export and plugin reconstruction.
+    if glob_parameters['choice'] in ['comparison', 'both']:
+        d_view = {
+            'padding': float(glob_parameters.get('f_grid_padding', 0.0) or 0.0),
+            'dataset_view': [float(v) for v in cmd.get_view()],
+            'pocket_residues': {},
+            'dataset_corners': [],
+            'pocket_corners': [],
+        }
+
+        for s_name, l_residues in gp.D_POCKET_RES_ID.items():
+            d_view['pocket_residues'][s_name] = [int(v) for v in l_residues]
+
+        try:
+            d_view['dataset_corners'] = _extent_to_corners(cmd.get_extent('(all)'))
+        except Exception:
+            d_view['dataset_corners'] = []
+
+        try:
+            if len(cmd.get_model('Pocket*').atom) > 0:
+                d_view['pocket_corners'] = _extent_to_corners(cmd.get_extent('Pocket*'))
+        except Exception:
+            d_view['pocket_corners'] = []
+
+        gp.D_COMPARISON_VIEW_META = d_view
+
+        # Write comparison CIF here while all scene/pocket metadata is still in memory.
+        if len(l_o_structures) > 0:
+            comparison_cif(
+                l_o_structures,
+                d_parameters['p_output_comparison'] + '/cleaned_dataset/cleaned_dataset.cif',
+                gp.D_PARAMETERS_COMPARISON,
+                d_view_meta=gp.D_COMPARISON_VIEW_META
+            )
+
+    # Cache per-structure hotspot view metadata for later CIF export (one CIF
+    # per structure, see hotspot_cif) and plugin reconstruction - pocket box,
+    # pocket residues and camera view, same schema as the comparison metadata.
+    if glob_parameters['choice'] in ['hotspot']:
+        camera_view = [float(v) for v in cmd.get_view()]
+        for pdb in pdbs:
+            d_view = {
+                'padding': float(glob_parameters.get('f_grid_padding', 0.0) or 0.0),
+                'dataset_view': camera_view,
+                'pocket_residues': {},
+                'pocket_corners': [],
+            }
+            if pdb in gp.D_POCKET_RES_ID:
+                d_view['pocket_residues'][pdb] = [int(v) for v in gp.D_POCKET_RES_ID[pdb]]
+
+            try:
+                pocket_sel = 'Pocket_*' + pdb + '*'
+                if cmd.count_atoms(pocket_sel) > 0:
+                    d_view['pocket_corners'] = _extent_to_corners(cmd.get_extent(pocket_sel))
+            except Exception:
+                d_view['pocket_corners'] = []
+
+            gp.D_HOTSPOT_VIEW_META[pdb] = d_view
+
     cmd.delete('pockets')
     cmd.enable('all')
 
@@ -244,3 +397,6 @@ def prepare_dataset(d_parameters):
         cmd.save(folder_out + '/cleaned_dataset/' + name + '.pse')
     if glob_parameters['watch_live']:
         cmd.quit()
+    
+    # Return the list of PdbStructure objects
+    return l_o_structures

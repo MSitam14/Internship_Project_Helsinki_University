@@ -12,6 +12,7 @@
 
 
 import multiprocessing as mp
+import os
 import subprocess
 import time
 
@@ -31,10 +32,10 @@ import matplotlib.pyplot as plt
 # Classes
 from Grid_methods.src.cla.systeme_class import System
 # Specific modules
-from Grid_methods.src.comparison.compute_grid_similarity import compute_grid_similarity
 from Grid_methods.src.comparison.tree_object import TreePlot
 # Parameters
 from Grid_methods.src.lib import global_parameters as gp
+from Grid_methods.src.lib.cif_generation import comparison_cif
 # Retrieves files path, recursively or not, matching a specific pattern, or not
 # In : (p) directory to retrieve files from, (s) pattern to match,
 # In : (b) if the search needs to be recursive, (i) minimum number of match,
@@ -66,7 +67,7 @@ from Grid_methods.src.lib.progress_bar_color import get_color
 
 
 
-def launch_structure_comparison(d_parameters):
+def launch_structure_comparison(d_parameters, l_o_structures=None):
 	"""
 	Manages the comparison of structures
 		Retrieves the PDB input files
@@ -84,34 +85,46 @@ def launch_structure_comparison(d_parameters):
 	# END STEP 0 ---------------------------------------- #
 
 
-	# STEP 1 : Find PDB files --------------------------- #
+	# STEP 1 : Load structures ----------------------- #
+	
+	# If structures are provided, use them directly (from prepare_dataset)
+	if l_o_structures is not None:
+		gp.O_SYSTEM_COMPARISON.l_o_structures = l_o_structures
+	else:
+		# Fallback: load from disk (backward compatibility)
+		l_p_input_pdb = retrieve_specific_files(d_parameters["p_input_pdb"], "*.pdb")
 
-	l_p_input_pdb = retrieve_specific_files(						# Retrieves PDB paths
-		p_directory=gp.D_PARAMETERS_COMPARISON['p_output_comparison'] + '/cleaned_dataset',		# Path to the input directory
-		s_pattern="*.pdb",											# Pattern to match within the directories
-		b_recursive=True,											# Also searches in the subdirectories
-		i_min_match=1,												# Minimum number of files to retrieve
-		i_max_match=9999											# Maximum number of files to retrieve
-	)
+		# For each PDB file to parse
+		for p_pdb in l_p_input_pdb :
+			o_structure = parse_pdb_file(p_file=p_pdb) # Extracts a PDB structure into an object
+			gp.O_SYSTEM_COMPARISON.l_o_structures.append(o_structure)		# Registers the structure in the system
+
 	# END STEP 1 ---------------------------------------- #
 
 
-	# STEP 2 : Extracts PDB structures ------------------ #
-
-	# For each PDB file to parse
-	for p_pdb in l_p_input_pdb :
-		o_structure = parse_pdb_file(p_file=p_pdb) # Extracts a PDB structure into an object
-		gp.O_SYSTEM_COMPARISON.l_o_structures.append(o_structure)		# Registers the structure in the system
-
+	# STEP 2 : Update system properties and generate CIF ------ #
 
 	gp.O_SYSTEM_COMPARISON.update_system_properties()		# Actualizes the system properties depending on the structures
+
+	# In the default flow the CIF is generated in prepare_dataset(), where all
+	# PyMOL view/pocket metadata is available. Keep a fallback for legacy paths.
+	p_comparison_cif = gp.D_PARAMETERS_COMPARISON['p_output_comparison'] + '/cleaned_dataset/cleaned_dataset.cif'
+	if not os.path.isfile(p_comparison_cif):
+		comparison_cif(
+			gp.O_SYSTEM_COMPARISON.l_o_structures,
+			p_comparison_cif,
+			gp.D_PARAMETERS_COMPARISON,
+			d_view_meta=gp.D_COMPARISON_VIEW_META
+		)
 	# END STEP 2 ---------------------------------------- #
 
 	# STEP 3 : Security check --------------------------- #
 	# If there is not enough file
 	if len(gp.O_SYSTEM_COMPARISON.l_o_structures) < 2:
 		l_s_logs.append("ERROR : There is not enough valid PDB structure to run a comparison, at least 2 are required")		# Defines the error message
-		raise ValueError("There is not enough valid PDB structure to run a comparison, at least 2 are required")
+		terminate_program_process(		# Stops the program
+			l_s_content=l_s_logs		# Content to save to logs
+		)
 	# END STEP 3 ---------------------------------------- #
 
 	# STEP 4 : Grid generation using multiprocess -------------- #
@@ -126,7 +139,8 @@ def launch_structure_comparison(d_parameters):
 	for structure in gp.O_SYSTEM_COMPARISON.l_o_structures:
 		gp.O_SYSTEM_COMPARISON.generate_grid(o_structure=structure, d_parameters=gp.D_PARAMETERS_COMPARISON)
 
-	with mp.Pool(processes=i_cpu_count) as o_pool:
+	o_pool = mp.Pool(processes=i_cpu_count)
+	try:
 		# Creates a pool of process
 		with tqdm(total=len(gp.O_SYSTEM_COMPARISON.l_o_structures), bar_format='{l_bar}{bar:80}{r_bar}', ncols=180,
 				  smoothing=1) as pbar:
@@ -137,8 +151,12 @@ def launch_structure_comparison(d_parameters):
 				progress = i / (len(gp.O_SYSTEM_COMPARISON.l_o_structures) -1)
 				pbar.set_description(get_color(progress) + "Generating grids")
 				pbar.update()
-			o_pool.close()
-			o_pool.join()
+		o_pool.close()
+		o_pool.join()
+	except Exception:
+		o_pool.terminate()
+		o_pool.join()
+		raise
 	print("Grids generated in {:.1f} seconds".format(time.time() - starting_time))
 	print('')
 		# with tqdm(total=len(gp.O_SYSTEM_COMPARISON.l_o_structures), bar_format='{l_bar}{bar:80}{r_bar}', ncols= 180, smoothing=1) as pbar:
@@ -202,7 +220,8 @@ def launch_structure_comparison(d_parameters):
 	# plot_heatmap(o_1.a_grid, z=15,lab=True)
 	# o_2 = gp.O_SYSTEM_COMPARISON.l_o_structures[1]
 	# plot_heatmap(o_2.a_grid, z=15,lab=True)
-	with mp.Pool(processes=i_cpu_count) as o_pool:  # Creates a pool of process
+	o_pool = mp.Pool(processes=i_cpu_count)  # Creates a pool of process
+	try:
 		l_l_results = []
 		with tqdm(total=len(pair_list), bar_format='{l_bar}{bar:80}{r_bar}', ncols=180, smoothing=1) as pbar:
 			for i, result in enumerate(o_pool.imap_unordered(compare_pairs, pair_list)):
@@ -215,6 +234,10 @@ def launch_structure_comparison(d_parameters):
 				pbar.update()
 		o_pool.close()
 		o_pool.join()
+	except Exception:
+		o_pool.terminate()
+		o_pool.join()
+		raise
 
 	# with mp.Pool(processes=i_cpu_count) as o_pool:		# Creates a pool of process
 	# 	l_l_results=[]
