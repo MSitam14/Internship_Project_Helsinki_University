@@ -101,3 +101,8 @@ By default, the server runs at:
 ```text
 http://127.0.0.1:5000
 ```
+
+# Server Deployment
+
+For deploying the application on a server, you can use `systemd` to manage the service. Follow the instructions in :
+[server deployment](deployServer.md) 

@@ -37,7 +37,8 @@ InternshipTestProject/
 ├── config.py
 ├── manage.py
 ├── README.md
-└── requirements_webViewer.yml
+├── requirements_webViewer.yml
+└──wsgi.py
 ```
 
 ## Quick Start

@@ -38,6 +38,7 @@ dependencies:
   - glm=1.0.1
   - gst-plugins-base=1.20.2
   - gstreamer=1.20.3
+  - gunicorn
   - h2=4.2.0
   - hdf4=4.2.15
   - hdf5=1.12.2
