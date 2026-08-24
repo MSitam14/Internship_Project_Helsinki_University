@@ -16,7 +16,7 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/Internship_Project_Helsinki_University
-ExecStart=/home/ubuntu/anaconda3/envs/webViewer/bin/gunicorn --bind 0.0.0.0:5000 wsgi:app
+ExecStart=/home/ubuntu/anaconda3/envs/webViewer/bin/gunicorn --workers 1 --timeout 600 --bind 0.0.0.0:5000 wsgi:app
 Restart=always
 
 [Install]
