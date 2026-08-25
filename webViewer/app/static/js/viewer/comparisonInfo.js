@@ -3,6 +3,8 @@ const styleEl = document.createElement('style');
 styleEl.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
 document.head.appendChild(styleEl);
 
+import * as cif from "../../tools/cifParser/cif.mjs";
+
 const showLoading = () => document.getElementById('loading').style.display = 'flex';
 const hideLoading = () => document.getElementById('loading').style.display = 'none';
 
@@ -104,18 +106,196 @@ function getModelColor(index, total) {
     );
 }
 
-function loadViewer() {
+function buildCIFFromAtomSite(dataBlockName, atomSite) {
+
+    const fields = Object.keys(atomSite);
+
+    if (fields.length === 0) {
+        throw new Error("atom_site ne contient aucun champ.");
+    }
+
+    const lines = [];
+
+    lines.push(`data_${dataBlockName}`);
+    lines.push("#");
+
+    lines.push("loop_");
+
+    for (const field of fields) {
+        lines.push(`_atom_site.${field}`);
+    }
+
+    const firstField = atomSite[fields[0]];
+
+    const rowCount = firstField.length;
+
+    function formatCIFValue(value) {
+
+        if (value === null || value === undefined) {
+            return "?";
+        }
+
+        const stringValue = String(value);
+
+        if (
+            stringValue === "?" ||
+            stringValue === "."
+        ) {
+            return stringValue;
+        }
+
+        if (stringValue === "") {
+            return "''";
+        }
+
+        if (
+            /\s/.test(stringValue) ||
+            stringValue.includes("'") ||
+            stringValue.includes('"')
+        ) {
+
+            if (!stringValue.includes('"')) {
+                return `"${stringValue}"`;
+            }
+
+            if (!stringValue.includes("'")) {
+                return `'${stringValue}'`;
+            }
+
+            return `'''${stringValue}'''`;
+        }
+
+        return stringValue;
+    }
+
+    for (let row = 0; row < rowCount; row++) {
+
+        const values = [];
+
+        for (const field of fields) {
+
+            const value = atomSite[field][row];
+
+            values.push(
+                formatCIFValue(value)
+            );
+        }
+
+        lines.push(values.join(" "));
+    }
+
+    lines.push("#");
+
+    return lines.join("\n") + "\n";
+}
+
+async function extractModelsFromCIF(cifContent) {
+
+    cifContent = atob(cifContent);
+
+    const parsed = await cif.loadCIF(cifContent, 1);
+
+    const blockNames = Object.keys(parsed);
+
+    if (blockNames.length === 0) {
+        throw new Error("Aucun data block trouvé dans le CIF.");
+    }
+
+    const block = parsed[blockNames[0]];
+
+
+    if (!block.atom_site) {
+        throw new Error("La catégorie _atom_site est absente du CIF.");
+    }
+
+    const atomSite = block.atom_site;
+
+    console.log("atom_site:", atomSite);
+
+    const modelField = "pdbx_PDB_model_num";
+
+    if (!Array.isArray(atomSite[modelField])) {
+        throw new Error(
+            `_atom_site.${modelField} est absent ou invalide.`
+        );
+    }
+
+    const modelNumbers = atomSite[modelField];
+
+    const fields = Object.keys(atomSite);
+
+    const uniqueModels = [
+        ...new Set(modelNumbers)
+    ].sort((a, b) => Number(a) - Number(b));
+
+    console.log("Modèles :", uniqueModels);
+
+    const models = {};
+
+    for (const modelNumber of uniqueModels) {
+
+        models[modelNumber] = {};
+
+        for (const field of fields) {
+            models[modelNumber][field] = [];
+        }
+    }
+
+    for (let i = 0; i < modelNumbers.length; i++) {
+
+        const modelNumber = modelNumbers[i];
+
+        for (const field of fields) {
+
+            const values = atomSite[field];
+
+            if (!Array.isArray(values)) {
+                continue;
+            }
+
+            models[modelNumber][field].push(
+                values[i]
+            );
+        }
+    }
+
+    const result = [];
+
+    for (const modelNumber of uniqueModels) {
+
+        const modelAtomSite = models[modelNumber];
+
+        const modelCIF = buildCIFFromAtomSite(
+            blockNames[0],
+            modelAtomSite
+        );
+
+        result.push([
+            `Model_${modelNumber}`,
+            {
+                content: modelCIF,
+                encoding: 'utf8',
+                atomSite: modelAtomSite
+            }
+        ]);
+    }
+
+    return result;
+}
+
+async function loadViewer() {
     const container = document.getElementById('container-frame');
 
     const config = { id: "3DMol_viewer", backgroundColor: 'white' };
     const viewer = $3Dmol.createViewer(container, config);
 
-    const models = Object.entries(dataResult.cleaned_dataset);
+    const models = await extractModelsFromCIF(dataResult.cleaned_dataset["cleaned_dataset.cif"].content) //Object.entries(dataResult.cleaned_dataset);
+    
     const modelColors = [];
 
     models.forEach(([name, data], index) => {
 
-        viewer.addModel(data.content, 'pdb');
+        viewer.addModel(data.content, 'mmcif');
 
         const color = getModelColor(index, models.length);
 
@@ -147,6 +327,7 @@ function loadViewer() {
 function fillFilesInfo() {
     const filesNameDiv = document.getElementById("FilesNameDiv");
 
+    let name, data;
     let i = 0;
     
     for ( [name, data] of Object.entries(dataResult.cleaned_dataset)) {
@@ -160,6 +341,7 @@ function fillFilesInfo() {
 function fillComparisonInfo() { 
 
     const comparisonInfoDiv = document.getElementById("comparisonInfoDiv");
+    let name, data;
 
     for ( [name, data] of Object.entries(dataResult)) {
         if (String(name).toLowerCase().endsWith(".svg")) {
