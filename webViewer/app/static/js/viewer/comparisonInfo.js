@@ -189,19 +189,15 @@ function buildCIFFromAtomSite(dataBlockName, atomSite) {
     return lines.join("\n") + "\n";
 }
 
-async function extractModelsFromCIF(cifContent) {
+function extractModelsFromCIF(parsedCif) {
 
-    cifContent = atob(cifContent);
-
-    const parsed = await cif.loadCIF(cifContent, 1);
-
-    const blockNames = Object.keys(parsed);
+    const blockNames = Object.keys(parsedCif);
 
     if (blockNames.length === 0) {
         throw new Error("Aucun data block trouvé dans le CIF.");
     }
 
-    const block = parsed[blockNames[0]];
+    const block = parsedCif[blockNames[0]];
 
 
     if (!block.atom_site) {
@@ -283,19 +279,81 @@ async function extractModelsFromCIF(cifContent) {
     return result;
 }
 
+function extractBoxCornersFromCIF(parsedCif) {
+
+    const blockNames = Object.keys(parsedCif);
+
+    if (blockNames.length === 0) {
+        throw new Error("Aucun data block trouvé dans le CIF.");
+    }
+
+    const block = parsedCif[blockNames[0]];
+
+    let boxCoordCif = block.grid_corner;
+
+    if (block._pocket_corner) {
+        boxCoordCif = block.pocket_corner;
+    }
+
+    let returnBoxCoord = [];
+
+    for(let i = 0; i < 8; i++) {
+
+        returnBoxCoord.push([
+            boxCoordCif.Cartn_x[i],
+            boxCoordCif.Cartn_y[i],
+            boxCoordCif.Cartn_z[i]
+        ]);
+    }
+
+    return returnBoxCoord;
+}
+
+function getBoxParameters(boxCorners) {
+
+    const xs = boxCorners.map(corner => corner[0]);
+    const ys = boxCorners.map(corner => corner[1]);
+    const zs = boxCorners.map(corner => corner[2]);
+
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+
+    const minZ = Math.min(...zs);
+    const maxZ = Math.max(...zs);
+
+    return {
+        center: {
+            x: (minX + maxX) / 2,
+            y: (minY + maxY) / 2,
+            z: (minZ + maxZ) / 2
+        },
+
+        dimensions: {
+            w: maxX - minX,
+            h: maxY - minY,
+            d: maxZ - minZ
+        }
+    };
+}
+
 async function loadViewer() {
     const container = document.getElementById('container-frame');
 
     const config = { id: "3DMol_viewer", backgroundColor: 'white' };
     const viewer = $3Dmol.createViewer(container, config);
 
-    const models = await extractModelsFromCIF(dataResult.cleaned_dataset["cleaned_dataset.cif"].content) //Object.entries(dataResult.cleaned_dataset);
+    const parsedCif = await cif.loadCIF(atob(dataResult.cleaned_dataset["cleaned_dataset.cif"].content), 1);
+
+    const models = extractModelsFromCIF(parsedCif) 
     
     const modelColors = [];
 
     models.forEach(([name, data], index) => {
 
-        viewer.addModel(data.content, 'mmcif');
+        viewer.addModel(data.content, 'cif');
 
         const color = getModelColor(index, models.length);
 
@@ -310,8 +368,6 @@ async function loadViewer() {
     const viewerHeight = window.innerHeight - 200;
     container.style.height = viewerHeight + "px";
     document.getElementById('3DMol_viewer').style.height = viewerHeight + "px";
-    viewer.resize();
-    viewer.render();
 
     window.addEventListener('resize', () => {
         const viewerHeight = window.innerHeight - 200;
@@ -320,6 +376,21 @@ async function loadViewer() {
         viewer.resize();
         viewer.render();
     });
+
+    const boxCoord = extractBoxCornersFromCIF(parsedCif); // [[x1, y1, z1], [x2, y2, z2], ..., [x8, y8, z8]]
+    const boxParams = getBoxParameters(boxCoord);
+
+    viewer.addBox({
+        center: boxParams.center,
+        dimensions: boxParams.dimensions,
+        color: "black",
+        opacity: 1,
+        wireframe: true
+    });
+    
+
+    viewer.resize();
+    viewer.render();
 
     connectButtonViewer(viewer, modelColors);
 }

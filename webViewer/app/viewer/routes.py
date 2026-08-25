@@ -80,6 +80,9 @@ def infoComparisonRequest():
     params.pdb2_name = the_file2.filename
     params.pdb2_content = file_content2
 
+    params.pocket_res_name = request.form.get('pocket_res_name') if request.form.get('pocket_res_name') != "" else "False"
+
+
     return infoComparison(json.loads(params.toJson()))
 
 @viewer.route('/requestFormHotSpots', methods=['GET'])
