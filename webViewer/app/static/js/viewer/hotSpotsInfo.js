@@ -3,6 +3,8 @@ const styleEl = document.createElement('style');
 styleEl.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
 document.head.appendChild(styleEl);
 
+import * as cif from "../../tools/cifParser/cif.mjs";
+
 const showLoading = () => document.getElementById('loading').style.display = 'flex';
 const hideLoading = () => document.getElementById('loading').style.display = 'none';
 
@@ -24,7 +26,174 @@ function initPage(data) {
     console.log("Data received:", dataResult);
     hideLoading();
 
+    fillFilesInfo();
+
     connectDownloadButton();
+
+    loadViewer();
+
+}
+
+function fillFilesInfo() {
+    const filesNameDiv = document.getElementById("fileName");
+
+    filesNameDiv.textContent = paramObject.pdb.name;
+}
+// input: parsedCif, typeBox: "grid" or "pocket"
+function extractBoxCornersFromCIF(parsedCif, typeBox) {
+
+    const blockNames = Object.keys(parsedCif);
+
+    if (blockNames.length === 0) {
+        throw new Error("Aucun data block trouvé dans le CIF.");
+    }
+
+    const block = parsedCif[blockNames[0]];
+
+    let boxCoordCif = null;
+
+    if (typeBox === "grid") {
+        boxCoordCif = block.grid_corner;
+    }else if (typeBox === "pocket") {
+        boxCoordCif = block.pocket_corner;
+    }
+
+    if (!boxCoordCif) {
+        return null; // Return null if the specified box type is not found
+    }
+
+    let returnBoxCoord = [];
+
+    for (let i = 0; i < 8; i++) {
+
+        returnBoxCoord.push([
+            boxCoordCif.Cartn_x[i],
+            boxCoordCif.Cartn_y[i],
+            boxCoordCif.Cartn_z[i]
+        ]);
+    }
+
+    return returnBoxCoord;
+}
+
+function getBoxParameters(boxCorners) {
+
+    const xs = boxCorners.map(corner => corner[0]);
+    const ys = boxCorners.map(corner => corner[1]);
+    const zs = boxCorners.map(corner => corner[2]);
+
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+
+    const minZ = Math.min(...zs);
+    const maxZ = Math.max(...zs);
+
+    return {
+        center: {
+            x: (minX + maxX) / 2,
+            y: (minY + maxY) / 2,
+            z: (minZ + maxZ) / 2
+        },
+
+        dimensions: {
+            w: maxX - minX,
+            h: maxY - minY,
+            d: maxZ - minZ
+        }
+    };
+}
+
+function addBox(viewer, cifContent) {
+    const boxCoord = extractBoxCornersFromCIF(cifContent, "grid"); // [[x1, y1, z1], [x2, y2, z2], ..., [x8, y8, z8]]
+    const boxParams = getBoxParameters(boxCoord);
+
+    viewer.addBox({
+        center: boxParams.center,
+        dimensions: boxParams.dimensions,
+        color: "black",
+        opacity: 1,
+        wireframe: true
+    });
+
+    const pocketBoxCoord = extractBoxCornersFromCIF(cifContent, "pocket");
+
+    if (pocketBoxCoord) {
+        const pocketBoxParams = getBoxParameters(pocketBoxCoord);
+
+        viewer.addBox({
+            center: pocketBoxParams.center,
+            dimensions: pocketBoxParams.dimensions,
+            color: "red",
+            opacity: 1,
+            wireframe: true
+        });
+
+        viewer.setStyle(
+            { resn: paramObject.params.global_parameters.pocket_res_name },
+            {
+                stick: {}
+            }
+        );
+    }
+}
+
+async function loadViewer() {
+    const container = document.getElementById('container-frame');
+
+    const config = { id: "3DMol_viewer", backgroundColor: 'white' };
+    const viewer = $3Dmol.createViewer(container, config);
+
+    const fileName = String(paramObject.pdb.name).split('.')[0];
+
+    const parsedCif = await cif.loadCIF(atob(dataResult[fileName][fileName + "_hotspot.cif"].content), 1);
+
+
+    // Load the model into the viewer
+    viewer.addModel(atob(dataResult[fileName][fileName + "_hotspot.cif"].content), 'cif');
+
+    viewer.setStyle({}, { cartoon: { colorscheme: "chain" } });
+
+    viewer.zoomTo();
+    viewer.zoom(1.2, 1000);
+
+    // Set the viewer height to be the window height minus 200px
+    const viewerHeight = window.innerHeight - 200;
+    container.style.height = viewerHeight + "px";
+    document.getElementById('3DMol_viewer').style.height = viewerHeight + "px";
+
+    window.addEventListener('resize', () => {
+        const viewerHeight = window.innerHeight - 200;
+        container.style.height = viewerHeight + "px";
+        document.getElementById('3DMol_viewer').style.height = viewerHeight + "px";
+        viewer.resize();
+        viewer.render();
+    });
+
+    // const boxCoord = extractBoxCornersFromCIF(parsedCif); // [[x1, y1, z1], [x2, y2, z2], ..., [x8, y8, z8]]
+    // const boxParams = getBoxParameters(boxCoord);
+
+    // viewer.addBox({
+    //     center: boxParams.center,
+    //     dimensions: boxParams.dimensions,
+    //     color: "black",
+    //     opacity: 1,
+    //     wireframe: true
+    // });
+
+    // Add pocket box if it exists and connect the buttons
+    
+    addBox(viewer, parsedCif);
+
+    viewer.resize();
+    viewer.render();
+
+    connectButtonViewer(viewer);
+}
+
+function connectButtonViewer(viewer, modelColors) {
 
 }
 

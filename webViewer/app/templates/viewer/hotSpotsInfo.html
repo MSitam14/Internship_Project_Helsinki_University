@@ -93,7 +93,7 @@
 
 <script id="params-data" type="application/json">{{ params | tojson }}</script>
 
-<script src="{{ url_for('static', filename='js/viewer/hotSpotsInfo.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/viewer/hotSpotsInfo.js') }}"></script>
 
 
 {% endblock %}
