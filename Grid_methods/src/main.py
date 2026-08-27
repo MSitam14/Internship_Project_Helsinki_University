@@ -169,6 +169,9 @@ def main_api(json_parameters):
 
 	cmd.reinitialize()
 	cmd.delete("all")
+
+	while(os.getcwd().find("Grid_methods") >= 0):
+		os.chdir("..")  # Change the working directory to Grid_methods/src/
 	
 	# STEP 0 : Loading parameters ----------------------- #
 	gp.init()							# Initializes the global parameters variables
@@ -264,6 +267,10 @@ def main_api(json_parameters):
 	# If a structure hotspot must be done
 
 	if gp.D_PARAMETERS_GLOBAL["run_hotspot"]:
+
+		# os.chdir("Grid_methods/..")  # Change the working directory to Grid_methods/src/
+		
+		#see the current working directory
 
 		print("RUN EXCTRACTION OF HOTSPOT PARAMETERS")
 
