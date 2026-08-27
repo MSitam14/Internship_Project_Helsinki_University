@@ -19,6 +19,9 @@ let userKey = null;
 
 let dataResult = null;
 
+let hotSpotsLevelInViewer = [[],[],[]]; // [lvl1, lvl2, lvl3] -> ref to spheres in viewer
+let hotSpotsTypeInViewer = [];
+
 console.log("paramObject", paramObject);
 
 function initPage(data) {
@@ -31,7 +34,6 @@ function initPage(data) {
     connectDownloadButton();
 
     loadViewer();
-
 }
 
 function fillFilesInfo() {
@@ -140,6 +142,68 @@ function addBox(viewer, cifContent) {
     }
 }
 
+function extractHopSpotsFromCIF(parsedCif) {
+
+    const blockNames = Object.keys(parsedCif);
+
+    if (blockNames.length === 0) {
+        throw new Error("Aucun data block trouvé dans le CIF.");
+    }
+
+    const block = parsedCif[blockNames[0]];
+
+    let hotSpotsCif = block.hotspot;
+
+    if (!hotSpotsCif) {
+        return null; // Return null is not found
+    }
+
+    let returnHotSpotsCoord = [[],[],[]]; // [lvl1, lvl2, lvl3]
+
+    for (let i = 0; i < hotSpotsCif.Cartn_x.length; i++) {
+
+        const level = hotSpotsCif.tier[i] - 1; // Assuming levels are 1, 2, 3 in the CIF, we convert to 0-based index
+
+        returnHotSpotsCoord[level].push([
+            hotSpotsCif.Cartn_x[i],
+            hotSpotsCif.Cartn_y[i],
+            hotSpotsCif.Cartn_z[i],
+            hotSpotsCif.sybyl_type[i] 
+        ]);
+    }
+
+    return returnHotSpotsCoord;
+}
+
+function addHotSpots(viewer, cifContent) {
+
+    const hotSpotsCoord = extractHopSpotsFromCIF(cifContent);
+
+    console.log("hotSpotsCoord", hotSpotsCoord);
+
+    if (!hotSpotsCoord) {
+        console.warn("No hot spots found in the CIF.");
+        return; // Return if not found
+    }
+
+    const model = viewer.addModel();
+
+    for(let level = 0; level < hotSpotsCoord.length; level++) {
+        const color = level === 0 ? "green" : (level === 1 ? "yellow" : "red");
+        const size = level === 0 ? 0.07 : (level === 1 ? 0.2 : 0.5);
+
+        for(let i = 0; i < hotSpotsCoord[level].length; i++) {
+            let coord = hotSpotsCoord[level][i];
+
+            viewer.addSphere({
+                center: { x: parseFloat(coord[0]), y: parseFloat(coord[1]), z: parseFloat(coord[2]) },
+                radius: size,
+                color: color
+            });
+        }
+    }
+}
+
 async function loadViewer() {
     const container = document.getElementById('container-frame');
 
@@ -172,20 +236,12 @@ async function loadViewer() {
         viewer.render();
     });
 
-    // const boxCoord = extractBoxCornersFromCIF(parsedCif); // [[x1, y1, z1], [x2, y2, z2], ..., [x8, y8, z8]]
-    // const boxParams = getBoxParameters(boxCoord);
 
-    // viewer.addBox({
-    //     center: boxParams.center,
-    //     dimensions: boxParams.dimensions,
-    //     color: "black",
-    //     opacity: 1,
-    //     wireframe: true
-    // });
 
     // Add pocket box if it exists and connect the buttons
     
     addBox(viewer, parsedCif);
+    addHotSpots(viewer, parsedCif);
 
     viewer.resize();
     viewer.render();
