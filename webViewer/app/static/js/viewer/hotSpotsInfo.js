@@ -168,7 +168,7 @@ function extractHopSpotsFromCIF(parsedCif) {
             hotSpotsCif.Cartn_x[i],
             hotSpotsCif.Cartn_y[i],
             hotSpotsCif.Cartn_z[i],
-            hotSpotsCif.sybyl_type[i] 
+            hotSpotsCif.type_symbol[i] 
         ]);
     }
 
@@ -183,27 +183,46 @@ function addHotSpots(viewer, cifContent) {
 
     if (!hotSpotsCoord) {
         console.warn("No hot spots found in the CIF.");
-        return; // Return if not found
+        return;
     }
 
-    const model = viewer.addModel();
+    for (let level = 0; level < hotSpotsCoord.length; level++) {
 
-    for(let level = 0; level < hotSpotsCoord.length; level++) {
-        const color = level === 0 ? "green" : (level === 1 ? "yellow" : "red");
-        const size = level === 0 ? 0.07 : (level === 1 ? 0.2 : 0.5);
+        const model = viewer.addModel();
 
-        for(let i = 0; i < hotSpotsCoord[level].length; i++) {
-            let coord = hotSpotsCoord[level][i];
+        const radius =
+            level === 0 ? 0.07 :
+                level === 1 ? 0.2 :
+                    0.5;
 
-            viewer.addSphere({
-                center: { x: parseFloat(coord[0]), y: parseFloat(coord[1]), z: parseFloat(coord[2]) },
-                radius: size,
-                color: color
+        const atoms = [];
+
+        for (let i = 0; i < hotSpotsCoord[level].length; i++) {
+
+            const coord = hotSpotsCoord[level][i];
+
+            atoms.push({
+                elem: coord[3],
+                x: parseFloat(coord[0]),
+                y: parseFloat(coord[1]),
+                z: parseFloat(coord[2])
             });
         }
-    }
-}
 
+        model.addAtoms(atoms);
+
+        model.setStyle({}, {
+            sphere: {
+                colorscheme: "Jmol",
+                radius: radius
+            }
+        });
+
+        hotSpotsLevelInViewer[level].push(model);
+    }
+
+    viewer.render();
+}
 async function loadViewer() {
     const container = document.getElementById('container-frame');
 

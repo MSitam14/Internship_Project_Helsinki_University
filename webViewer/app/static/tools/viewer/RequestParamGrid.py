@@ -220,7 +220,7 @@ class RequestGridHotspotParameters(RequestGridGlobalParameters):
     grid_geometry: str = "Sphere"
     max_neighbor_number: str = "3"
 
-    hotspot_type: str = "C.ar"
+    hotspot_type: str = "O.3.wat C.ar"
     tag_threshold: str = "6"
     bad_score_threshold: str = "0.4"
     good_score_threshold: str = "0.6"
