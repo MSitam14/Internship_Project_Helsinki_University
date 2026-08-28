@@ -19,8 +19,7 @@ let userKey = null;
 
 let dataResult = null;
 
-let hotSpotsLevelInViewer = [[],[],[]]; // [lvl1, lvl2, lvl3] -> ref to spheres in viewer
-let hotSpotsTypeInViewer = [];
+let hotSpotsInViewer = {}; //{sybylType: {visible:true, level: {visible: true, model: model}}}
 
 console.log("paramObject", paramObject);
 
@@ -109,17 +108,7 @@ function getBoxParameters(boxCorners) {
 }
 
 function addBox(viewer, cifContent) {
-    const boxCoord = extractBoxCornersFromCIF(cifContent, "grid"); // [[x1, y1, z1], [x2, y2, z2], ..., [x8, y8, z8]]
-    const boxParams = getBoxParameters(boxCoord);
-
-    viewer.addBox({
-        center: boxParams.center,
-        dimensions: boxParams.dimensions,
-        color: "black",
-        opacity: 1,
-        wireframe: true
-    });
-
+    
     const pocketBoxCoord = extractBoxCornersFromCIF(cifContent, "pocket");
 
     if (pocketBoxCoord) {
@@ -140,6 +129,18 @@ function addBox(viewer, cifContent) {
             }
         );
     }
+    else {
+        const boxCoord = extractBoxCornersFromCIF(cifContent, "grid"); // [[x1, y1, z1], [x2, y2, z2], ..., [x8, y8, z8]]
+        const boxParams = getBoxParameters(boxCoord);
+
+        viewer.addBox({
+            center: boxParams.center,
+            dimensions: boxParams.dimensions,
+            color: "black",
+            opacity: 1,
+            wireframe: true
+        });
+    }
 }
 
 function extractHopSpotsFromCIF(parsedCif) {
@@ -152,23 +153,34 @@ function extractHopSpotsFromCIF(parsedCif) {
 
     const block = parsedCif[blockNames[0]];
 
-    let hotSpotsCif = block.hotspot;
+    const hotSpotsCif = block.hotspot;
 
     if (!hotSpotsCif) {
-        return null; // Return null is not found
+        return null;
     }
 
-    let returnHotSpotsCoord = [[],[],[]]; // [lvl1, lvl2, lvl3]
+    // {
+    //   "C.3": [ [lvl1], [lvl2], [lvl3] ],
+    //   "O.2": [ [lvl1], [lvl2], [lvl3] ],
+    //   ...
+    // }
+    const returnHotSpotsCoord = {};
 
     for (let i = 0; i < hotSpotsCif.Cartn_x.length; i++) {
 
-        const level = hotSpotsCif.tier[i] - 1; // Assuming levels are 1, 2, 3 in the CIF, we convert to 0-based index
+        const level = Number(hotSpotsCif.tier[i]) - 1;
+        const sybylType = hotSpotsCif.sybyl_type[i];
 
-        returnHotSpotsCoord[level].push([
+        if (!returnHotSpotsCoord[sybylType]) {
+            returnHotSpotsCoord[sybylType] = [[], [], []];
+        }
+
+        returnHotSpotsCoord[sybylType][level].push([
             hotSpotsCif.Cartn_x[i],
             hotSpotsCif.Cartn_y[i],
             hotSpotsCif.Cartn_z[i],
-            hotSpotsCif.type_symbol[i] 
+            hotSpotsCif.type_symbol[i],
+            hotSpotsCif.sybyl_type[i]
         ]);
     }
 
@@ -186,43 +198,65 @@ function addHotSpots(viewer, cifContent) {
         return;
     }
 
-    for (let level = 0; level < hotSpotsCoord.length; level++) {
+    Object.entries(hotSpotsCoord).forEach(([sybylType, levels]) => {
 
-        const model = viewer.addModel();
+        console.log("Sybyl type:", sybylType);
 
-        const radius =
-            level === 0 ? 0.07 :
-                level === 1 ? 0.2 :
-                    0.5;
+        for (let level = 0; level < levels.length; level++) {
 
-        const atoms = [];
+            const coords = levels[level];
 
-        for (let i = 0; i < hotSpotsCoord[level].length; i++) {
-
-            const coord = hotSpotsCoord[level][i];
-
-            atoms.push({
-                elem: coord[3],
-                x: parseFloat(coord[0]),
-                y: parseFloat(coord[1]),
-                z: parseFloat(coord[2])
-            });
-        }
-
-        model.addAtoms(atoms);
-
-        model.setStyle({}, {
-            sphere: {
-                colorscheme: "Jmol",
-                radius: radius
+            if (coords.length === 0) {
+                continue;
             }
-        });
 
-        hotSpotsLevelInViewer[level].push(model);
-    }
+            const model = viewer.addModel();
+
+            const radius =
+                level === 0 ? 0.07 :
+                    level === 1 ? 0.2 :
+                        0.5;
+
+            const atoms = [];
+
+            for (let i = 0; i < coords.length; i++) {
+
+                const coord = coords[i];
+
+                atoms.push({
+                    elem: coord[3],
+                    x: parseFloat(coord[0]),
+                    y: parseFloat(coord[1]),
+                    z: parseFloat(coord[2])
+                });
+            }
+
+            model.addAtoms(atoms);
+
+            model.setStyle({}, {
+                sphere: {
+                    colorscheme: "Jmol",
+                    radius: radius
+                }
+            });
+
+            if (!hotSpotsInViewer[sybylType]) {
+                hotSpotsInViewer[sybylType] = {};
+                hotSpotsInViewer[sybylType]["visible"] = true;
+            }
+            hotSpotsInViewer[sybylType][level] = {};
+            hotSpotsInViewer[sybylType][level]["visible"] = true;
+            hotSpotsInViewer[sybylType][level]["model"] = model;
+        }
+    });
+
+    console.log("hotSpotsInViewer", hotSpotsInViewer);
 
     viewer.render();
 }
+
+
+
 async function loadViewer() {
     const container = document.getElementById('container-frame');
 
@@ -268,8 +302,79 @@ async function loadViewer() {
     connectButtonViewer(viewer);
 }
 
-function connectButtonViewer(viewer, modelColors) {
+function setModelVisibility(model, isVisible) {
+    if (isVisible) {
+        model.show();
+    }
+    else {
+        model.hide();
+    }
+}
 
+function connectButtonViewer(viewer) {
+
+    const divButtonType = document.getElementById("buttonDiv3DMol-Types")
+
+    for (const sybylType in hotSpotsInViewer) {
+        const blockHtml = `
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="buttonType_${sybylType}" name="${sybylType}" checked>
+            <label for="buttonType_${sybylType}" class="form-check-label"> ${sybylType} </label>
+        </div>
+        `;
+        divButtonType.insertAdjacentHTML('beforeend', blockHtml);
+    }
+
+    document.querySelectorAll('input[id^="buttonType_"]').forEach(button => {
+
+        button.addEventListener('click', () => {
+
+            const sybylType = button.name;
+            const isVisible = button.checked;
+
+            hotSpotsInViewer[sybylType]["visible"] = isVisible;
+
+            for (const level in hotSpotsInViewer[sybylType]) {
+                if (level !== "visible") {
+                    const model = hotSpotsInViewer[sybylType][level]["model"];
+                    setModelVisibility(model, isVisible && hotSpotsInViewer[sybylType][level]["visible"]);
+                }
+            }
+
+            viewer.render();
+        });
+    });
+
+    const divButtonLevel = document.getElementById("buttonDiv3DMol-Tiers")
+
+    for (let level = 0; level < 3; level++) {
+        const blockHtml = `
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="buttonLevel_${level}" name="${level}" checked>
+            <label for="buttonLevel_${level}" class="form-check-label"> Level ${level + 1} </label>
+        </div>
+        `;
+        divButtonLevel.insertAdjacentHTML('beforeend', blockHtml);
+    }
+
+    document.querySelectorAll('input[id^="buttonLevel_"]').forEach(button => {
+
+        button.addEventListener('click', () => {
+            const level = parseInt(button.name);
+            const isVisible = button.checked;
+
+            for (const sybylType in hotSpotsInViewer) {
+                hotSpotsInViewer[sybylType][level]["visible"] = isVisible;
+            }
+
+            for (const sybylType in hotSpotsInViewer) {
+                const model = hotSpotsInViewer[sybylType][level]["model"];
+                setModelVisibility(model, isVisible && hotSpotsInViewer[sybylType]["visible"]);
+            }
+
+            viewer.render();
+        });
+    });
 }
 
 function connectDownloadButton() {
