@@ -1,5 +1,6 @@
 const filesInput = document.getElementById("filesInput");
 const filesList = document.getElementById("filesList");
+const MAX_TOTAL_SIZE = 10000 * 1024;
 
 filesInput.addEventListener("change", () => {
 
@@ -7,15 +8,11 @@ filesInput.addEventListener("change", () => {
 
     const files = filesInput.files;
 
-    if (files.length < 2) {
-        filesInput.setCustomValidity(
-            "Please select at least 2 files."
-        );
-    } else {
-        filesInput.setCustomValidity("");
-    }
+    let totalSize = 0;
 
     for (const file of files) {
+
+        totalSize += file.size;
 
         const div = document.createElement("div");
 
@@ -29,5 +26,18 @@ filesInput.addEventListener("change", () => {
         );
 
         filesList.appendChild(div);
+    }
+
+    if (totalSize > MAX_TOTAL_SIZE) {
+
+        filesInput.setCustomValidity(
+            "The total file size must not exceed 10 000 KB."
+        );
+    } else if (files.length < 2) {
+        filesInput.setCustomValidity(
+            "Please select at least 2 files."
+        );
+    } else {
+        filesInput.setCustomValidity("");
     }
 });
