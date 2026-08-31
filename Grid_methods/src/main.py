@@ -255,12 +255,12 @@ def main_api(json_parameters):
 		print('')
 		print('')
 
+		while(os.getcwd().find("Grid_methods") >= 0):
+						os.chdir("..")
+
 		json_return = compileFolderToJson(gp.D_PARAMETERS_COMPARISON['p_output_comparison'])
 
 		shutil.rmtree(gp.D_PARAMETERS_COMPARISON['p_output_comparison'])
-
-		while(os.getcwd().find("Grid_methods") >= 0):
-				os.chdir("..")  # Change the working directory to Grid_methods/src/
 
 		return json_return
 
@@ -298,7 +298,8 @@ def main_api(json_parameters):
 		print('')
 		print('')
 
-		os.chdir("../../../../../../") 
+		while(os.getcwd().find("Grid_methods") >= 0):
+						os.chdir("..") 
 
 		json_return = compileFolderToJson(gp.D_PARAMETERS_HOTSPOT['p_output_hotspot'])
 		
