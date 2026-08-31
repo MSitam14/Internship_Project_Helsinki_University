@@ -98,10 +98,14 @@ def infoHotSpotsRequest():
     the_file = request.files['the_file']
     file_content = the_file.read().decode('utf-8', errors='replace')
 
+    hotspot_type = request.form.getlist('hotspot_type') if request.form.getlist('hotspot_type') else []
+    hotspot_type = " ".join(hotspot_type)
+
     params = RequestGridHotspotParameters()
 
     params.pdb_name = the_file.filename
     params.pdb_content = file_content
+    params.hotspot_type = hotspot_type
 
     params.pocket_res_name = request.form.get('pocket_res_name') if request.form.get('pocket_res_name') != "" else "False"
 

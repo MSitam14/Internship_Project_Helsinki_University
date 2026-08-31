@@ -20,6 +20,23 @@
                         <input class="form-number-input" type="text" id="pocket_res_name" name="pocket_res_name" value="">
                     </div>
 
+                    <div class="mb-2">
+                        <button type="button" class="btn btn-sm btn-primary" id="selectAllHotspot">
+                            Select All
+                        </button>
+                    
+                        <button type="button" class="btn btn-sm btn-secondary" id="deselectAllHotspot">
+                            Deselect All
+                        </button>          
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Hotspot types</label>
+                    
+                        <div id="hotspotTypeSelection" class="row">
+                        </div>              
+                    </div>
+
                     <button type="submit" class="btn btn-primary">Run</button>
                 </form>
             </div>
@@ -30,5 +47,7 @@
 {% endblock %}
 
 {% block scripts %}
+
+<script src="{{ url_for('static', filename='js/viewer/hotSpotsForm.js') }}"></script>
 
 {% endblock %}
