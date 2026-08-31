@@ -18,11 +18,16 @@
     <header>
         <nav class="navbar navbar-dark bg-primary">
             <div class="container">
-                <div id="divNavBarLogo">
+                <a href="{{ url_for('viewer.home') }}" id="divNavBarLogo"
+                    class="text-white text-decoration-none d-flex align-items-center">
+
                     <img src="{{ url_for('static', filename='img/logoUniv.png') }}" height="40" alt="University logo">
-                    <a class="text-white text-decoration-none">Molecular Structure Analysis Platform</a>
-                </div>
-                <!-- <a class="text-white text-decoration-none"> EN </a> -->
+
+                    <span class="ms-2">
+                        Molecular Structure Analysis Platform
+                    </span>
+
+                </a>
             </div>
         </nav>
     </header>
@@ -36,24 +41,39 @@
 
             <ul class="nav flex-column">
 
-                <li class="nav-item p-2" onclick="window.location.href='{{ url_for('viewer.home') }}'">
-                    <i class="bi bi-house-fill"></i> <span class="menu-text"> Home </span>
+                <li class="nav-item">
+                    <a href="{{ url_for('viewer.home') }}" class="nav-link text-black">
+                        <i class="bi bi-house-fill"></i>
+                        <span class="menu-text">Home</span>
+                    </a>
                 </li>
 
-                <li class="nav-item p-2" onclick="window.location.href='{{ url_for('viewer.fitnessForm') }}'">
-                    <i class="bi-rulers"></i> <span class="menu-text"> Score a file</span>
+                <li class="nav-item">
+                    <a href="{{ url_for('viewer.fitnessForm') }}" class="nav-link text-black">
+                        <i class="bi bi-rulers"></i>
+                        <span class="menu-text">Score a file</span>
+                    </a>
                 </li>
 
-                <li class="nav-item p-2" onclick="window.location.href='{{ url_for('viewer.requestFormHotSpots') }}'">
-                    <i class="bi bi-radar"></i> <span class="menu-text"> Hot spots</span>
+                <li class="nav-item">
+                    <a href="{{ url_for('viewer.requestFormHotSpots') }}" class="nav-link text-black">
+                        <i class="bi bi-radar"></i>
+                        <span class="menu-text">Hot spots</span>
+                    </a>
                 </li>
 
-                <li class="nav-item p-2" onclick="window.location.href='{{ url_for('viewer.requestFormComparison') }}'">
-                    <i class="bi bi-front"></i> <span class="menu-text"> Compare</span>
+                <li class="nav-item">
+                    <a href="{{ url_for('viewer.requestFormComparison') }}" class="nav-link text-black">
+                        <i class="bi bi-front"></i>
+                        <span class="menu-text">Compare</span>
+                    </a>
                 </li>
 
-                <li class="nav-item p-2" onclick="window.location.href='{{ url_for('viewer.credits') }}'">
-                    <i class="bi bi-info-circle"></i> <span class="menu-text"> Credits</span>
+                <li class="nav-item">
+                    <a href="{{ url_for('viewer.credits') }}" class="nav-link text-black">
+                        <i class="bi bi-info-circle"></i>
+                        <span class="menu-text">Credits</span>
+                    </a>
                 </li>
 
             </ul>
