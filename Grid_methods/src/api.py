@@ -42,8 +42,10 @@ def _json_safe(value):
 #                   "param1":"value1", ...
 #               }
 #           }, 
-#           "pdb1": {"name": "file1.pdb", "content": "PDB content 1"}, 
-#           "pdb2": {"name": "file2.pdb", "content": "PDB content 2"}
+#           "pdbList": {
+#               "nameX": { "content": "PDB content X" },
+#                ...
+#           }
 #       }
 @api.route('/comparison', methods=['POST'])
 def calculate_comparison():
@@ -58,8 +60,7 @@ def calculate_comparison():
 
     try:
         params = data['params']
-        pdb1 = data['pdb1']
-        pdb2 = data['pdb2']
+        pdbList = data['pdbList']
     except KeyError as e:
         return jsonify({
             'status': 'error',
@@ -67,20 +68,17 @@ def calculate_comparison():
         }), 400
 
     file_path_input = 'Grid_methods/data/input/structures/' + date + '/'
-    pdb1_path = file_path_input + pdb1["name"]
-    pdb2_path = file_path_input + pdb2["name"]
 
     params['comparison_parameters']["path_to_PDB_directory"] = file_path_input
 
     os.makedirs(file_path_input, exist_ok=True)
 
-    with open(pdb1_path, 'w') as f:
-        f.write(pdb1["content"])
+    for pdb_name, pdb_data in pdbList.items():
+        pdb_path = file_path_input + pdb_name
+        with open(pdb_path, 'w') as f:
+            f.write(pdb_data["content"])
     
-    with open(pdb2_path, 'w') as f:
-        f.write(pdb2["content"])
-    
-    print(f"\nReceived comparison request for {pdb1['name']} and {pdb2['name']}")
+    print(f"\nReceived comparison request for {', '.join(pdbList.keys())}")
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     try:
         out = main_api(params) 
@@ -94,7 +92,7 @@ def calculate_comparison():
             'message': f'Error during comparison: {str(e)}'
         }), 400
     
-    print(f"\nComparison completed for {pdb1['name']} and {pdb2['name']}. Cleaning up temporary files.")
+    print(f"\nComparison completed for {', '.join(pdbList.keys())}. Cleaning up temporary files.")
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
 
     try: shutil.rmtree(file_path_input)

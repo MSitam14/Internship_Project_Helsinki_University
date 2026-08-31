@@ -11,13 +11,9 @@
                 <form action="/infoComparisonRequest" method="post" enctype="multipart/form-data">
 
                     <div class="mb-3">
-                        <label for="the_file1" class="form-label">Choose a file (only .pdb files are allowed):</label>
-                        <input class="form-control" type="file" id="the_file1" name="the_file1" accept=".pdb" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="the_file2" class="form-label">Choose a second file (only .pdb files are allowed):</label>
-                        <input class="form-control" type="file" id="the_file2" name="the_file2" accept=".pdb" required>
+                        <label for="files" class="form-label">Choose files (2 minimum, only .pdb files are allowed):</label>
+                        <input class="form-control" type="file" id="filesInput" name="files" accept=".pdb" required multiple>
+                        <div id="filesList" class="mt-2 d-flex"></div>
                     </div>
 
                     <div class="form-group mb-3">
@@ -35,5 +31,7 @@
 {% endblock %}
 
 {% block scripts %}
+
+<script src="{{ url_for('static', filename='js/viewer/comparisonForm.js') }}"></script>
 
 {% endblock %}

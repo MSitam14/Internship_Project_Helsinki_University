@@ -68,20 +68,17 @@ def infoComparison(parameters):
 @viewer.route('/infoComparisonRequest', methods=['POST'])
 def infoComparisonRequest():
 
-    the_file1 = request.files['the_file1']
-    the_file2 = request.files['the_file2']
-    file_content1 = the_file1.read().decode('utf-8', errors='replace')
-    file_content2 = the_file2.read().decode('utf-8', errors='replace')
-
     params = RequestGridComparisonParameters()
+    params.pdbList = {}
 
-    params.pdb1_name = the_file1.filename
-    params.pdb1_content = file_content1
-    params.pdb2_name = the_file2.filename
-    params.pdb2_content = file_content2
+    files = request.files.getlist("files")
+
+    for file in files:
+        params.pdbList[file.filename] = file.read().decode('utf-8', errors='replace')
 
     params.pocket_res_name = request.form.get('pocket_res_name') if request.form.get('pocket_res_name') != "" else "False"
 
+    print("params.pdbList: ", params.pdbList)
 
     return infoComparison(json.loads(params.toJson()))
 

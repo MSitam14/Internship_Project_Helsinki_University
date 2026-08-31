@@ -101,11 +101,8 @@ class RequestGridComparisonParameters(RequestGridGlobalParameters):
     branch_length: str = "True"
 
     # ---------- PDB ----------
-    pdb1_name: str = ""
-    pdb1_content: str = ""
 
-    pdb2_name: str = ""
-    pdb2_content: str = ""
+    pdbList: list = None
 
     def toJson(self):
 
@@ -185,20 +182,27 @@ class RequestGridComparisonParameters(RequestGridGlobalParameters):
             )
         }
 
+        # {
+        #     "pdbx": {
+        #         "name": ,
+        #         "content":
+        #     },
+        #       ...
+        # }
+        json_object = {
+            k: {
+                "content": v
+            }
+            for k, v in self.pdbList.items()
+        }
+            
         return json.dumps(
             {
                 "params": {
                     "comparison_parameters": comparison_parameters,
                     "global_parameters": global_parameters,
                 },
-                "pdb1": {
-                    "name": self.pdb1_name,
-                    "content": self.pdb1_content
-                },
-                "pdb2": {
-                    "name": self.pdb2_name,
-                    "content": self.pdb2_content
-                }
+                "pdbList": json_object
             },
             indent=4
         )
