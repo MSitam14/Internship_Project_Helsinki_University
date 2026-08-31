@@ -78,8 +78,6 @@ def infoComparisonRequest():
 
     params.pocket_res_name = request.form.get('pocket_res_name') if request.form.get('pocket_res_name') != "" else "False"
 
-    print("params.pdbList: ", params.pdbList)
-
     return infoComparison(json.loads(params.toJson()))
 
 @viewer.route('/requestFormHotSpots', methods=['GET'])
