@@ -98,7 +98,7 @@ def infoHotSpotsRequest():
     the_file = request.files['the_file']
     file_content = the_file.read().decode('utf-8', errors='replace')
 
-    hotspot_type = request.form.getlist('hotspot_type') if request.form.getlist('hotspot_type') else []
+    hotspot_type = request.form.getlist('hotspot_type') if request.form.getlist('hotspot_type') else ['None']
     hotspot_type = " ".join(hotspot_type)
 
     params = RequestGridHotspotParameters()

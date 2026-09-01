@@ -1,10 +1,8 @@
 const hotspot_type = [
-    "C.1", "C.2", "C.3", "C.ar", "C.cat",
-    "Co.oh", "Cr.oh", "N.1", "N.2", "N.3",
+    "C.1", "C.2", "C.3", "C.ar", "C.cat", "N.1", "N.2", "N.3",
     "N.4", "N.am", "N.pl3", "O.2", "O.3",
-    "O.3.wat", "O.co2", "P.3", "Ru.oh",
-    "S.2", "S.3"
-];
+    "O.3.wat", "O.co2", "P.3", "Ru.oh", "S.3"
+]; // "Co.oh", "Cr.oh", "S.2" out of the list reason issue
 
 const container = document.getElementById("hotspotTypeSelection");
 
@@ -50,4 +48,26 @@ deselectAllButton.addEventListener("click", () => {
         checkbox.checked = false;
     });
 
+});
+
+const form = document.getElementById("hotspotForm");
+
+form.addEventListener("submit", (event) => {
+
+    const selectedTypes = document.querySelectorAll(
+        ".hotspot-type:checked"
+    );
+
+    const count = selectedTypes.length;
+
+    if (count < 1) {
+        event.preventDefault();
+
+        alert("Please select at least one hotspot type.");
+
+    } else if (count > 10) {
+        event.preventDefault();
+
+        alert("Please select a maximum of 10 hotspot types.");
+    }
 });
