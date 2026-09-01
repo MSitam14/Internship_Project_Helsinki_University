@@ -25,15 +25,14 @@ console.log("paramObject", paramObject);
 
 function initPage(data) {
     dataResult = data.content;
+    console.log("Data received:", dataResult);
 
-    if (dataResult[fileName][fileName + "_hotspot.cif"].content === null) {
+    const fileName = String(paramObject.pdb.name).split('.')[0];
+    if (dataResult[fileName][fileName + "_hotspot.cif"] === null) {
         hideLoading();
         showErrorPopup("Error during Cif file generation, retry with another parameters.");
-        return;
     }
 
-
-    console.log("Data received:", dataResult);
     hideLoading();
 
     fillFilesInfo();
@@ -45,9 +44,16 @@ function initPage(data) {
 
 function fillFilesInfo() {
     const filesNameDiv = document.getElementById("fileName");
-
     filesNameDiv.textContent = paramObject.pdb.name;
+
+    const pocketResNameDiv = document.getElementById("pocket_res_name");
+    if (paramObject.params.global_parameters.pocket_res_name != "") {
+        pocketResNameDiv.textContent = paramObject.params.global_parameters.pocket_res_name;
+    }else {
+        pocketResNameDiv.textContent = "No pocket residue name provided";
+    }    
 }
+
 // input: parsedCif, typeBox: "grid" or "pocket"
 function extractBoxCornersFromCIF(parsedCif, typeBox) {
 
@@ -199,16 +205,12 @@ function addHotSpots(viewer, cifContent) {
 
     const hotSpotsCoord = extractHopSpotsFromCIF(cifContent);
 
-    console.log("hotSpotsCoord", hotSpotsCoord);
-
     if (!hotSpotsCoord) {
         console.warn("No hot spots found in the CIF.");
         return;
     }
 
     Object.entries(hotSpotsCoord).forEach(([sybylType, levels]) => {
-
-        console.log("Sybyl type:", sybylType);
 
         for (let level = 0; level < levels.length; level++) {
 
@@ -257,8 +259,6 @@ function addHotSpots(viewer, cifContent) {
             hotSpotsInViewer[sybylType][level]["model"] = model;
         }
     });
-
-    console.log("hotSpotsInViewer", hotSpotsInViewer);
 
     viewer.render();
 }
@@ -524,8 +524,6 @@ onload = async function () {
     showLoading();
 
     userKey = await getUserKey();
-
-    console.log("userKey", userKey);
 
     if (userKey) {
         fetch(`/api-database-hotSpots/getDataWhithUserKey/` + userKey, {
