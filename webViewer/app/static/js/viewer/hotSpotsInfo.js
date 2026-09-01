@@ -25,6 +25,14 @@ console.log("paramObject", paramObject);
 
 function initPage(data) {
     dataResult = data.content;
+
+    if (dataResult[fileName][fileName + "_hotspot.cif"].content === null) {
+        hideLoading();
+        showErrorPopup("Error during Cif file generation, retry with another parameters.");
+        return;
+    }
+
+
     console.log("Data received:", dataResult);
     hideLoading();
 
@@ -289,8 +297,6 @@ async function loadViewer() {
         viewer.render();
     });
 
-
-
     // Add pocket box if it exists and connect the buttons
     
     addBox(viewer, parsedCif);
@@ -317,7 +323,7 @@ function connectButtonViewer(viewer) {
 
     for (const sybylType in hotSpotsInViewer) {
         const blockHtml = `
-        <div class="form-check form-switch mb-3">
+        <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="buttonType_${sybylType}" name="${sybylType}" checked>
             <label for="buttonType_${sybylType}" class="form-check-label"> ${sybylType} </label>
         </div>
