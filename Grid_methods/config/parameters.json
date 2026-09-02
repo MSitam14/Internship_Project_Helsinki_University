@@ -1,79 +1,26 @@
 {
     "global_parameters": {
-        "run_comparison": "True",
-        "run_hotspot": "False",
-        "explicit_grid": "False",
-        "atom_type": "SYBYL",
-        "grid_spacing": "0.35",
-        "grid_padding": "1.0",
-        "align_principal_axes": "True",
-        "pocket_res_name": "False",
-        "pocket_res_id": "False",
-        "lig_chain": "False",
-        "pocket_size": "5",
+        "grid_spacing": "0.35 - 1", 
+        "pocket_res_name": "CVD",
+        "pocket_res_id": "12",
+        "lig_chain": "False", "A",
+        "pocket_size": "3-10 5 DEFAULT",
         "discard_hetatm": "False",
-        "discard_atom": "False",
         "discard_hydrogen": "True",
         "discard_water": "True",
-        "discard_alternative": "True",
-        "keep_chains": "",
-        "discard_chains": "",
-        "keep_residues": "",
-        "discard_residues": "",
-        "keep_residue_ids": "",
-        "discard_residue_ids": "",
-        "keep_atoms": "",
-        "discard_atoms": "",
-        "cpu_allocated": null,
-        "path_to_comparison_parameters": "Grid_methods/config/comparison_parameters.txt",
-        "path_to_hotspot_parameters": "Grid_methods/config/hotspot_parameters.txt",
-        "watch_live": "False",
-        "create_pymol_session": "True",
-        "session_name": null
+        "discard_chains": ""
+
     },
     "comparison_parameters": {
-        "path_to_PDB_directory": "Grid_methods/data/input/structures_comparison/",
-        "path_to_output_directory": "Grid_methods/data/output/structures_comparison/",
-        "path_to_cleaned_directory": "Grid_methods/data/output/structures_comparison/cleaned_dataset/",
-        "consider_elements": "True",
-        "comparison_normalisation": "Min",
-        "grid_geometry": "Sphere",
-        "delete_grid": "False",
-        "save_parameters_files": "True",
-        "database": "False",
-        "dataset_status": "2",
-        "tmalign_reference": null,
-        "tree": "structures",
-        "tree_name": null,
-        "display_alignment": "False",
-        "node_name": "pdb_organism",
-        "spheres_size": "0",
-        "sphere_color": "True",
-        "label_color": "True",
-        "show_distances": "True",
-        "line_width": "5",
-        "tree_scale": "80",
-        "save_structures_tree": "True",
-        "save_sequences_tree": "False",
-        "show_structures_tree": "False",
-        "show_sequences_tree": "False",
-        "save_newick_files": "False",
-        "tree_shape": "Circular",
-        "only_topology": "False",
-        "leaf_name": "True",
-        "branch_length": "True"
+        "consider_elements": "True", # remove if not working
+        "tmalign_reference": null, pdb nqme 
+        "tree": "structures", # last not important
     },
     "hotspot_parameters": {
-        "path_to_PDB_directory": "Grid_methods/data/input/hotspot_lig/",
-        "path_to_output_directory": "Grid_methods/data/output/hotspot/",
-        "grid_geometry": "Sphere",
-        "max_neighbor_number": "3",
-        "hotspot_type": "C.ar",
-        "tag_threshold": "1",
-        "bad_score_threshold": "0.8",
-        "good_score_threshold": "0.2",
-        "number_of_rounds": "1",
-        "electronic_densities_folder": "Grid_methods/data/densities",
-        "normalize_electronic_densities": "True"
+        "max_neighbor_number": "3", # neighbor to consider for scoring 3 1 to 10 
+        "tag_threshold": "1", # renqme tagged limit for a position to be considered as voxels after 
+        "bad_score_threshold": "0.8", # rename Score limit to be consider as origin from 0.1 to 1. 0.4 
+        "good_score_threshold": "0.2", # rename Score limit to retain a potential voxel as hotspot from 0.1 to 1 
+        "number_of_rounds": "1", 1 to 5
     }
 }

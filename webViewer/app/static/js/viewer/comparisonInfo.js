@@ -401,10 +401,54 @@ function fillFilesInfo() {
     let name, data;
     let i = 0;
     
-    for ( [name, data] of Object.entries(dataResult.cleaned_dataset)) {
+    for ( [name, data] of Object.entries(paramObject.pdbList)) {
         i++;
-        let innerHTML = `<div class="col-3" id="fileName${i}">${name}</div>`;
+        let innerHTML = `<div class="col-2" id="fileName${i}">${name}</div>`;
         filesNameDiv.insertAdjacentHTML('beforeend', innerHTML);
+    }
+
+    document.getElementById("grid_spacing").textContent = paramObject.params.global_parameters.grid_spacing;
+
+    const pocketResNameDiv = document.getElementById("pocket_res_name");
+    if (paramObject.params.global_parameters.pocket_res_name != "False") {
+        pocketResNameDiv.textContent = paramObject.params.global_parameters.pocket_res_name;
+    } else {
+        pocketResNameDiv.textContent = "No pocket residue name provided";
+    }
+
+    const pocket_res_idDiv = document.getElementById("pocket_res_id");
+    if (paramObject.params.global_parameters.pocket_res_id != "") {
+        pocket_res_idDiv.textContent = paramObject.params.global_parameters.pocket_res_id;
+    } else {
+        pocket_res_idDiv.textContent = "No pocket residue ID provided";
+    }
+
+    const lig_chainDiv = document.getElementById("lig_chain");
+    if (paramObject.params.global_parameters.lig_chain != "False") {
+        lig_chainDiv.textContent = paramObject.params.global_parameters.lig_chain;
+    } else {
+        lig_chainDiv.textContent = "No ligand chain provided";
+    }
+
+    document.getElementById("pocket_size").textContent = paramObject.params.global_parameters.pocket_size;
+    document.getElementById("discard_hetatm").textContent = paramObject.params.global_parameters.discard_hetatm;
+    document.getElementById("discard_hydrogen").textContent = paramObject.params.global_parameters.discard_hydrogen;
+    document.getElementById("discard_water").textContent = paramObject.params.global_parameters.discard_water;
+
+    const discard_chainsDiv = document.getElementById("discard_chains");
+    if (paramObject.params.global_parameters.discard_chains != "") {
+        discard_chainsDiv.textContent = paramObject.params.global_parameters.discard_chains;
+    } else {
+        discard_chainsDiv.textContent = "No discard chains provided";
+    }
+
+    document.getElementById("consider_elements").textContent = paramObject.params.comparison_parameters.consider_elements;
+
+    const tmalign_referenceDiv = document.getElementById("tmalign_reference");
+    if (paramObject.params.comparison_parameters.tmalign_reference != "None") {
+        tmalign_referenceDiv.textContent = paramObject.params.comparison_parameters.tmalign_reference;
+    } else {
+        tmalign_referenceDiv.textContent = "No tmalign reference provided";
     }
 
 }

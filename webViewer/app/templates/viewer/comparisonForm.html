@@ -8,17 +8,78 @@
             <div class="card-body">
                 <h2 class="card-title mb-3">Comparison</h2>
 
-                <form action="/infoComparisonRequest" method="post" enctype="multipart/form-data">
+                <form id="comparisonForm" action="/infoComparisonRequest" method="post" enctype="multipart/form-data">
 
                     <div class="mb-3">
-                        <label for="files" class="form-label">Choose files (2 minimum, only .pdb files are allowed):</label>
-                        <input class="form-control" type="file" id="filesInput" name="files" accept=".pdb" required multiple>
+                        <label for="files" class="form-label">Choose files (2 minimum, only .pdb files are
+                            allowed):</label>
+                        <input class="form-control" type="file" id="filesInput" name="files" accept=".pdb" required
+                            multiple>
                         <div id="filesList" class="mt-2 d-flex"></div>
                     </div>
 
                     <div class="form-group mb-3">
+                        <label for="grid_spacing" class="form-check-label">Grid spacing</label>
+                        <input class="form-number-input" type="number" id="grid_spacing" name="grid_spacing"
+                            value="0.35" step="0.01" min="0.35" max="1" required>
+                    </div>
+
+                    <div class="form-group mb-3">
                         <label for="pocket_res_name" class="form-check-label">Pocket residue name</label>
-                        <input class="form-number-input" type="text" id="pocket_res_name" name="pocket_res_name" value="">
+                        <input class="form-number-input" type="text" id="pocket_res_name" name="pocket_res_name"
+                            value="">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="pocket_res_id" class="form-check-label">Pocket residue ID</label>
+                        <input class="form-number-input" type="text" id="pocket_res_id" name="pocket_res_id" value="">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="lig_chain" class="form-check-label">Ligand chains</label>
+                        <input class="form-number-input" type="text" id="lig_chain" name="lig_chain" value="">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="pocket_size" class="form-check-label">Pocket size</label>
+                        <input class="form-number-input" type="number" id="pocket_size" name="pocket_size" value="5"
+                            step="1" min="1" max="10" required>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <label for="discard_hetatm" class="form-check-label">Discard heteroatoms</label>
+                        <input class="form-check-input" type="checkbox" id="discard_hetatm" name="discard_hetatm">
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <label for="discard_hydrogen" class="form-check-label">Discard hydrogens</label>
+                        <input class="form-check-input" type="checkbox" id="discard_hydrogen" name="discard_hydrogen"
+                            checked>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <label for="discard_water" class="form-check-label">Discard water molecules</label>
+                        <input class="form-check-input" type="checkbox" id="discard_water" name="discard_water" checked>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="discard_chains" class="form-check-label">Chains to discard</label>
+                        <input class="form-number-input" type="text" id="discard_chains" name="discard_chains" value="">
+                    </div>
+
+
+
+                    <div class="form-check form-switch mb-3">
+                        <label for="consider_elements" class="form-check-label">Consider elements</label>
+                        <input class="form-check-input" type="checkbox" id="consider_elements" name="consider_elements"
+                            checked>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="tmalign_reference" class="form-check-label">Tmalign reference</label>
+                        <input class="form-number-input" type="text" id="tmalign_reference" name="tmalign_reference"
+                            value="">
+                        <a><i>pdb file name without .pdb</i></a>
                     </div>
 
                     <button type="submit" class="btn btn-primary">Run</button>
