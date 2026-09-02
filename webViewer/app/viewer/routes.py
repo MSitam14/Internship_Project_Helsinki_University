@@ -105,9 +105,24 @@ def infoHotSpotsRequest():
 
     params.pdb_name = the_file.filename
     params.pdb_content = file_content
-    params.hotspot_type = hotspot_type
 
+    params.grid_spacing = str(request.form.get('grid_spacing'))
     params.pocket_res_name = request.form.get('pocket_res_name') if request.form.get('pocket_res_name') != "" else "False"
+    params.pocket_res_id = request.form.get('pocket_res_id')
+    params.lig_chain = request.form.get('lig_chain') if request.form.get('lig_chain') != "" else "False"
+    params.pocket_size = str(request.form.get('pocket_size'))
+    params.discard_hetatm = "True" if request.form.get('discard_hetatm') else "False"
+    params.discard_hydrogen = "True" if request.form.get('discard_hydrogen') else "False"
+    params.discard_water = "True" if request.form.get('discard_water') else "False"
+    params.discard_chains = request.form.get('discard_chains')
+
+    params.max_neighbor_number = str(request.form.get('max_neighbor_number'))
+    params.tag_threshold = str(request.form.get('tag_threshold'))
+    params.bad_score_threshold = str(request.form.get('bad_score_threshold'))
+    params.good_score_threshold = str(request.form.get('good_score_threshold'))
+    params.number_of_rounds = str(request.form.get('number_of_rounds'))
+
+    params.hotspot_type = hotspot_type
 
     return infoHotSpots(json.loads(params.toJson()))
 

@@ -8,20 +8,22 @@
 
 <div class="container pt-4">
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
+    <h1 class="text-center mb-4">Hot Spots Analysis</h1>
 
-            <!-- Loading overlay -->
-            <div id="loading"
-                style="display:none;position:fixed;inset:0;background:rgba(255,255,255,0.8);align-items:center;justify-content:center;z-index:9999;">
-                <div style="display:flex;flex-direction:column;align-items:center;">
-                    <div
-                        style="width:48px;height:48px;border:6px solid #ddd;border-top-color:#007bff;border-radius:50%;animation:spin 1s linear infinite">
-                    </div>
-                    <div style="margin-top:8px;font-size:14px;color:#333">Loading…</div>
-                </div>
+    <!-- Loading overlay -->
+    <div id="loading"
+        style="display:none;position:fixed;inset:0;background:rgba(255,255,255,0.8);align-items:center;justify-content:center;z-index:9999;">
+        <div style="display:flex;flex-direction:column;align-items:center;">
+            <div
+                style="width:48px;height:48px;border:6px solid #ddd;border-top-color:#007bff;border-radius:50%;animation:spin 1s linear infinite">
             </div>
+            <div style="margin-top:8px;font-size:14px;color:#333">Loading…</div>
+        </div>
+    </div>
 
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
             <!-- ACTION BUTTONS -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
@@ -32,11 +34,37 @@
 
                 </div>
             </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-xl-12">
+
+                        <div id="buttonDiv3DMol-Types" class="d-flex flex-wrap gap-4">
+                        </div>
+
+                        <hr class="my-3" />
+
+                        <div id="buttonDiv3DMol-Tiers" class="d-flex flex-wrap gap-4">
+                        </div>
+
+                        <div class="border border-2 border-secondary rounded-3 p-2 bg-white shadow-sm mol-frame">
+                            <div id="container-frame" height="1000" class="mol-container"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-8">
 
             <!-- FILE INFO -->
             <div class="card shadow-sm mb-3">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Hot Spots information</h5>
+                    <h5 class="card-title mb-0">Analyse informations</h5>
                 </div>
                 <div class="card-body" id="filesInfoDiv">
 
@@ -45,9 +73,78 @@
                         <div class="col-8" id="fileName"></div>
                     </div>
 
+                    <hr class="my-4" />
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Grid spacing</div>
+                        <div class="col-8" id="grid_spacing"></div>
+                    </div>
+
                     <div class="row mb-2">
                         <div class="col-4 fw-bold">Pocket residue name</div>
                         <div class="col-8" id="pocket_res_name"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Pocket residue ID</div>
+                        <div class="col-8" id="pocket_res_id"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Ligand chains</div>
+                        <div class="col-8" id="lig_chain"></div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Pocket size</div>
+                        <div class="col-8" id="pocket_size"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Discard heteroatoms</div>
+                        <div class="col-8" id="discard_hetatm"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Discard hydrogens</div>
+                        <div class="col-8" id="discard_hydrogen"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Discard water molecules</div>
+                        <div class="col-8" id="discard_water"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Chains to discard</div>
+                        <div class="col-8" id="discard_chains"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Neighbor to consider for scoring</div>
+                        <div class="col-8" id="max_neighbor_number"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Tag threshold</div>
+                        <div class="col-8" id="tag_threshold"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Origin score threshold</div>
+                        <div class="col-8" id="bad_score_threshold"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Retaining score threshold</div>
+                        <div class="col-8" id="good_score_threshold"></div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Number of rounds</div>
+                        <div class="col-8" id="number_of_rounds"></div>
                     </div>
 
                 </div>
@@ -55,25 +152,7 @@
         </div>
 
 
-        <hr class="my-4" />
-        
-        <div class="row justify-content-center">
-            <div class="col-12 col-xl-10">
-        
-                <div id="buttonDiv3DMol-Types" class="d-flex flex-wrap gap-4">
-                </div>
 
-                <hr class="my-3" />
-        
-                <div id="buttonDiv3DMol-Tiers" class="d-flex flex-wrap gap-4">
-                </div>
-        
-                <div class="mb-4 border border-2 border-secondary rounded-3 p-2 bg-white shadow-sm mol-frame">
-                    <div id="container-frame" height="1000" class="mol-container"></div>
-                </div>
-        
-            </div>
-        </div>
 
     </div>
 </div>

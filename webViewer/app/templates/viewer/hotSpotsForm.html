@@ -16,9 +16,86 @@
                     </div>
 
                     <div class="form-group mb-3">
+                        <label for="grid_spacing" class="form-check-label">Grid spacing</label>
+                        <input class="form-number-input" type="number" id="grid_spacing" name="grid_spacing" value="0.35" step="0.01" min="0.35" max="1" required>
+                    </div>
+
+                    <div class="form-group mb-3">
                         <label for="pocket_res_name" class="form-check-label">Pocket residue name</label>
                         <input class="form-number-input" type="text" id="pocket_res_name" name="pocket_res_name" value="">
                     </div>
+
+                    <div class="form-group mb-3">
+                        <label for="pocket_res_id" class="form-check-label">Pocket residue ID</label>
+                        <input class="form-number-input" type="text" id="pocket_res_id" name="pocket_res_id" value="">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="lig_chain" class="form-check-label">Ligand chains</label>
+                        <input class="form-number-input" type="text" id="lig_chain" name="lig_chain" value="">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="pocket_size" class="form-check-label">Pocket size</label>
+                        <input class="form-number-input" type="number" id="pocket_size" name="pocket_size" value="5" step="1" min="1" max="10" required>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <label for="discard_hetatm" class="form-check-label">Discard heteroatoms</label>
+                        <input class="form-check-input" type="checkbox" id="discard_hetatm" name="discard_hetatm">
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <label for="discard_hydrogen" class="form-check-label">Discard hydrogens</label>
+                        <input class="form-check-input" type="checkbox" id="discard_hydrogen" name="discard_hydrogen" checked>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <label for="discard_water" class="form-check-label">Discard water molecules</label>
+                        <input class="form-check-input" type="checkbox" id="discard_water" name="discard_water" checked>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="discard_chains" class="form-check-label">Chains to discard</label>
+                        <input class="form-number-input" type="text" id="discard_chains" name="discard_chains" value="">
+                    </div>
+
+
+
+                    <div class="form-group mb-3">
+                        <label for="max_neighbor_number" class="form-check-label">Neighbor to consider for scoring</label>
+                        <input class="form-number-input" type="number" id="max_neighbor_number" name="max_neighbor_number" 
+                            value="3" step="1" min="1" max="10" required>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="tag_threshold" class="form-check-label">Tag threshold</label>
+                        <input class="form-number-input" type="number" id="tag_threshold" name="tag_threshold" 
+                            value="1" step="1" min="1" max="20" required>
+                        <a><i>Tagged limit for a position to be considered as voxels</i></a>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="bad_score_threshold" class="form-check-label">Origin score threshold</label>
+                        <input class="form-number-input" type="number" id="bad_score_threshold" name="bad_score_threshold" 
+                            value="0.4" step="0.1" min="0.1" max="1" required>
+                        <a><i>Score limit to be consider as origin</i></a>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="good_score_threshold" class="form-check-label">Retaining score threshold</label>
+                        <input class="form-number-input" type="number" id="good_score_threshold" name="good_score_threshold" 
+                            value="0.2" step="0.1" min="0.1" max="1" required>
+                        <a><i>Score limit to retain a potential voxel as hotspot</i></a>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="number_of_rounds" class="form-check-label">Number of rounds</label>
+                        <input class="form-number-input" type="number" id="number_of_rounds" name="number_of_rounds" 
+                            value="1" step="1" min="1" max="5" required>
+                    </div>
+
+                    <hr class="my-3" />
 
                     <div class="mb-2">
                         <button type="button" class="btn btn-sm btn-primary" id="selectAllHotspot">

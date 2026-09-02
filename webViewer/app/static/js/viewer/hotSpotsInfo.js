@@ -46,12 +46,47 @@ function fillFilesInfo() {
     const filesNameDiv = document.getElementById("fileName");
     filesNameDiv.textContent = paramObject.pdb.name;
 
+    document.getElementById("grid_spacing").textContent = paramObject.params.global_parameters.grid_spacing;
+
     const pocketResNameDiv = document.getElementById("pocket_res_name");
-    if (paramObject.params.global_parameters.pocket_res_name != "") {
+    if (paramObject.params.global_parameters.pocket_res_name != "False") {
         pocketResNameDiv.textContent = paramObject.params.global_parameters.pocket_res_name;
     }else {
         pocketResNameDiv.textContent = "No pocket residue name provided";
-    }    
+    }  
+
+    const pocket_res_idDiv = document.getElementById("pocket_res_id");
+    if (paramObject.params.global_parameters.pocket_res_id != "") {
+        pocket_res_idDiv.textContent = paramObject.params.global_parameters.pocket_res_id;
+    }else {
+        pocket_res_idDiv.textContent = "No pocket residue ID provided";
+    }
+
+    const lig_chainDiv = document.getElementById("lig_chain");
+    if (paramObject.params.global_parameters.lig_chain != "False") {
+        lig_chainDiv.textContent = paramObject.params.global_parameters.lig_chain;
+    }else {
+        lig_chainDiv.textContent = "No ligand chain provided";
+    }
+
+    document.getElementById("pocket_size").textContent = paramObject.params.global_parameters.pocket_size;
+    document.getElementById("discard_hetatm").textContent = paramObject.params.global_parameters.discard_hetatm;
+    document.getElementById("discard_hydrogen").textContent = paramObject.params.global_parameters.discard_hydrogen;
+    document.getElementById("discard_water").textContent = paramObject.params.global_parameters.discard_water;
+    
+    const discard_chainsDiv = document.getElementById("discard_chains");
+    if (paramObject.params.global_parameters.discard_chains != "") {
+        discard_chainsDiv.textContent = paramObject.params.global_parameters.discard_chains;
+    }else {
+        discard_chainsDiv.textContent = "No discard chains provided";
+    }
+
+    document.getElementById("max_neighbor_number").textContent = paramObject.params.hotspot_parameters.max_neighbor_number;
+    document.getElementById("tag_threshold").textContent = paramObject.params.hotspot_parameters.tag_threshold;
+    document.getElementById("bad_score_threshold").textContent = paramObject.params.hotspot_parameters.bad_score_threshold;
+    document.getElementById("good_score_threshold").textContent = paramObject.params.hotspot_parameters.good_score_threshold;
+    document.getElementById("number_of_rounds").textContent = paramObject.params.hotspot_parameters.number_of_rounds;
+
 }
 
 // input: parsedCif, typeBox: "grid" or "pocket"
