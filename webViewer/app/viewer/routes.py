@@ -84,7 +84,7 @@ def infoComparisonRequest():
     params.discard_hetatm = "True" if request.form.get('discard_hetatm') else "False"
     params.discard_hydrogen = "True" if request.form.get('discard_hydrogen') else "False"
     params.discard_water = "True" if request.form.get('discard_water') else "False"
-    params.keep_chains = request.form.get('keep_chains')
+    params.keep_chains = request.form.get('keep_chains') + "," if request.form.get('keep_chains') != "" else ""
 
     params.consider_elements = "True" if request.form.get('consider_elements') else "False"
     params.tmalign_reference = request.form.get('tmalign_reference') if request.form.get('tmalign_reference') else "False"
@@ -125,7 +125,7 @@ def infoHotSpotsRequest():
     params.discard_hetatm = "True" if request.form.get('discard_hetatm') else "False"
     params.discard_hydrogen = "True" if request.form.get('discard_hydrogen') else "False"
     params.discard_water = "True" if request.form.get('discard_water') else "False"
-    params.keep_chains = request.form.get('keep_chains')
+    params.keep_chains = request.form.get('keep_chains') + "," if request.form.get('keep_chains') != "" else ""
 
     params.max_neighbor_number = str(request.form.get('max_neighbor_number'))
     params.tag_threshold = str(request.form.get('tag_threshold'))
