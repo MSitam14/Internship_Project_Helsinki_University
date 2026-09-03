@@ -206,8 +206,6 @@ function extractModelsFromCIF(parsedCif) {
 
     const atomSite = block.atom_site;
 
-    console.log("atom_site:", atomSite);
-
     const modelField = "pdbx_PDB_model_num";
 
     if (!Array.isArray(atomSite[modelField])) {
@@ -223,8 +221,6 @@ function extractModelsFromCIF(parsedCif) {
     const uniqueModels = [
         ...new Set(modelNumbers)
     ].sort((a, b) => Number(a) - Number(b));
-
-    console.log("Modèles :", uniqueModels);
 
     const models = {};
 
@@ -636,8 +632,6 @@ onload = async function () {
     showLoading();
 
     userKey = await getUserKey();
-
-    console.log("userKey", userKey);
 
     if (userKey) {
         fetch(`/api-database-comparison/getDataWhithUserKey/` + userKey, {
