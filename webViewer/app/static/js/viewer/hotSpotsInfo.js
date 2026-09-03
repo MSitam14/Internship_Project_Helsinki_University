@@ -389,10 +389,29 @@ function connectButtonViewer(viewer) {
     const divButtonLevel = document.getElementById("buttonDiv3DMol-Tiers")
 
     for (let level = 0; level < 3; level++) {
+
+        let buttonName = '';
+        
+        switch (level) {
+            case 0:
+                buttonName = 'Explored voxels';
+                break;
+            case 1:
+                buttonName = 'Hotspots';
+                break;
+            case 2:
+                buttonName = `Cleaned Hotspots 
+                            <i class="bi bi-question-circle-fill" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                title = "Top scoring Hotspots with no overlap" >
+                            </i>`;
+                break;
+        }
+
+
         const blockHtml = `
         <div class="form-check form-switch mb-3">
             <input class="form-check-input" type="checkbox" id="buttonLevel_${level}" name="${level}" checked>
-            <label for="buttonLevel_${level}" class="form-check-label"> Level ${level + 1} </label>
+            <label for="buttonLevel_${level}" class="form-check-label">${buttonName}</label>
         </div>
         `;
         divButtonLevel.insertAdjacentHTML('beforeend', blockHtml);
