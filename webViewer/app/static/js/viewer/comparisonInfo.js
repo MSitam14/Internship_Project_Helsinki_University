@@ -431,11 +431,11 @@ function fillFilesInfo() {
     document.getElementById("discard_hydrogen").textContent = paramObject.params.global_parameters.discard_hydrogen;
     document.getElementById("discard_water").textContent = paramObject.params.global_parameters.discard_water;
 
-    const discard_chainsDiv = document.getElementById("discard_chains");
-    if (paramObject.params.global_parameters.discard_chains != "") {
-        discard_chainsDiv.textContent = paramObject.params.global_parameters.discard_chains;
+    const keep_chainsDiv = document.getElementById("keep_chains");
+    if (paramObject.params.global_parameters.keep_chains != "") {
+        keep_chainsDiv.textContent = paramObject.params.global_parameters.keep_chains;
     } else {
-        discard_chainsDiv.textContent = "No discard chains provided";
+        keep_chainsDiv.textContent = "No chains to provided";
     }
 
     document.getElementById("consider_elements").textContent = paramObject.params.comparison_parameters.consider_elements;
