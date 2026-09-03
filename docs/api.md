@@ -215,12 +215,14 @@ Example:
     "params": {
         "global_parameters": {
             "run_comparison": "False",
-            "run_hotspot": "True"
+            "run_hotspot": "True",
+            ...
         },
         "comparison_parameters": {},
         "hotspot_parameters": {
             "hotspot_type": "C.ar",
-            "number_of_rounds": "1"
+            "number_of_rounds": "1",
+            ...
         }
     },
     "pdb": {
