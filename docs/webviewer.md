@@ -60,7 +60,6 @@ The main application structure is:
 
 ```text
 webViewer/
-├── requirements.txt
 └── app/
     ├── __init__.py
     ├── models.py
@@ -289,13 +288,6 @@ The hotspot workflow is similar to the comparison workflow.
 6. The hotspot result page is displayed.
 7. JavaScript calls `/api-hot-comp/hotSpots`.
 8. The generated results are displayed.
-
-The main parameter groups are:
-
-```text
-global_parameters
-hotspot_parameters
-```
 
 ---
 

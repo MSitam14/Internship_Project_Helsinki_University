@@ -136,8 +136,7 @@ Performs a structural comparison between two molecular structures.
 The request must contain:
 
 * `params`
-* `pdb1`
-* `pdb2`
+* `pdbList`
 
 Example:
 
@@ -146,20 +145,18 @@ Example:
     "params": {
         "global_parameters": {
             "run_comparison": "True",
-            "run_hotspot": "False"
+            "run_hotspot": "False",
+            ...
         },
         "comparison_parameters": {
-            "tree": "structures"
+            "tree": "structures",
+            ...
         },
         "hotspot_parameters": {}
     },
-    "pdb1": {
-        "name": "structure_1.pdb",
-        "content": "ATOM ...\n"
-    },
-    "pdb2": {
-        "name": "structure_2.pdb",
-        "content": "ATOM ...\n"
+    "pdbList": {
+        "nameX": { "content": "PDB content X" },
+        ...
     }
 }
 ```
