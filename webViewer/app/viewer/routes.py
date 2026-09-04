@@ -86,6 +86,7 @@ def infoComparisonRequest():
     params.discard_water = "True" if request.form.get('discard_water') else "False"
     params.keep_chains = request.form.get('keep_chains') + "," if request.form.get('keep_chains') != "" else ""
 
+    params.dataset_status = "3" if request.form.get('dataset_status') else "4"
     params.consider_elements = "True" if request.form.get('consider_elements') else "False"
     params.tmalign_reference = request.form.get('tmalign_reference') if request.form.get('tmalign_reference') else "False"
 

@@ -438,10 +438,17 @@ function fillFilesInfo() {
         keep_chainsDiv.textContent = "No chains to provided";
     }
 
+    const dataset_statusDiv = document.getElementById("dataset_status");
+    if (paramObject.params.comparison_parameters.dataset_status === "3") {
+        dataset_statusDiv.textContent = "True";
+    } else {
+        dataset_statusDiv.textContent = "False";
+    }
+
     document.getElementById("consider_elements").textContent = paramObject.params.comparison_parameters.consider_elements;
 
     const tmalign_referenceDiv = document.getElementById("tmalign_reference");
-    if (paramObject.params.comparison_parameters.tmalign_reference != "None") {
+    if (paramObject.params.comparison_parameters.tmalign_reference != ("False" || "False")) {
         tmalign_referenceDiv.textContent = paramObject.params.comparison_parameters.tmalign_reference;
     } else {
         tmalign_referenceDiv.textContent = "No tmalign reference provided";

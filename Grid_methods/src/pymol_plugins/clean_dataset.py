@@ -212,7 +212,7 @@ def prepare_dataset(d_parameters):
 
         pdbs = [pdb.replace('.pdb', '') for pdb in pdbs]
         t_start = time.time()
-        if d_parameters['dataset_status'] == 0 or d_parameters['dataset_status'] == 1:
+        if d_parameters['dataset_status'] == 0 or d_parameters['dataset_status'] == 1 or d_parameters['dataset_status'] == 3:
             tmalign_reference = d_parameters['tmalign_reference']
             if tmalign_reference is None or tmalign_reference == 'first':
                 pdb_ref = pdbs[0]

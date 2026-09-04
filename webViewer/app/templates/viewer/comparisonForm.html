@@ -71,16 +71,21 @@
 
 
                     <div class="form-check form-switch mb-3">
-                        <label for="consider_elements" class="form-check-label">Consider elements</label>
-                        <input class="form-check-input" type="checkbox" id="consider_elements" name="consider_elements"
-                            checked>
+                        <label for="dataset_status" class="form-check-label">Align structures</label>
+                        <input class="form-check-input" type="checkbox" id="dataset_status" name="dataset_status">
+                        <a><i>Alignment based on Tmalign</i></a>
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="tmalign_reference" class="form-check-label">Tmalign reference</label>
-                        <input class="form-number-input" type="text" id="tmalign_reference" name="tmalign_reference"
-                            value="">
+                        <input class="form-number-input" type="text" id="tmalign_reference" name="tmalign_reference" value="" disabled>
                         <a><i>pdb file name without .pdb</i></a>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <label for="consider_elements" class="form-check-label">Consider elements</label>
+                        <input class="form-check-input" type="checkbox" id="consider_elements" name="consider_elements"
+                            checked>
                     </div>
 
                     <button type="submit" class="btn btn-primary">Run</button>

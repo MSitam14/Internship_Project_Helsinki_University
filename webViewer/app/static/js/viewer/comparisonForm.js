@@ -41,3 +41,15 @@ filesInput.addEventListener("change", () => {
         filesInput.setCustomValidity("");
     }
 });
+
+
+const dataset_statusInput = document.getElementById("dataset_status");
+
+dataset_statusInput.addEventListener("change", () => {
+    if (dataset_statusInput.checked) {
+        document.getElementById("tmalign_reference").disabled = false;
+    } else {
+        document.getElementById("tmalign_reference").disabled = true;
+        document.getElementById("tmalign_reference").value = "";
+    }
+});
